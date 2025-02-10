@@ -116,7 +116,7 @@
 
                 // Aggiungiamo una riga alla tabella
                 resultsHTML += `<tr>
-                    <td>${day}/${month}/${year}</td>
+                    <td>${day.toString().padStart(2, '0')}-${month}-${year}</td>
                     <td>${sunrise}${isDST ? " *" : ""}</td>
                     <td>${solarNoon}</td>
                     <td>${sunset}${isDST ? " *" : ""}</td>
@@ -129,7 +129,7 @@
         }
 
         function getSunTimes(date, lat, lon) {
-            // Converti la data in giorni giuliani
+            // Calcola il giorno giuliano
             const jd = toJulian(date);
 
             // Calcola il tempo siderale
@@ -152,10 +152,12 @@
             const sunset = mod(theta0 + deg(H), 360) / 15;
             const solarNoon = mod(theta0 - lon, 360) / 15;
 
+            // Converti in orari locali
+            const timezoneOffset = date.getTimezoneOffset() / 60;
             return {
-                sunrise: new Date(date.getTime() + (sunrise * 3600000)),
-                solarNoon: new Date(date.getTime() + (solarNoon * 3600000)),
-                sunset: new Date(date.getTime() + (sunset * 3600000))
+                sunrise: new Date(date.getTime() + (sunrise + timezoneOffset) * 3600000),
+                solarNoon: new Date(date.getTime() + (solarNoon + timezoneOffset) * 3600000),
+                sunset: new Date(date.getTime() + (sunset + timezoneOffset) * 3600000)
             };
         }
 
