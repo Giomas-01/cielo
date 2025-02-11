@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calcolo Culminazione della Luna per un Mese con SunCalc</title>
+    <title>Calcolo Culminazione della Luna per un Mese con Astronomy Engine</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -52,7 +52,7 @@
     </style>
 </head>
 <body>
-    <h1>Effemeridi della Luna mensili (SunCalc v3)</h1>
+    <h1>Effemeridi della Luna mensili (Astronomy Engine)</h1>
     <div class="container">
         <label for="latitude">Latitudine:</label>
         <input type="number" id="latitude" placeholder="Es. 45.28"><br>
@@ -77,8 +77,8 @@
         </tbody>
     </table>
 
-    <!-- Include SunCalc library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/suncalc/1.8.0/suncalc.min.js"></script>
+    <!-- Include Astronomy Engine library -->
+    <script src="https://cdn.jsdelivr.net/gh/cosinekitty/astronomy/js/astronomy.js"></script>
     <script>
         function calculateMonthlyMoonTimes() {
             const latitude = parseFloat(document.getElementById('latitude').value);
@@ -106,32 +106,11 @@
             for (let day = 1; day <= daysInMonth; day++) {
                 const date = new Date(year, month - 1, day); // Create date object
 
-                // Find moon culmination by checking altitude every 15 minutes during the day
-                const startOfDay = new Date(date);
-                startOfDay.setHours(0, 0, 0, 0); // Start of the day
-                const endOfDay = new Date(date);
-                endOfDay.setHours(23, 59, 59, 999); // End of the day
-
-                let maxAltitudeTime = null;
-                let maxAltitude = -Infinity;
-
-                // Check altitude every 15 minutes during the day
-                for (let hour = 0; hour <= 23; hour++) {
-                    for (let minute = 0; minute <= 45; minute += 15) { // Every 15 minutes
-                        const checkTime = new Date(startOfDay);
-                        checkTime.setHours(hour, minute, 0, 0); // Set time to current hour and minute
-                        const position = SunCalc.getPosition(checkTime, latitude, longitude);
-
-                        // Update max altitude if current altitude is higher
-                        if (position.altitude > maxAltitude) {
-                            maxAltitude = position.altitude;
-                            maxAltitudeTime = checkTime;
-                        }
-                    }
-                }
+                // Find moon culmination using Astronomy Engine
+                const culminationTime = findMoonCulmination(date, latitude, longitude);
 
                 // Format moon culmination time to local time (CET)
-                const moonCulminationLocal = formatTime(maxAltitudeTime);
+                const moonCulminationLocal = formatTime(culminationTime);
 
                 // Create a row for the table
                 const row = document.createElement('tr');
@@ -143,9 +122,42 @@
             }
         }
 
-        function formatTime(time) {
-            if (!time) return "Non visibile"; // Handle cases where moon culmination might not occur
-            return new Date(time).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+        function findMoonCulmination(date, latitude, longitude) {
+            const observer = astronomy.Observer(latitude, longitude, 0); // Altitude is not relevant here
+            const startOfDay = astronomy.Time.utc(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(), 0, 0, 0);
+            const endOfDay = astronomy.Time.utc(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(), 23, 59, 59);
+
+            let maxAltitudeTime = null;
+            let maxAltitude = -Infinity;
+
+            // Check altitude every 15 minutes during the day
+            let currentTime = startOfDay;
+            while (currentTime.compare(endOfDay) <= 0) {
+                const moonPos = astronomy.getMoon(currentTime);
+                const altAz = astronomy ObserverToAltAz(moonPos, observer);
+                if (altAz.altitude > maxAltitude) {
+                    maxAltitude = altAz.altitude;
+                    maxAltitudeTime = currentTime.clone();
+                }
+                currentTime = currentTime.addMinutes(15); // Increment by 15 minutes
+            }
+
+            return maxAltitudeTime ? astronomy.timeToUtcString(maxAltitudeTime) : null;
+        }
+
+        function formatTime(timeString) {
+            if (!timeString) return "Non visibile"; // Handle cases where moon culmination might not occur
+            const timeParts = timeString.split(' ');
+            const dateParts = timeParts[0].split('-');
+            const timeParts2 = timeParts[1].split(':');
+            const date = new Date(
+                parseInt(dateParts[0]), // Year
+                parseInt(dateParts[1]) - 1, // Month (0-based)
+                parseInt(dateParts[2]), // Day
+                parseInt(timeParts2[0]), // Hours
+                parseInt(timeParts2[1]) // Minutes
+            );
+            return date.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
         }
 
         function downloadTableAsCSV() {
