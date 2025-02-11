@@ -46,10 +46,13 @@
             background-color: #007BFF;
             color: white;
         }
+        #downloadButton {
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
-    <h1>Calcolo Orari del Sole per un Mese con SunCalc v3</h1>
+    <h1>Effemeridi del Sole mensili (SunCalc v3)</h1>
     <div class="container">
         <label for="latitude">Latitudine:</label>
         <input type="number" id="latitude" placeholder="Es. 45.28"><br>
@@ -62,6 +65,9 @@
 
         <button onclick="calculateMonthlySunTimes()">Calcola</button>
     </div>
+
+    <!-- Download Button -->
+    <button id="downloadButton" onclick="downloadTableAsCSV()">Scarica Tabella come CSV</button>
 
     <!-- Tabella dei risultati -->
     <table id="sunTimesTable">
@@ -128,6 +134,36 @@
         function formatTime(time) {
             if (!time) return "N/A"; // Handle cases where sunrise/sunset might not occur (e.g., near poles)
             return new Date(time).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function downloadTableAsCSV() {
+            const table = document.getElementById('sunTimesTable');
+            const rows = table.querySelectorAll('tr');
+
+            // Extract table headers
+            const headers = Array.from(rows[0].cells).map(cell => cell.textContent);
+
+            // Extract table data
+            const data = [];
+            for (let i = 1; i < rows.length; i++) {
+                const rowData = Array.from(rows[i].cells).map(cell => cell.textContent);
+                data.push(rowData.join(','));
+            }
+
+            // Combine headers and data into CSV format
+            const csvContent = [headers.join(','), ...data].join('\n');
+
+            // Create a downloadable link
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.setAttribute('hidden', true);
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'sun_times.csv');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
         }
     </script>
 </body>
