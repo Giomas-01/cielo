@@ -92,6 +92,10 @@
             localDate.setUTCHours(hours);
             localDate.setUTCMinutes(0);
             localDate.setUTCSeconds(0);
+
+            // Convert to CET (UTC+1)
+            localDate.setUTCHours(localDate.getUTCHours() + 1);
+
             return localDate.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
         }
 
