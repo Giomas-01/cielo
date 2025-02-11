@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calcolo Sorgere e Tramonto del Sole</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        .container {
+            display: inline-block;
+            text-align: left;
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        input, button {
+            margin: 10px 0;
+            padding: 8px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Calcolo Sorgere e Tramonto del Sole</h1>
+    <div class="container">
+        <label for="latitude">Latitudine:</label>
+        <input type="number" id="latitude" placeholder="Es. 45.28"><br>
+
+        <label for="longitude">Longitudine:</label>
+        <input type="number" id="longitude" placeholder="Es. 9.12"><br>
+
+        <label for="date">Data (YYYY-MM-DD):</label>
+        <input type="date" id="date"><br>
+
+        <button onclick="calculateSunTimes()">Calcola</button>
+
+        <div class="result" id="sunriseResult"></div>
+        <div class="result" id="sunsetResult"></div>
+    </div>
+
+    <script>
+        function calculateJulianDay(date) {
+            const A = Math.floor((14 - date.getMonth()) / 12);
+            const Y = date.getFullYear() + 4800 - A;
+            const M = date.getMonth() + 12 * A - 3;
+            return date.getDate() + Math.floor((153 * M + 2) / 5) + 365 * Y + Math.floor(Y / 4) - Math.floor(Y / 100) + Math.floor(Y / 400) - 32045;
+        }
+
+        function calculateSunriseAndSunset(julianDay, latitude, longitude) {
+            const n = julianDay - 2451545.0; // Days since J2000
+            const L = (280.460 + 0.9856474 * n) % 360; // Mean longitude of the Sun
+            const g = (357.528 + 0.9856003 * n) % 360; // Mean anomaly of the Sun
+            const lambda = L + 1.915 * Math.sin(toRadians(g)) + 0.020 * Math.sin(toRadians(2 * g)); // Ecliptic longitude
+            const epsilon = 23.439 - 0.0000004 * n; // Obliquity of the ecliptic
+            const delta = Math.asin(Math.sin(toRadians(epsilon)) * Math.sin(toRadians(lambda))); // Declination of the Sun
+            const omega = Math.acos((-Math.sin(toRadians(-0.83)) - Math.sin(toRadians(latitude)) * Math.sin(delta)) / (Math.cos(toRadians(latitude)) * Math.cos(delta))); // Hour angle
+
+            const sr = (720 - 4 * longitude - 2 * toDegrees(omega)) / 60; // Sunrise in hours
+            const ss = (720 - 4 * longitude + 2 * toDegrees(omega)) / 60; // Sunset in hours
+            return [sr, ss];
+        }
+
+        function toRadians(degrees) {
+            return degrees * Math.PI / 180;
+        }
+
+        function toDegrees(radians) {
+            return radians * 180 / Math.PI;
+        }
+
+        function formatTime(hours, date) {
+            const localDate = new Date(date);
+            localDate.setUTCHours(hours);
+            localDate.setUTCMinutes(0);
+            localDate.setUTCSeconds(0);
+            return localDate.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function calculateSunTimes() {
+            const latitude = parseFloat(document.getElementById('latitude').value);
+            const longitude = parseFloat(document.getElementById('longitude').value);
+            const dateString = document.getElementById('date').value;
+
+            if (isNaN(latitude) || isNaN(longitude) || !dateString) {
+                alert("Inserisci valori validi per latitudine, longitudine e data.");
+                return;
+            }
+
+            const date = new Date(dateString);
+            const julianDay = calculateJulianDay(date);
+
+            const [sunriseUTC, sunsetUTC] = calculateSunriseAndSunset(julianDay, latitude, longitude);
+
+            const sunriseLocal = formatTime(sunriseUTC, date);
+            const sunsetLocal = formatTime(sunsetUTC, date);
+
+            document.getElementById('sunriseResult').textContent = `Sorgere del Sole: ${sunriseLocal}`;
+            document.getElementById('sunsetResult').textContent = `Tramonto del Sole: ${sunsetLocal}`;
+        }
+    </script>
+</body>
+</html>
