@@ -57,12 +57,10 @@
 
     <button type="button" onclick="downloadCSV()" style="margin-top: 20px;">Scarica CSV</button>
 
-    <script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.0.0/astronomy.js"></script>
+    <script src="astronomy.js"></script>
     <script>
-        // Array per memorizzare i risultati
         let results = [];
 
-        // Funzione per calcolare la culminazione della Luna
         function calculateCulmination() {
             const latitude = parseFloat(document.getElementById('latitude').value);
             const longitude = parseFloat(document.getElementById('longitude').value);
@@ -74,20 +72,17 @@
             }
 
             try {
-                // Calcola la culminazione della Luna
                 const culminationTime = Astronomy.SearchHourly((time) => {
                     const observer = new Astronomy.Observer(latitude, longitude, 0);
                     const hourAngle = Astronomy.Moon.HourAngle(observer, time);
                     return hourAngle;
                 }, date);
 
-                // Aggiungi il risultato all'array
                 results.push({
                     date: date.toISOString().split('T')[0],
                     culmination: culminationTime.toUTCString()
                 });
 
-                // Aggiorna la tabella
                 updateTable();
             } catch (error) {
                 console.error("Errore durante il calcolo:", error);
@@ -95,10 +90,9 @@
             }
         }
 
-        // Funzione per aggiornare la tabella
         function updateTable() {
             const tbody = document.querySelector('#resultsTable tbody');
-            tbody.innerHTML = ''; // Pulisci la tabella
+            tbody.innerHTML = '';
 
             results.forEach(result => {
                 const row = document.createElement('tr');
@@ -110,27 +104,24 @@
             });
         }
 
-        // Funzione per scaricare i risultati come CSV
         function downloadCSV() {
             if (results.length === 0) {
                 alert("Nessun dato da scaricare.");
                 return;
             }
 
-            // Crea il contenuto CSV
             let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "Data,Ora Culminazione (UTC)\n"; // Intestazione
+            csvContent += "Data,Ora Culminazione (UTC)\n";
             results.forEach(result => {
                 csvContent += `${result.date},${result.culmination}\n`;
             });
 
-            // Crea un link per il download
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement('a');
             link.setAttribute('href', encodedUri);
             link.setAttribute('download', 'culminazione_luna.csv');
             document.body.appendChild(link);
-            link.click(); // Scarica il file
+            link.click();
         }
     </script>
 </body>
