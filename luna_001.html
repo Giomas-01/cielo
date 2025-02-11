@@ -106,7 +106,7 @@
             for (let day = 1; day <= daysInMonth; day++) {
                 const date = new Date(year, month - 1, day); // Create date object
 
-                // Find moon culmination by checking altitude throughout the day
+                // Find moon culmination by checking altitude every 15 minutes during the day
                 const startOfDay = new Date(date);
                 startOfDay.setHours(0, 0, 0, 0); // Start of the day
                 const endOfDay = new Date(date);
@@ -115,14 +115,18 @@
                 let maxAltitudeTime = null;
                 let maxAltitude = -Infinity;
 
-                // Check altitude every hour during the day
+                // Check altitude every 15 minutes during the day
                 for (let hour = 0; hour <= 23; hour++) {
-                    const checkTime = new Date(startOfDay);
-                    checkTime.setHours(hour, 0, 0, 0); // Set time to current hour
-                    const position = SunCalc.getPosition(checkTime, latitude, longitude);
-                    if (position.altitude > maxAltitude) {
-                        maxAltitude = position.altitude;
-                        maxAltitudeTime = checkTime;
+                    for (let minute = 0; minute <= 45; minute += 15) { // Every 15 minutes
+                        const checkTime = new Date(startOfDay);
+                        checkTime.setHours(hour, minute, 0, 0); // Set time to current hour and minute
+                        const position = SunCalc.getPosition(checkTime, latitude, longitude);
+
+                        // Update max altitude if current altitude is higher
+                        if (position.altitude > maxAltitude) {
+                            maxAltitude = position.altitude;
+                            maxAltitudeTime = checkTime;
+                        }
                     }
                 }
 
