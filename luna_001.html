@@ -57,15 +57,20 @@
 
     <button type="button" onclick="downloadCSV()" style="margin-top: 20px;">Scarica CSV</button>
 
-    <!-- Usa il CDN corretto per Astronomy Engine -->
-    <script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.0.0/umd/astronomy.min.js"></script>
     <script>
         let results = [];
 
-        function calculateCulmination() {
+        async function getMoonCulmination(latitude, longitude, date) {
+            const url = `https://api.open-meteo.com/v1/astronomy?latitude=${latitude}&longitude=${longitude}&start_date=${date}&end_date=${date}`;
+            const response = await fetch(url);
+            const data = await response.json();
+            return data.daily.moon_culmination[0];
+        }
+
+        async function calculateCulmination() {
             const latitude = parseFloat(document.getElementById('latitude').value);
             const longitude = parseFloat(document.getElementById('longitude').value);
-            const date = new Date(document.getElementById('date').value);
+            const date = document.getElementById('date').value;
 
             if (isNaN(latitude) || isNaN(longitude) || !date) {
                 alert("Inserisci coordinate e data validi.");
@@ -73,20 +78,11 @@
             }
 
             try {
-                // Calcola la culminazione della Luna
-                const culminationTime = Astronomy.SearchHourly((time) => {
-                    const observer = new Astronomy.Observer(latitude, longitude, 0);
-                    const hourAngle = Astronomy.Moon.HourAngle(observer, time);
-                    return hourAngle;
-                }, date);
-
-                // Aggiungi il risultato all'array
+                const culminationTime = await getMoonCulmination(latitude, longitude, date);
                 results.push({
-                    date: date.toISOString().split('T')[0],
-                    culmination: culminationTime.toUTCString()
+                    date: date,
+                    culmination: culminationTime
                 });
-
-                // Aggiorna la tabella
                 updateTable();
             } catch (error) {
                 console.error("Errore durante il calcolo:", error);
