@@ -131,7 +131,13 @@
 
                 // Search for the moment when the Moon's hour angle is zero
                 const culminationEvent = astronomy.searchHourAngleZero(astronomy.Moon, startOfDay, endOfDay, observer);
-                return astronomy.timeToUtcString(culminationEvent.time);
+
+                // Check if the event occurred within the day
+                if (culminationEvent.time.compare(startOfDay) >= 0 && culminationEvent.time.compare(endOfDay) <= 0) {
+                    return astronomy.timeToUtcString(culminationEvent.time);
+                } else {
+                    return null; // Event not within the day
+                }
             } catch (error) {
                 console.error(`No moon culmination found for ${date.toISOString().split('T')[0]}:`, error);
                 return null; // Return null if no culmination is found
