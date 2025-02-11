@@ -85,6 +85,7 @@
             const longitude = parseFloat(document.getElementById('longitude').value);
             const monthYearInput = document.getElementById('monthYear').value;
 
+            // Validate inputs
             if (isNaN(latitude) || isNaN(longitude) || !monthYearInput) {
                 alert("Inserisci valori validi per latitudine, longitudine e mese-anno.");
                 return;
@@ -123,18 +124,17 @@
         }
 
         function findMoonCulmination(date, latitude, longitude) {
-            const observer = astronomy.Observer(latitude, longitude, 0); // Altitude is not relevant here
-            const startOfDay = astronomy.Time.utc(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(), 0, 0, 0);
-            const endOfDay = astronomy.Time.utc(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(), 23, 59, 59);
-
             try {
+                const observer = astronomy.Observer(latitude, longitude, 0); // Altitude is not relevant here
+                const startOfDay = astronomy.Time.utc(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(), 0, 0, 0);
+                const endOfDay = astronomy.Time.utc(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(), 23, 59, 59);
+
                 // Search for the moment when the Moon's hour angle is zero
                 const culminationEvent = astronomy.searchHourAngleZero(astronomy.Moon, startOfDay, endOfDay, observer);
                 return astronomy.timeToUtcString(culminationEvent.time);
             } catch (error) {
-                // If no culmination occurs, return null
                 console.error(`No moon culmination found for ${date.toISOString().split('T')[0]}:`, error);
-                return null;
+                return null; // Return null if no culmination is found
             }
         }
 
