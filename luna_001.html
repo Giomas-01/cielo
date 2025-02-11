@@ -106,7 +106,7 @@
             for (let day = 1; day <= daysInMonth; day++) {
                 const date = new Date(year, month - 1, day); // Create date object
 
-                // Find moon culmination using Astronomy Engine
+                // Find moon culmination using Astronomy Engine's searchHourAngleZero
                 const culminationTime = findMoonCulmination(date, latitude, longitude);
 
                 // Format moon culmination time to local time (CET)
@@ -127,23 +127,15 @@
             const startOfDay = astronomy.Time.utc(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(), 0, 0, 0);
             const endOfDay = astronomy.Time.utc(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(), 23, 59, 59);
 
-            let maxAltitudeTime = null;
-            let maxAltitude = -Infinity;
-
-            // Check altitude every 15 minutes during the day
-            let currentTime = startOfDay;
-            while (currentTime.compare(endOfDay) <= 0) {
-                const moonPos = astronomy.getMoon(currentTime);
-                const altAz = astronomy.toAltAz(moonPos.ra, moonPos.dec, currentTime, observer);
-
-                if (altAz.altitude > maxAltitude) {
-                    maxAltitude = altAz.altitude;
-                    maxAltitudeTime = currentTime.clone();
-                }
-                currentTime = currentTime.addMinutes(15); // Increment by 15 minutes
+            try {
+                // Search for the moment when the Moon's hour angle is zero
+                const culminationEvent = astronomy.searchHourAngleZero(astronomy.Moon, startOfDay, endOfDay, observer);
+                return astronomy.timeToUtcString(culminationEvent.time);
+            } catch (error) {
+                // If no culmination occurs, return null
+                console.error(`No moon culmination found for ${date.toISOString().split('T')[0]}:`, error);
+                return null;
             }
-
-            return maxAltitudeTime ? astronomy.timeToUtcString(maxAltitudeTime) : null;
         }
 
         function formatTime(timeString) {
