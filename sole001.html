@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calcolo Sorgere e Tramonto del Sole</title>
+    <title>Calcolo Sorgere e Tramonto del Sole  v6</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -40,7 +40,7 @@
     </style>
 </head>
 <body>
-    <h1>Calcolo Sorgere e Tramonto del Sole</h1>
+    <h1>Calcolo Sorgere e Tramonto del Sole  v6</h1>
     <div class="container">
         <label for="latitude">Latitudine:</label>
         <input type="number" id="latitude" placeholder="Es. 45.28"><br>
@@ -72,11 +72,25 @@
             const lambda = L + 1.915 * Math.sin(toRadians(g)) + 0.020 * Math.sin(toRadians(2 * g)); // Ecliptic longitude
             const epsilon = 23.439 - 0.0000004 * n; // Obliquity of the ecliptic
             const delta = Math.asin(Math.sin(toRadians(epsilon)) * Math.sin(toRadians(lambda))); // Declination of the Sun
-            const omega = Math.acos((-Math.sin(toRadians(-0.83)) - Math.sin(toRadians(latitude)) * Math.sin(delta)) / (Math.cos(toRadians(latitude)) * Math.cos(delta))); // Hour angle
 
-            const sr = (720 - 4 * longitude - 2 * toDegrees(omega)) / 60; // Sunrise in hours
-            const ss = (720 - 4 * longitude + 2 * toDegrees(omega)) / 60; // Sunset in hours
+            // Hour angle
+            const omega = Math.acos((-Math.sin(toRadians(-0.83)) - Math.sin(toRadians(latitude)) * Math.sin(delta)) / (Math.cos(toRadians(latitude)) * Math.cos(delta)));
+
+            // Solar noon in local time
+            const solarNoonLocal = 720 - 4 * longitude - equationOfTime(n);
+
+            // Sunrise and sunset in local time
+            const sr = (solarNoonLocal - toDegrees(omega)) / 60; // Sunrise in hours
+            const ss = (solarNoonLocal + toDegrees(omega)) / 60; // Sunset in hours
+
             return [sr, ss];
+        }
+
+        function equationOfTime(n) {
+            const L = (280.460 + 0.9856474 * n) % 360; // Mean longitude of the Sun
+            const g = (357.528 + 0.9856003 * n) % 360; // Mean anomaly of the Sun
+            const lambda = L + 1.915 * Math.sin(toRadians(g)) + 0.020 * Math.sin(toRadians(2 * g)); // Ecliptic longitude
+            return 4 * (lambda - 0.0057183 - L); // Equation of time in minutes
         }
 
         function toRadians(degrees) {
