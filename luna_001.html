@@ -106,27 +106,28 @@
             for (let day = 1; day <= daysInMonth; day++) {
                 const date = new Date(year, month - 1, day); // Create date object
 
-                // Get moon positions
-                const times = SunCalc.getMoonTimes(date, latitude, longitude);
+                // Find moon culmination by checking altitude throughout the day
+                const startOfDay = new Date(date);
+                startOfDay.setHours(0, 0, 0, 0); // Start of the day
+                const endOfDay = new Date(date);
+                endOfDay.setHours(23, 59, 59, 999); // End of the day
 
-                // Fallback calculation if culmination is not provided
-                let moonCulminationTime = times.culmination;
-                if (!moonCulminationTime) {
-                    // Calculate culmination manually using Moon position at solar noon
-                    const solarNoon = SunCalc.getTimes(date, latitude, longitude).solarNoon;
-                    const moonPosition = SunCalc.getMoonIllumination(solarNoon);
-                    const moonAltitude = SunCalc.getPosition(solarNoon, latitude, longitude).altitude;
+                let maxAltitudeTime = null;
+                let maxAltitude = -Infinity;
 
-                    // If moon altitude is positive at solar noon, use it as culmination time
-                    if (moonAltitude > 0) {
-                        moonCulminationTime = solarNoon;
-                    } else {
-                        moonCulminationTime = null; // No valid culmination
+                // Check altitude every hour during the day
+                for (let hour = 0; hour <= 23; hour++) {
+                    const checkTime = new Date(startOfDay);
+                    checkTime.setHours(hour, 0, 0, 0); // Set time to current hour
+                    const position = SunCalc.getPosition(checkTime, latitude, longitude);
+                    if (position.altitude > maxAltitude) {
+                        maxAltitude = position.altitude;
+                        maxAltitudeTime = checkTime;
                     }
                 }
 
                 // Format moon culmination time to local time (CET)
-                const moonCulminationLocal = formatTime(moonCulminationTime);
+                const moonCulminationLocal = formatTime(maxAltitudeTime);
 
                 // Create a row for the table
                 const row = document.createElement('tr');
