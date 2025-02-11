@@ -134,7 +134,8 @@
             let currentTime = startOfDay;
             while (currentTime.compare(endOfDay) <= 0) {
                 const moonPos = astronomy.getMoon(currentTime);
-                const altAz = astronomy ObserverToAltAz(moonPos, observer);
+                const altAz = astronomy.toAltAz(moonPos.ra, moonPos.dec, currentTime, observer);
+
                 if (altAz.altitude > maxAltitude) {
                     maxAltitude = altAz.altitude;
                     maxAltitudeTime = currentTime.clone();
