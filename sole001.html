@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calcolo Sorgere e Tramonto del Sole con SunCalc</title>
+    <title>Calcolo Sorgere, Culminazione e Tramonto del Sole con SunCalc</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -40,7 +40,7 @@
     </style>
 </head>
 <body>
-    <h1>Calcolo Sorgere e Tramonto del Sole con SunCalc v1</h1>
+    <h1>Calcolo Sorgere, Culminazione e Tramonto del Sole con SunCalc  v2</h1>
     <div class="container">
         <label for="latitude">Latitudine:</label>
         <input type="number" id="latitude" placeholder="Es. 45.28"><br>
@@ -54,6 +54,7 @@
         <button onclick="calculateSunTimes()">Calcola</button>
 
         <div class="result" id="sunriseResult"></div>
+        <div class="result" id="solarNoonResult"></div>
         <div class="result" id="sunsetResult"></div>
     </div>
 
@@ -73,15 +74,17 @@
             // Create date object for the selected day
             const date = new Date(dateString);
 
-            // Calculate sunrise and sunset times using SunCalc
+            // Calculate sunrise, solar noon, and sunset times using SunCalc
             const times = SunCalc.getTimes(date, latitude, longitude);
 
             // Format times to local time (CET)
             const sunriseLocal = formatTime(times.sunrise);
+            const solarNoonLocal = formatTime(times.solarNoon);
             const sunsetLocal = formatTime(times.sunset);
 
             // Display results
             document.getElementById('sunriseResult').textContent = `Sorgere del Sole: ${sunriseLocal}`;
+            document.getElementById('solarNoonResult').textContent = `Culminazione: ${solarNoonLocal}`;
             document.getElementById('sunsetResult').textContent = `Tramonto del Sole: ${sunsetLocal}`;
         }
 
@@ -91,4 +94,4 @@
         }
     </script>
 </body>
-</html>
+</html
