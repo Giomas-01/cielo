@@ -109,8 +109,24 @@
                 // Get moon positions
                 const times = SunCalc.getMoonTimes(date, latitude, longitude);
 
+                // Fallback calculation if culmination is not provided
+                let moonCulminationTime = times.culmination;
+                if (!moonCulminationTime) {
+                    // Calculate culmination manually using Moon position at solar noon
+                    const solarNoon = SunCalc.getTimes(date, latitude, longitude).solarNoon;
+                    const moonPosition = SunCalc.getMoonIllumination(solarNoon);
+                    const moonAltitude = SunCalc.getPosition(solarNoon, latitude, longitude).altitude;
+
+                    // If moon altitude is positive at solar noon, use it as culmination time
+                    if (moonAltitude > 0) {
+                        moonCulminationTime = solarNoon;
+                    } else {
+                        moonCulminationTime = null; // No valid culmination
+                    }
+                }
+
                 // Format moon culmination time to local time (CET)
-                const moonCulminationLocal = formatTime(times.culmination);
+                const moonCulminationLocal = formatTime(moonCulminationTime);
 
                 // Create a row for the table
                 const row = document.createElement('tr');
