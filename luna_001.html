@@ -57,6 +57,7 @@
 
     <button type="button" onclick="downloadCSV()" style="margin-top: 20px;">Scarica CSV</button>
 
+    <!-- Usa la versione browser-compatibile di Astronomy Engine -->
     <script src="astronomy.js"></script>
     <script>
         let results = [];
@@ -72,17 +73,20 @@
             }
 
             try {
+                // Calcola la culminazione della Luna
                 const culminationTime = Astronomy.SearchHourly((time) => {
                     const observer = new Astronomy.Observer(latitude, longitude, 0);
                     const hourAngle = Astronomy.Moon.HourAngle(observer, time);
                     return hourAngle;
                 }, date);
 
+                // Aggiungi il risultato all'array
                 results.push({
                     date: date.toISOString().split('T')[0],
                     culmination: culminationTime.toUTCString()
                 });
 
+                // Aggiorna la tabella
                 updateTable();
             } catch (error) {
                 console.error("Errore durante il calcolo:", error);
