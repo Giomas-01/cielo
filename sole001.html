@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calcolo Sorgere, Culminazione e Tramonto del Sole con SunCalc</title>
+    <title>Calcolo Orari del Sole per un Mese con SunCalc</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -32,15 +32,24 @@
         button:hover {
             background-color: #0056b3;
         }
-        .result {
-            margin-top: 20px;
-            font-size: 18px;
-            font-weight: bold;
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background-color: #007BFF;
+            color: white;
         }
     </style>
 </head>
 <body>
-    <h1>Calcolo Sorgere, Culminazione e Tramonto del Sole con SunCalc  v2</h1>
+    <h1>Calcolo Orari del Sole per un Mese con SunCalc v3</h1>
     <div class="container">
         <label for="latitude">Latitudine:</label>
         <input type="number" id="latitude" placeholder="Es. 45.28"><br>
@@ -48,44 +57,72 @@
         <label for="longitude">Longitudine:</label>
         <input type="number" id="longitude" placeholder="Es. 9.12"><br>
 
-        <label for="date">Data (YYYY-MM-DD):</label>
-        <input type="date" id="date"><br>
+        <label for="monthYear">Mese-Anno (MM-YYYY):</label>
+        <input type="text" id="monthYear" placeholder="Es. 02-2025"><br>
 
-        <button onclick="calculateSunTimes()">Calcola</button>
-
-        <div class="result" id="sunriseResult"></div>
-        <div class="result" id="solarNoonResult"></div>
-        <div class="result" id="sunsetResult"></div>
+        <button onclick="calculateMonthlySunTimes()">Calcola</button>
     </div>
+
+    <!-- Tabella dei risultati -->
+    <table id="sunTimesTable">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Levata</th>
+                <th>Culminazione</th>
+                <th>Tramonto</th>
+            </tr>
+        </thead>
+        <tbody id="resultsBody">
+            <!-- I risultati verranno inseriti qui -->
+        </tbody>
+    </table>
 
     <!-- Include SunCalc library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/suncalc/1.8.0/suncalc.min.js"></script>
     <script>
-        function calculateSunTimes() {
+        function calculateMonthlySunTimes() {
             const latitude = parseFloat(document.getElementById('latitude').value);
             const longitude = parseFloat(document.getElementById('longitude').value);
-            const dateString = document.getElementById('date').value;
+            const monthYearInput = document.getElementById('monthYear').value;
 
-            if (isNaN(latitude) || isNaN(longitude) || !dateString) {
-                alert("Inserisci valori validi per latitudine, longitudine e data.");
+            if (isNaN(latitude) || isNaN(longitude) || !monthYearInput) {
+                alert("Inserisci valori validi per latitudine, longitudine e mese-anno.");
                 return;
             }
 
-            // Create date object for the selected day
-            const date = new Date(dateString);
+            // Parse month and year from input (format MM-YYYY)
+            const [month, year] = monthYearInput.split('-').map(Number);
+            if (isNaN(month) || isNaN(year) || month < 1 || month > 12) {
+                alert("Inserisci un mese e un anno validi nel formato MM-YYYY.");
+                return;
+            }
 
-            // Calculate sunrise, solar noon, and sunset times using SunCalc
-            const times = SunCalc.getTimes(date, latitude, longitude);
+            // Clear previous results
+            const resultsBody = document.getElementById('resultsBody');
+            resultsBody.innerHTML = '';
 
-            // Format times to local time (CET)
-            const sunriseLocal = formatTime(times.sunrise);
-            const solarNoonLocal = formatTime(times.solarNoon);
-            const sunsetLocal = formatTime(times.sunset);
+            // Calculate sun times for each day of the month
+            const daysInMonth = new Date(year, month, 0).getDate(); // Get number of days in the month
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(year, month - 1, day); // Create date object
+                const times = SunCalc.getTimes(date, latitude, longitude);
 
-            // Display results
-            document.getElementById('sunriseResult').textContent = `Sorgere del Sole: ${sunriseLocal}`;
-            document.getElementById('solarNoonResult').textContent = `Culminazione: ${solarNoonLocal}`;
-            document.getElementById('sunsetResult').textContent = `Tramonto del Sole: ${sunsetLocal}`;
+                // Format times to local time (CET)
+                const sunriseLocal = formatTime(times.sunrise);
+                const solarNoonLocal = formatTime(times.solarNoon);
+                const sunsetLocal = formatTime(times.sunset);
+
+                // Create a row for the table
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${date.toLocaleDateString('it-IT')}</td>
+                    <td>${sunriseLocal}</td>
+                    <td>${solarNoonLocal}</td>
+                    <td>${sunsetLocal}</td>
+                `;
+                resultsBody.appendChild(row);
+            }
         }
 
         function formatTime(time) {
@@ -94,4 +131,4 @@
         }
     </script>
 </body>
-</html
+</html>
