@@ -23,8 +23,8 @@
         // Cerchiamo il momento in cui l'angolo orario della Luna è zero
         const culminationEvent = Astronomy.SearchHourAngleZero(Astronomy.Moon, startOfDay, endOfDay, observer);
 
-        // Verifichiamo che l'evento si verifichi all'interno del giorno
-        if (culminationEvent.time.compare(startOfDay) >= 0 && culminationEvent.time.compare(endOfDay) <= 0) {
+        // Verifichiamo che l'evento sia valido
+        if (culminationEvent.time) {
           // Convertiamo l'ora UTC in locale (CET) e formattiamo
           const culminationCET = new Date(culminationEvent.time.toDate().getTime() + 3600 * 1000); // Aggiungiamo 1 ora per CET
           const hours = culminationCET.getUTCHours();
@@ -34,21 +34,24 @@
           // Mostriamo il risultato
           document.getElementById("culminationTime").innerText = `Culminazione della Luna: ${result}`;
         } else {
-          // Se l'evento non si verifica nel giorno specificato
+          // Se non viene trovato alcun evento di culminazione
           document.getElementById("culminationTime").innerText = "Culminazione della Luna: Non visibile";
         }
       } catch (error) {
-        // Gestione degli errori (es. se la Luna non transita sopra il meridiano locale quel giorno)
+        // Gestione degli errori
         console.error("Errore durante il calcolo della culminazione:", error);
-        document.getElementById("culminationTime").innerText = "Culminazione della Luna: Non visibile";
+        document.getElementById("culminationTime").innerText = "Culminazione della Luna: Errore nel calcolo";
       }
     }
+
+    // Funzione di avvio automatico per testare il codice
+    window.onload = calculateMoonCulmination;
   </script>
 </head>
 <body>
-  <h1>Calcolo Culminazione della Luna  16:10</h1>
+  <h1>Calcolo Culminazione della Luna  16:21</h1>
   <p>Data: 1 Febbraio 2025</p>
   <p id="culminationTime">Culminazione della Luna: Caricamento...</p>
-  <button onclick="calculateMoonCulmination()">Calcola Culminazione</button>
+  <button onclick="calculateMoonCulmination()">Ricalcola Culminazione</button>
 </body>
 </html>
