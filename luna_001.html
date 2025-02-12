@@ -28,7 +28,7 @@
     </style>
 </head>
 <body>
-    <h1>Calcolo Culminazione della Luna 12-2  11:54</h1>
+    <h1>Calcolo Culminazione della Luna 11:57</h1>
     <form id="moonForm">
         <label for="latitude">Latitudine:</label>
         <input type="text" id="latitude" placeholder="Es. 45.4642" required>
@@ -69,7 +69,8 @@
                 const response = await fetch(url);
                 const data = await response.json();
                 
-                console.log(data); // Aggiunto per esaminare la risposta dell'API
+                console.log(data); // Esamina l'intera risposta dell'API
+                console.log(data.days); // Aggiungi un log per vedere cosa c'è nel campo `days`
 
                 // Verifica se la risposta contiene i dati attesi
                 if (data && data.days && data.days[0] && data.days[0].astronomy && data.days[0].astronomy.moonculmination) {
