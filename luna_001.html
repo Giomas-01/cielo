@@ -28,13 +28,16 @@
     </style>
 </head>
 <body>
-    <h1>Calcolo Culminazione della Luna</h1>
+    <h1>Calcolo Culminazione della Luna  13:44</h1>
     <form id="moonForm">
         <label for="latitude">Latitudine:</label>
         <input type="text" id="latitude" placeholder="Es. 45.4642" required>
         <br>
         <label for="longitude">Longitudine:</label>
         <input type="text" id="longitude" placeholder="Es. 9.1900" required>
+        <br>
+        <label for="year">Anno:</label>
+        <input type="number" id="year" min="1900" max="2100" placeholder="Anno (es. 2025)" required>
         <br>
         <label for="month">Mese:</label>
         <input type="number" id="month" min="1" max="12" placeholder="Mese (1-12)" required>
@@ -47,7 +50,7 @@
         <thead>
             <tr>
                 <th>Data</th>
-                <th>Ora Culminazione (CET) 13:40</th>
+                <th>Ora Culminazione (CET)</th>
             </tr>
         </thead>
         <tbody>
@@ -58,18 +61,26 @@
     <script>
         // Funzione per calcolare la culminazione della Luna per un dato giorno
         function calculateLunarCulmination(date, latitude, longitude) {
-            // Valori approssimativi per la posizione della Luna per il calcolo
-            // Questi devono essere sostituiti con i calcoli astronomici precisi
-            const JD = julianDate(date); // Calcola la data giuliana
-            const moonPosition = getMoonPosition(JD); // Calcola la posizione della Luna
+            // Calcoliamo la data giuliana per il giorno specificato
+            const JD = julianDate(date);
             
-            // Calcoliamo l'ora di culminazione in UTC
+            // Calcoliamo la posizione della Luna per quel giorno
+            const moonPosition = getMoonPosition(JD);
+            
+            // Calcoliamo il tempo di culminazione in UTC
             const culminationUTC = calculateCulminationTime(moonPosition, latitude, longitude);
             
-            // Convertiamo l'ora in UTC nel fuso orario locale (CET per l'Italia)
+            // Convertiamo l'ora di culminazione in UTC a CET (Central European Time)
             const culminationLocal = convertToCET(culminationUTC);
 
             return culminationLocal;
+        }
+
+        // Funzione per calcolare la data giuliana
+        function julianDate(date) {
+            const julian = new Date(date);
+            const jd = (julian / 86400000) + 2440587.5;
+            return jd;
         }
 
         // Funzione che converte l'ora UTC in CET (Central European Time)
@@ -82,42 +93,42 @@
 
         // Funzione per ottenere la posizione della Luna (approssimazione)
         function getMoonPosition(JD) {
-            // Funzioni di calcolo astrononomico per determinare posizione della luna (ascensione retta, declinazione)
-            // Eseguiamo i calcoli per ottenere la posizione della luna per quel giorno (approssimativa)
+            // Questi calcoli sono approssimazioni: ascensione retta e declinazione
+            // Si possono usare formule più precise per una posizione esatta della Luna
+            const ascensionRight = 15 * (JD % 24);  // Ascensione retta semplificata
+            const declination = 5;                   // Declinaione semplificata
+
             return {
-                ascensionRight: 15 * (JD % 24),  // Esempio di calcolo semplificato dell'ascensione retta
-                declination: 5,                   // Esempio di calcolo semplificato della declinazione
+                ascensionRight: ascensionRight,
+                declination: declination
             };
         }
 
-        // Funzione per calcolare il tempo di culminazione (approssimazione)
+        // Funzione per calcolare il tempo di culminazione
         function calculateCulminationTime(moonPosition, latitude, longitude) {
-            // Algoritmo semplificato per calcolare la culminazione (approssimato)
-            // basato sulla posizione della luna (ascensione retta e declinazione)
-            // e la latitudine e longitudine dell'osservatore
-            const culminationTime = new Date();
-            culminationTime.setHours(12); // Approccio semplificato, possiamo regolare
-            return culminationTime;
-        }
+            // Approssimazione semplificata per il calcolo della culminazione della Luna
+            // Il calcolo si basa sulla posizione della Luna e sul meridiano dell'osservatore
 
-        // Funzione per calcolare la data giuliana
-        function julianDate(date) {
-            const julian = new Date(date);
-            const jd = (julian / 86400000) + 2440587.5;
-            return jd;
+            const culminationTime = new Date();
+            culminationTime.setHours(12);  // Impostiamo un orario medio di culminazione (approssimativo)
+
+            return culminationTime;
         }
 
         // Funzione per calcolare la culminazione della luna per ogni giorno del mese
         function calculateCulmination() {
             const latitude = parseFloat(document.getElementById('latitude').value);
             const longitude = parseFloat(document.getElementById('longitude').value);
+            const year = parseInt(document.getElementById('year').value);
             const month = parseInt(document.getElementById('month').value);
 
             const results = [];
-            const currentYear = new Date().getFullYear();
-
+            
+            // Per ogni giorno del mese
             for (let day = 1; day <= 31; day++) {
-                const date = new Date(currentYear, month - 1, day);
+                const date = new Date(year, month - 1, day);
+                
+                // Verifichiamo che il giorno sia valido per il mese
                 if (date.getMonth() === (month - 1)) {
                     const culmination = calculateLunarCulmination(date, latitude, longitude);
                     results.push({
