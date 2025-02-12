@@ -28,7 +28,7 @@
     </style>
 </head>
 <body>
-    <h1>Calcolo Culminazione della Luna  12:07</h1>
+    <h1>Calcolo Culminazione della Luna 12:10</h1>
     <form id="moonForm">
         <label for="latitude">Latitudine:</label>
         <input type="text" id="latitude" placeholder="Es. 45.4642" required>
@@ -60,16 +60,20 @@
     <script>
         let results = [];
 
-        async function getMoonCulmination(latitude, longitude, date) {
-            const url = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${latitude},${longitude}/${date}/next7days?key=JE3EXF46JDSAZYB7YN2Z2CDPE&contentType=json&include=fcst,obs,histfcst,stats,events`;
-            
+        async function getMoonCulmination(latitude, longitude, startDate) {
+            // Ottenere l'anno e il mese dalla data
+            const year = startDate.getFullYear();
+            const month = startDate.getMonth() + 1; // I mesi sono 0-indexed
+
+            const url = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${latitude},${longitude}/${year}-${month}-01/${year}-${month}-31?key=JE3EXF46JDSAZYB7YN2Z2CDPE&contentType=json&include=fcst,obs,histfcst,stats,events`;
+
             try {
                 const response = await fetch(url);
                 const data = await response.json();
                 if (data && data.days) {
                     return data.days.map(day => ({
                         date: day.datetime,
-                        culmination: day.moonculmination // Cambia a "moonculmination" se la risposta API lo fornisce
+                        culmination: day.moonculmination || 'Dati non disponibili' // Verifica il nome del campo corretto
                     }));
                 } else {
                     throw new Error("I dati per la culminazione della luna non sono disponibili.");
@@ -83,7 +87,7 @@
         async function calculateCulmination() {
             const latitude = parseFloat(document.getElementById('latitude').value);
             const longitude = parseFloat(document.getElementById('longitude').value);
-            const date = document.getElementById('date').value;
+            const date = new Date(document.getElementById('date').value);
 
             if (isNaN(latitude) || isNaN(longitude) || !date) {
                 alert("Inserisci coordinate e data validi.");
@@ -107,7 +111,7 @@
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${result.date}</td>
-                    <td>${result.culmination || 'Dati non disponibili'}</td>
+                    <td>${result.culmination}</td>
                 `;
                 tbody.appendChild(row);
             });
@@ -122,7 +126,7 @@
             let csvContent = "data:text/csv;charset=utf-8,";
             csvContent += "Data,Ora Culminazione (UTC)\n";
             results.forEach(result => {
-                csvContent += `${result.date},${result.culmination || 'Dati non disponibili'}\n`;
+                csvContent += `${result.date},${result.culmination}\n`;
             });
 
             const encodedUri = encodeURI(csvContent);
