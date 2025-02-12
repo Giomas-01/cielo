@@ -4,47 +4,38 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Calcolo Culminazione della Luna</title>
+  <script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.0.0/umd/astronomy.min.js"></script>
   <script>
-    // Funzione per calcolare la culminazione della luna
+    // Funzione per calcolare la culminazione della Luna
     function calculateMoonCulmination() {
-      const latitude = 45.45;  // Milano latitudine
-      const longitude = 9.19;  // Milano longitudine
+      const latitude = 45.45;  // Latitudine di Milano
+      const longitude = 9.19;   // Longitudine di Milano
       const date = new Date("2025-02-01T00:00:00Z");  // Data specificata
 
-      // Costanti per il calcolo (orbitali)
-      const J2000 = 2451545.0;  // Epoch J2000 (data di riferimento per l'astronomia)
-      const D = 297.8502042;  // Longitudine della Luna
-      const M = 357.5291092;  // Longitudine del Sole
+      // Creiamo un osservatore (posizione geografica)
+      const observer = new Astronomy.Observer(latitude, longitude, 0);
 
-      // Calcoliamo il numero di giorni da J2000
-      const JD = (date.getTime() / 86400000) + 2440587.5;
-      const T = (JD - J2000) / 36525;  // Tempo in secoli dal 1 gennaio 2000
+      // Calcoliamo la culminazione della Luna
+      const culminationTime = Astronomy.SearchHourly((time) => {
+        const hourAngle = Astronomy.Moon.HourAngle(observer, time);
+        return hourAngle;  // La culminazione avviene quando l'angolo orario è 0
+      }, date);
 
-      // Calcoliamo la posizione della Luna (approccio semplificato)
-      const N = 125.1228 - 0.0529538083 * (JD - J2000);  // Nodo ascendente della Luna
-      const i = 5.145396;  // Inclinazione dell'orbita lunare
-      const omega = 318.0634 + 0.1643573223 * (JD - J2000);  // Argomento del perigeo
+      // Convertiamo l'ora UTC in CET (UTC + 1)
+      const culminationCET = new Date(culminationTime.getTime() + 3600 * 1000);
 
-      const lambda = D + (1.915 * Math.sin(M * Math.PI / 180)) + (0.02 * Math.sin(2 * M * Math.PI / 180));
-      
-      // Calcolare il tempo di culminazione della Luna
-      const L = lambda + N;  // Longitudine della Luna
-      const CulminationUTC = 12 + (L / 360.0) * 24;  // La culminazione avviene quando la Luna è al meridiano locale
-
-      // Correzione per il fuso orario (CET = UTC + 1)
-      const CulminationCET = (CulminationUTC + 1) % 24;
-
-      // Mostriamo l'orario della culminazione
-      const hours = Math.floor(CulminationCET);
-      const minutes = Math.floor((CulminationCET - hours) * 60);
+      // Formattiamo l'ora
+      const hours = culminationCET.getUTCHours();
+      const minutes = culminationCET.getUTCMinutes();
       const result = `${hours}:${minutes < 10 ? '0' : ''}${minutes} CET`;
 
-      document.getElementById("culminationTime").innerText = result;
+      // Mostriamo il risultato
+      document.getElementById("culminationTime").innerText = `Culminazione della Luna: ${result}`;
     }
   </script>
 </head>
 <body>
-  <h1>Calcolo Culminazione della Luna  15:43</h1>
+  <h1>Calcolo Culminazione della Luna  15:49</h1>
   <p>Data: 1 Febbraio 2025</p>
   <p id="culminationTime">Culminazione della Luna: Caricamento...</p>
   <button onclick="calculateMoonCulmination()">Calcola Culminazione</button>
