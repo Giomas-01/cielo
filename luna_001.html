@@ -28,7 +28,7 @@
     </style>
 </head>
 <body>
-    <h1>Calcolo Culminazione della Luna  12/2 10:53 gpt</h1>
+    <h1>Calcolo Culminazione della Luna 12/2 11:13</h1>
     <form id="moonForm">
         <label for="latitude">Latitudine:</label>
         <input type="text" id="latitude" placeholder="Es. 45.4642" required>
@@ -60,26 +60,27 @@
     <script>
         let results = [];
 
-        // Funzione per ottenere la culminazione della luna
+        // Funzione per ottenere la culminazione della luna usando AstronomyAPI
         async function getMoonCulmination(latitude, longitude, date) {
-            // URL corretto per ottenere informazioni astronomiche
-            const url = `https://api.open-meteo.com/v1/astronomy?latitude=${latitude}&longitude=${longitude}&start_date=${date}&end_date=${date}`;
-            
+            const apiKey = '01d7a7d2-fbef-4076-b5f1-03383c67b814';  // Sostituisci con la tua API key di AstronomyAPI
+            const url = `https://api.astronomyapi.com/api/v2/studio/moon/culmination?latitude=${latitude}&longitude=${longitude}&date=${date}`;
+
             try {
-                // Effettuiamo la richiesta
-                const response = await fetch(url);
+                const response = await fetch(url, {
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`
+                    }
+                });
+
                 const data = await response.json();
-                
-                // Controlliamo la risposta
-                if (data && data.daily && data.daily.moon_culmination) {
-                    // Restituiamo l'ora di culminazione della luna
-                    return data.daily.moon_culmination[0];
+
+                // Verifica se i dati di culminazione sono disponibili
+                if (data && data.data && data.data.culmination) {
+                    return data.data.culmination.utc;  // Restituiamo l'orario in UTC
                 } else {
-                    // Se i dati non sono disponibili, lanciamo un errore
                     throw new Error("I dati per la culminazione della luna non sono disponibili.");
                 }
             } catch (error) {
-                // Gestione degli errori
                 console.error("Errore durante il recupero dei dati:", error);
                 throw new Error("Impossibile ottenere i dati dalla API.");
             }
