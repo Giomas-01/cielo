@@ -4,43 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Culminazione della Luna - Milano (1 Feb 2025)</title>
-    <script src="https://cdn.jsdelivr.net/npm/astro.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/astro.js@1.0.0/dist/astro.min.js"></script>
 </head>
 <body>
-    <h1>Culminazione della Luna - Milano (1 Feb 2025)  15:31</h1>
+    <h1>Culminazione della Luna - Milano (1 Feb 2025)  15:35</h1>
     <p id="culminationTime">Caricamento...</p>
 
     <script>
-        // Milano: latitudine 45.45, longitudine 9.19
+        // Definiamo le coordinate per Milano
         const latitude = 45.45;
         const longitude = 9.19;
         const date = new Date('2025-02-01T00:00:00Z'); // 1 Febbraio 2025
 
         // Funzione per calcolare la culminazione della Luna usando Astro.js
         function calculateMoonCulmination() {
-            // Calcola l'ora siderea per la longitudine
-            const siderealTime = Astro.sideralTime(date, longitude);
-
-            // Calcola l'ascensione retta e declinazione della Luna
+            // Calcoliamo la posizione della Luna (ascensione retta e declinazione)
             const moonPosition = Astro.moon(date);
 
-            // Formula per calcolare la culminazione (transito locale)
-            // Assumiamo che la culminazione avvenga quando l'ascensione retta della Luna coincide con l'ora siderea
+            // Calcoliamo l'ora siderea per Milano
+            const siderealTime = Astro.sideralTime(date, longitude);
+
+            // Calcoliamo la culminazione della Luna, che avviene quando l'ascensione retta della Luna è uguale all'ora siderea
             const culminationRA = moonPosition.ra;
             const culminationTime = siderealTime - culminationRA;
 
-            // Converto il risultato in ore locali
-            const culminationDate = new Date(date.getTime() + (culminationTime * 3600 * 1000)); // Converto in millisecondi
+            // Convertiamo il risultato in ore locali
+            const culminationDate = new Date(date.getTime() + (culminationTime * 3600 * 1000)); // Millisecondi
 
-            // Ora in formato legibile
+            // Ora della culminazione in formato leggibile
             const hours = culminationDate.getUTCHours();
             const minutes = culminationDate.getUTCMinutes();
             const timeString = `${hours}:${minutes < 10 ? '0' + minutes : minutes}`;
 
-            document.getElementById("culminationTime").textContent = `Culminazione della Luna: ${timeString} UTC (milano time)`;
+            // Mostriamo l'orario di culminazione
+            document.getElementById("culminationTime").textContent = `Culminazione della Luna: ${timeString} UTC (Milano Time)`;
         }
 
-        calculateMoonCulmination();
+        // Calcoliamo la culminazione quando la pagina è pronta
+        window.onload = calculateMoonCulmination;
     </script>
 </body>
 </html>
