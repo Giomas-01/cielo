@@ -14,11 +14,9 @@
 
             const observer = new Astronomy.Observer(latitude, longitude, 0);
 
-            // Correzione: Usa Search for Moon Culmination
             const culmination = Astronomy.SearchMoonCulmination(observer, date);
 
             if (culmination) {
-                // Convertiamo l'ora UTC in CET (UTC + 1)
                 const culminationCET = new Date(culmination.getTime() + 3600 * 1000);
 
                 const hours = culminationCET.getUTCHours().toString().padStart(2, '0');
@@ -36,7 +34,7 @@
 </head>
 
 <body>
-    <h1>Calcolo Culminazione della Luna  16:51</h1>
+    <h1>Calcolo Culminazione della Luna  16:51</h1>
     <p>Data: 1 Febbraio 2025</p>
     <p id="culminationTime">Culminazione della Luna: Caricamento...</p>
     <button onclick="calculateMoonCulmination()">Calcola Culminazione</button>
