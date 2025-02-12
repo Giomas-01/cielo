@@ -12,30 +12,35 @@
       const longitude = 9.19;   // Longitudine di Milano
       const date = new Date("2025-02-01T00:00:00Z");  // Data specificata
 
-      // Creiamo un osservatore (posizione geografica)
-      const observer = new Astronomy.Observer(latitude, longitude, 0);
+      try {
+        // Creiamo un osservatore (posizione geografica)
+        const observer = new Astronomy.Observer(latitude, longitude, 0);
 
-      // Calcoliamo la culminazione della Luna
-      const culminationTime = Astronomy.SearchHourly((time) => {
-        const hourAngle = Astronomy.Moon.HourAngle(observer, time);
-        return hourAngle;  // La culminazione avviene quando l'angolo orario è 0
-      }, date);
+        // Definiamo l'intervallo temporale per il giorno selezionato
+        const startOfDay = Astronomy.Time.utc(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(), 0, 0, 0);
+        const endOfDay = Astronomy.Time.utc(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(), 23, 59, 59);
 
-      // Convertiamo l'ora UTC in CET (UTC + 1)
-      const culminationCET = new Date(culminationTime.getTime() + 3600 * 1000);
+        // Cerchiamo il momento in cui l'angolo orario della Luna è zero
+        const culminationEvent = Astronomy.SearchHourAngleZero(Astronomy.Moon, startOfDay, endOfDay, observer);
 
-      // Formattiamo l'ora
-      const hours = culminationCET.getUTCHours();
-      const minutes = culminationCET.getUTCMinutes();
-      const result = `${hours}:${minutes < 10 ? '0' : ''}${minutes} CET`;
+        // Convertiamo l'ora UTC in locale (CET) e formattiamo
+        const culminationCET = new Date(culminationEvent.time.toDate().getTime() + 3600 * 1000); // Aggiungiamo 1 ora per CET
+        const hours = culminationCET.getUTCHours();
+        const minutes = culminationCET.getUTCMinutes();
+        const result = `${hours}:${minutes < 10 ? '0' : ''}${minutes} CET`;
 
-      // Mostriamo il risultato
-      document.getElementById("culminationTime").innerText = `Culminazione della Luna: ${result}`;
+        // Mostriamo il risultato
+        document.getElementById("culminationTime").innerText = `Culminazione della Luna: ${result}`;
+      } catch (error) {
+        // Gestione degli errori (es. se la Luna non transita sopra il meridiano locale quel giorno)
+        console.error("Errore durante il calcolo della culminazione:", error);
+        document.getElementById("culminationTime").innerText = "Culminazione della Luna: Non visibile";
+      }
     }
   </script>
 </head>
 <body>
-  <h1>Calcolo Culminazione della Luna  15:49</h1>
+  <h1>Calcolo Culminazione della Luna 16:05</h1>
   <p>Data: 1 Febbraio 2025</p>
   <p id="culminationTime">Culminazione della Luna: Caricamento...</p>
   <button onclick="calculateMoonCulmination()">Calcola Culminazione</button>
