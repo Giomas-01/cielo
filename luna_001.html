@@ -3,22 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calcolo Culminazione della Luna</title>
+    <title>Tabella Culminazione Luna</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        label, input, button {
-            margin: 5px;
-        }
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid black;
         }
         th, td {
-            border: 1px solid #ddd;
             padding: 8px;
             text-align: center;
         }
@@ -28,114 +22,97 @@
     </style>
 </head>
 <body>
-    <h1>Calcolo Culminazione della Luna 12:10</h1>
-    <form id="moonForm">
-        <label for="latitude">Latitudine:</label>
-        <input type="text" id="latitude" placeholder="Es. 45.4642" required>
-        <br>
-        <label for="longitude">Longitudine:</label>
-        <input type="text" id="longitude" placeholder="Es. 9.1900" required>
-        <br>
-        <label for="date">Data:</label>
-        <input type="date" id="date" required>
-        <br>
-        <button type="button" onclick="calculateCulmination()">Calcola</button>
-    </form>
 
-    <h2>Risultati</h2>
-    <table id="resultsTable">
-        <thead>
-            <tr>
-                <th>Data</th>
-                <th>Ora Culminazione (UTC)</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Risultati verranno inseriti qui -->
-        </tbody>
-    </table>
+<h1>Tabella Mensile Culminazione della Luna 13:04</h1>
+<table>
+    <thead>
+        <tr>
+            <th>Data</th>
+            <th>Ora di Culminazione (UTC)</th>
+        </tr>
+    </thead>
+    <tbody id="moonCulminationTable"></tbody>
+</table>
 
-    <button type="button" onclick="downloadCSV()" style="margin-top: 20px;">Scarica CSV</button>
+<script>
+    // Funzione per calcolare l'ora siderale di Greenwich (GST)
+    function calculateGST(julianDate) {
+        return 280.46061837 + 360.98564736629 * (julianDate - 2451545);
+    }
 
-    <script>
-        let results = [];
+    // Funzione per calcolare l'ora siderale locale (LST)
+    function calculateLST(gst, observerLongitude, observerOffset) {
+        let lst = gst + (observerLongitude / 15.0) + observerOffset;
+        return lst % 24; // Mantieni l'ora tra 0 e 24 ore
+    }
 
-        async function getMoonCulmination(latitude, longitude, startDate) {
-            // Ottenere l'anno e il mese dalla data
-            const year = startDate.getFullYear();
-            const month = startDate.getMonth() + 1; // I mesi sono 0-indexed
+    // Funzione per calcolare la posizione della Luna
+    function calculateMoonPosition(julianDate) {
+        // Approssimazione delle coordinate lunari
+        let AR = 4.4; // Ascensione retta (esempio)
+        let Decl = -23.5; // Declinazione (esempio)
+        return { AR, Decl };
+    }
 
-            const url = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${latitude},${longitude}/${year}-${month}-01/${year}-${month}-31?key=JE3EXF46JDSAZYB7YN2Z2CDPE&contentType=json&include=fcst,obs,histfcst,stats,events`;
+    // Funzione per calcolare la culminazione
+    function calculateMoonCulmination(observerLatitude, observerLongitude, julianDate, observerOffset) {
+        const gst = calculateGST(julianDate);
+        const lst = calculateLST(gst, observerLongitude, observerOffset);
 
-            try {
-                const response = await fetch(url);
-                const data = await response.json();
-                if (data && data.days) {
-                    return data.days.map(day => ({
-                        date: day.datetime,
-                        culmination: day.moonculmination || 'Dati non disponibili' // Verifica il nome del campo corretto
-                    }));
-                } else {
-                    throw new Error("I dati per la culminazione della luna non sono disponibili.");
-                }
-            } catch (error) {
-                console.error("Errore durante il recupero dei dati:", error);
-                throw error;
-            }
+        // Calcolare la posizione della Luna
+        const { AR, Decl } = calculateMoonPosition(julianDate);
+
+        // Determinare la culminazione
+        let culminationTime = lst - AR;
+        if (culminationTime < 0) {
+            culminationTime += 24; // Se il tempo è negativo, aggiungi 24 ore
         }
 
-        async function calculateCulmination() {
-            const latitude = parseFloat(document.getElementById('latitude').value);
-            const longitude = parseFloat(document.getElementById('longitude').value);
-            const date = new Date(document.getElementById('date').value);
+        return culminationTime;
+    }
 
-            if (isNaN(latitude) || isNaN(longitude) || !date) {
-                alert("Inserisci coordinate e data validi.");
-                return;
-            }
+    // Funzione per calcolare il giorno giuliano
+    function calculateJulianDate(year, month, day) {
+        const a = Math.floor((14 - month) / 12);
+        const y = year + 4800 - a;
+        const m = month + 12 * a - 3;
+        const jd = day + Math.floor((153 * m + 2) / 5) + 365 * y + Math.floor(y / 4) - Math.floor(y / 100) + Math.floor(y / 400) - 32045;
+        return jd;
+    }
 
-            try {
-                results = await getMoonCulmination(latitude, longitude, date);
-                updateTable();
-            } catch (error) {
-                console.error("Errore durante il calcolo:", error);
-                alert("Si è verificato un errore durante il calcolo. Controlla la console per ulteriori dettagli.");
-            }
+    // Funzione per generare la tabella della culminazione lunare
+    function generateMoonCulminationTable() {
+        const observerLatitude = 45.45; // Esempio: latitudine dell'Italia
+        const observerLongitude = 9.19; // Esempio: longitudine dell'Italia
+        const observerOffset = 1; // Fuso orario (UTC+1)
+
+        const year = 2025;
+        const month = 2; // Esempio: Febbraio
+
+        const daysInMonth = new Date(year, month, 0).getDate();
+
+        let tableBody = '';
+
+        for (let day = 1; day <= daysInMonth; day++) {
+            const julianDate = calculateJulianDate(year, month, day);
+            const culminationTime = calculateMoonCulmination(observerLatitude, observerLongitude, julianDate, observerOffset);
+
+            // Converti il tempo della culminazione in ore e minuti
+            const hours = Math.floor(culminationTime);
+            const minutes = Math.round((culminationTime - hours) * 60);
+            const culminationString = `${hours}:${minutes < 10 ? '0' : ''}${minutes} UTC`;
+
+            tableBody += `<tr><td>${year}-${month}-${day}</td><td>${culminationString}</td></tr>`;
         }
 
-        function updateTable() {
-            const tbody = document.querySelector('#resultsTable tbody');
-            tbody.innerHTML = '';
+        document.getElementById('moonCulminationTable').innerHTML = tableBody;
+    }
 
-            results.forEach(result => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${result.date}</td>
-                    <td>${result.culmination}</td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
+    // Genera la tabella al caricamento della pagina
+    window.onload = function() {
+        generateMoonCulminationTable();
+    };
+</script>
 
-        function downloadCSV() {
-            if (results.length === 0) {
-                alert("Nessun dato da scaricare.");
-                return;
-            }
-
-            let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "Data,Ora Culminazione (UTC)\n";
-            results.forEach(result => {
-                csvContent += `${result.date},${result.culmination}\n`;
-            });
-
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement('a');
-            link.setAttribute('href', encodedUri);
-            link.setAttribute('download', 'culminazione_luna.csv');
-            document.body.appendChild(link);
-            link.click();
-        }
-    </script>
 </body>
 </html>
