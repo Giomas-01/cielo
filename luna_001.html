@@ -28,7 +28,7 @@
     </style>
 </head>
 <body>
-    <h1>Calcolo Culminazione della Luna  12/2  10:26</h1>
+    <h1>Calcolo Culminazione della Luna  12/2 10:53 gpt</h1>
     <form id="moonForm">
         <label for="latitude">Latitudine:</label>
         <input type="text" id="latitude" placeholder="Es. 45.4642" required>
@@ -62,18 +62,26 @@
 
         // Funzione per ottenere la culminazione della luna
         async function getMoonCulmination(latitude, longitude, date) {
+            // URL corretto per ottenere informazioni astronomiche
             const url = `https://api.open-meteo.com/v1/astronomy?latitude=${latitude}&longitude=${longitude}&start_date=${date}&end_date=${date}`;
-            const response = await fetch(url);
-            const data = await response.json();
             
-            // Log dei dati per il debug
-            console.log(data);
-
-            // Controllo se i dati contengono il campo daily e moonrise
-            if (data.daily && data.daily.moonrise && data.daily.moonrise[0]) {
-                return data.daily.moonrise[0]; // Usa moonrise come esempio
-            } else {
-                throw new Error("I dati per la culminazione della luna non sono disponibili.");
+            try {
+                // Effettuiamo la richiesta
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                // Controlliamo la risposta
+                if (data && data.daily && data.daily.moon_culmination) {
+                    // Restituiamo l'ora di culminazione della luna
+                    return data.daily.moon_culmination[0];
+                } else {
+                    // Se i dati non sono disponibili, lanciamo un errore
+                    throw new Error("I dati per la culminazione della luna non sono disponibili.");
+                }
+            } catch (error) {
+                // Gestione degli errori
+                console.error("Errore durante il recupero dei dati:", error);
+                throw new Error("Impossibile ottenere i dati dalla API.");
             }
         }
 
@@ -90,6 +98,7 @@
             }
 
             try {
+                // Otteniamo l'ora di culminazione
                 const culminationTime = await getMoonCulmination(latitude, longitude, date);
                 results.push({
                     date: date,
@@ -97,6 +106,7 @@
                 });
                 updateTable();
             } catch (error) {
+                // In caso di errore, mostriamo un messaggio di errore
                 console.error("Errore durante il calcolo:", error);
                 alert("Si è verificato un errore durante il calcolo. Controlla la console per ulteriori dettagli.");
             }
