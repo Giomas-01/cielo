@@ -28,7 +28,7 @@
     </style>
 </head>
 <body>
-    <h1>Calcolo Culminazione della Luna  12/2  11:18</h1>
+    <h1>Calcolo Culminazione della Luna 12/2 11:23</h1>
     <form id="moonForm">
         <label for="latitude">Latitudine:</label>
         <input type="text" id="latitude" placeholder="Es. 45.4642" required>
@@ -60,23 +60,16 @@
     <script>
         let results = [];
 
-        // Funzione per ottenere la culminazione della luna usando AstronomyAPI
+        // Funzione per ottenere la culminazione della luna usando Open Meteo
         async function getMoonCulmination(latitude, longitude, date) {
-            const apiKey = '01d7a7d2-fbef-4076-b5f1-03383c67b814';  // La tua API Key di AstronomyAPI
-            const url = `https://api.astronomyapi.com/api/v2/studio/moon/culmination?latitude=${latitude}&longitude=${longitude}&date=${date}`;
+            const url = `https://api.open-meteo.com/v1/astronomy?latitude=${latitude}&longitude=${longitude}&start_date=${date}&end_date=${date}&timezone=UTC`;
 
             try {
-                const response = await fetch(url, {
-                    headers: {
-                        'Authorization': `Bearer ${apiKey}`
-                    }
-                });
-
+                const response = await fetch(url);
                 const data = await response.json();
 
-                // Verifica se i dati di culminazione sono disponibili
-                if (data && data.data && data.data.culmination) {
-                    return data.data.culmination.utc;  // Restituiamo l'orario in UTC
+                if (data && data.moon && data.moon.culmination) {
+                    return data.moon.culmination;
                 } else {
                     throw new Error("I dati per la culminazione della luna non sono disponibili.");
                 }
