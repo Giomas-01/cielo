@@ -64,7 +64,7 @@
             const url = `https://api.open-meteo.com/v1/astronomy?latitude=${latitude}&longitude=${longitude}&start_date=${date}&end_date=${date}`;
             const response = await fetch(url);
             const data = await response.json();
-            return data.daily.moon_culmination[0];
+            return data.daily.moonrise[0]; // Usiamo moonrise come esempio, ma OpenMeteo non fornisce direttamente la culminazione
         }
 
         async function calculateCulmination() {
