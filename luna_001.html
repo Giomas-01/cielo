@@ -28,7 +28,7 @@
     </style>
 </head>
 <body>
-    <h1>Calcolo Culminazione della Luna 12:00</h1>
+    <h1>Calcolo Culminazione della Luna  12:07</h1>
     <form id="moonForm">
         <label for="latitude">Latitudine:</label>
         <input type="text" id="latitude" placeholder="Es. 45.4642" required>
@@ -60,38 +60,26 @@
     <script>
         let results = [];
 
-        // Funzione per ottenere la culminazione della luna tramite Visual Crossing API
         async function getMoonCulmination(latitude, longitude, date) {
-            const apiKey = 'JE3EXF46JDSAZYB7YN2Z2CDPE'; // La tua chiave API di Visual Crossing
-            const url = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${latitude},${longitude}/${date}?key=${apiKey}&include=astronomy`;
-
+            const url = `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${latitude},${longitude}/${date}/next7days?key=JE3EXF46JDSAZYB7YN2Z2CDPE&contentType=json&include=fcst,obs,histfcst,stats,events`;
+            
             try {
                 const response = await fetch(url);
                 const data = await response.json();
-
-                console.log(data); // Esamina l'intera risposta dell'API
-                console.log(data.days); // Aggiungi un log per vedere cosa c'è nel campo `days`
-
-                // Esamina completamente la struttura di `days` per verificare se la culminazione è presente
-                if (data.days && data.days.length > 0) {
-                    console.log(data.days[0]); // Log del primo oggetto all'interno di `days`
-                    if (data.days[0].astronomy && data.days[0].astronomy.moonculmination) {
-                        const culminationTime = data.days[0].astronomy.moonculmination;
-                        return culminationTime;
-                    } else {
-                        throw new Error('I dati per la culminazione della luna non sono disponibili.');
-                    }
+                if (data && data.days) {
+                    return data.days.map(day => ({
+                        date: day.datetime,
+                        culmination: day.moonculmination // Cambia a "moonculmination" se la risposta API lo fornisce
+                    }));
                 } else {
-                    throw new Error('I dati per il giorno richiesto non sono disponibili.');
+                    throw new Error("I dati per la culminazione della luna non sono disponibili.");
                 }
-
             } catch (error) {
                 console.error("Errore durante il recupero dei dati:", error);
-                throw new Error("Impossibile ottenere i dati dalla API.");
+                throw error;
             }
         }
 
-        // Funzione per calcolare e visualizzare la culminazione
         async function calculateCulmination() {
             const latitude = parseFloat(document.getElementById('latitude').value);
             const longitude = parseFloat(document.getElementById('longitude').value);
@@ -103,11 +91,7 @@
             }
 
             try {
-                const culminationTime = await getMoonCulmination(latitude, longitude, date);
-                results.push({
-                    date: date,
-                    culmination: culminationTime
-                });
+                results = await getMoonCulmination(latitude, longitude, date);
                 updateTable();
             } catch (error) {
                 console.error("Errore durante il calcolo:", error);
@@ -115,7 +99,6 @@
             }
         }
 
-        // Funzione per aggiornare la tabella dei risultati
         function updateTable() {
             const tbody = document.querySelector('#resultsTable tbody');
             tbody.innerHTML = '';
@@ -124,13 +107,12 @@
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${result.date}</td>
-                    <td>${result.culmination}</td>
+                    <td>${result.culmination || 'Dati non disponibili'}</td>
                 `;
                 tbody.appendChild(row);
             });
         }
 
-        // Funzione per scaricare i risultati come CSV
         function downloadCSV() {
             if (results.length === 0) {
                 alert("Nessun dato da scaricare.");
@@ -140,7 +122,7 @@
             let csvContent = "data:text/csv;charset=utf-8,";
             csvContent += "Data,Ora Culminazione (UTC)\n";
             results.forEach(result => {
-                csvContent += `${result.date},${result.culmination}\n`;
+                csvContent += `${result.date},${result.culmination || 'Dati non disponibili'}\n`;
             });
 
             const encodedUri = encodeURI(csvContent);
