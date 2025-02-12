@@ -28,7 +28,7 @@
     </style>
 </head>
 <body>
-    <h1>Calcolo Culminazione della Luna 12/2 11:51</h1>
+    <h1>Calcolo Culminazione della Luna 12-2  11:54</h1>
     <form id="moonForm">
         <label for="latitude">Latitudine:</label>
         <input type="text" id="latitude" placeholder="Es. 45.4642" required>
@@ -69,14 +69,15 @@
                 const response = await fetch(url);
                 const data = await response.json();
                 
-                // Verifica se i dati sono presenti
-                if (!data || !data.days || data.days.length === 0) {
+                console.log(data); // Aggiunto per esaminare la risposta dell'API
+
+                // Verifica se la risposta contiene i dati attesi
+                if (data && data.days && data.days[0] && data.days[0].astronomy && data.days[0].astronomy.moonculmination) {
+                    const culminationTime = data.days[0].astronomy.moonculmination;
+                    return culminationTime;
+                } else {
                     throw new Error('I dati per la culminazione della luna non sono disponibili.');
                 }
-
-                // Estrai l'ora di culminazione dalla risposta
-                const culminationTime = data.days[0].astronomy.moonculmination;
-                return culminationTime;
 
             } catch (error) {
                 console.error("Errore durante il recupero dei dati:", error);
