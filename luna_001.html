@@ -1,52 +1,52 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Culminazione della Luna - Milano (1 Feb 2025)  15:38</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calcolo Culminazione della Luna</title>
+  <script>
+    // Funzione per calcolare la culminazione della luna
+    function calculateMoonCulmination() {
+      const latitude = 45.45;  // Milano latitudine
+      const longitude = 9.19;  // Milano longitudine
+      const date = new Date("2025-02-01T00:00:00Z");  // Data specificata
+
+      // Costanti per il calcolo (orbitali)
+      const J2000 = 2451545.0;  // Epoch J2000 (data di riferimento per l'astronomia)
+      const D = 297.8502042;  // Longitudine della Luna
+      const M = 357.5291092;  // Longitudine del Sole
+
+      // Calcoliamo il numero di giorni da J2000
+      const JD = (date.getTime() / 86400000) + 2440587.5;
+      const T = (JD - J2000) / 36525;  // Tempo in secoli dal 1 gennaio 2000
+
+      // Calcoliamo la posizione della Luna (approccio semplificato)
+      const N = 125.1228 - 0.0529538083 * (JD - J2000);  // Nodo ascendente della Luna
+      const i = 5.145396;  // Inclinazione dell'orbita lunare
+      const omega = 318.0634 + 0.1643573223 * (JD - J2000);  // Argomento del perigeo
+
+      const lambda = D + (1.915 * Math.sin(M * Math.PI / 180)) + (0.02 * Math.sin(2 * M * Math.PI / 180));
+      
+      // Calcolare il tempo di culminazione della Luna
+      const L = lambda + N;  // Longitudine della Luna
+      const CulminationUTC = 12 + (L / 360.0) * 24;  // La culminazione avviene quando la Luna è al meridiano locale
+
+      // Correzione per il fuso orario (CET = UTC + 1)
+      const CulminationCET = (CulminationUTC + 1) % 24;
+
+      // Mostriamo l'orario della culminazione
+      const hours = Math.floor(CulminationCET);
+      const minutes = Math.floor((CulminationCET - hours) * 60);
+      const result = `${hours}:${minutes < 10 ? '0' : ''}${minutes} CET`;
+
+      document.getElementById("culminationTime").innerText = result;
+    }
+  </script>
 </head>
 <body>
-    <h1>Culminazione della Luna - Milano (1 Feb 2025)</h1>
-    <p id="culminationTime">Caricamento...</p>
-
-    <script>
-        // Funzione per calcolare la culminazione della Luna usando equazioni semplificate
-        function calculateMoonCulmination() {
-            // Parametri di base
-            const latitude = 45.45;  // Milano (Latitudine)
-            const longitude = 9.19;  // Milano (Longitudine)
-            const date = new Date('2025-02-01T00:00:00Z'); // 1 Febbraio 2025
-
-            // Calcolare il giorno dell'anno
-            const startOfYear = new Date('2025-01-01T00:00:00Z');
-            const dayOfYear = Math.floor((date - startOfYear) / (1000 * 60 * 60 * 24)) + 1;
-
-            // Fase lunare
-            const T = (dayOfYear - 1) / 36525; // Tempo Julian
-            const L0 = 280.46646 + 36000.76983 * T;  // Longitudine del Sole
-            const M = 357.52911 + 35999.05029 * T;  // Anomalia del Sole
-
-            // Calcolo della longitudine della Luna
-            const L = 218.31617 + 481267.88134 * T;  // Longitudine della Luna
-            const D = 297.85036 + 445267.11148 * T;  // Longitudine della perigeo lunare
-
-            // Calcoliamo la culminazione della Luna in ore
-            let culminationTimeUTC = 12.0 + (L - 180.0) / 360.0 * 24; // Calcoliamo l'ora UTC della culminazione
-
-            // Convertiamo il risultato in ore locali (CET = UTC + 1)
-            const culminationTimeCET = culminationTimeUTC + 1;  // Milano è UTC +1
-
-            // Convertiamo l'ora in formato leggibile
-            const hours = Math.floor(culminationTimeCET);
-            const minutes = Math.round((culminationTimeCET - hours) * 60);
-            const timeString = `${hours}:${minutes < 10 ? '0' + minutes : minutes}`;
-
-            // Mostriamo l'orario di culminazione
-            document.getElementById("culminationTime").textContent = `Culminazione della Luna: ${timeString} CET`;
-        }
-
-        // Calcoliamo la culminazione quando la pagina è pronta
-        window.onload = calculateMoonCulmination;
-    </script>
+  <h1>Calcolo Culminazione della Luna  15:43</h1>
+  <p>Data: 1 Febbraio 2025</p>
+  <p id="culminationTime">Culminazione della Luna: Caricamento...</p>
+  <button onclick="calculateMoonCulmination()">Calcola Culminazione</button>
 </body>
 </html>
