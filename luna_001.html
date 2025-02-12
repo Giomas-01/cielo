@@ -3,71 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calcolo Culminazione della Luna</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        label, input, button {
-            margin: 5px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-    </style>
+    <title>Culminazione della Luna</title>
 </head>
 <body>
-    <h1>Calcolo Culminazione della Luna  13:48</h1>
-    <form id="moonForm">
-        <label for="latitude">Latitudine:</label>
-        <input type="text" id="latitude" placeholder="Es. 45.4642" required>
-        <br>
-        <label for="longitude">Longitudine:</label>
-        <input type="text" id="longitude" placeholder="Es. 9.1900" required>
-        <br>
-        <label for="year">Anno:</label>
-        <input type="number" id="year" min="1900" max="2100" placeholder="Anno (es. 2025)" required>
-        <br>
-        <label for="month">Mese:</label>
-        <input type="number" id="month" min="1" max="12" placeholder="Mese (1-12)" required>
-        <br>
-        <button type="button" onclick="calculateCulmination()">Calcola</button>
-    </form>
-
-    <h2>Risultati</h2>
-    <table id="resultsTable">
-        <thead>
-            <tr>
-                <th>Data</th>
-                <th>Ora Culminazione (CET)</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Risultati verranno inseriti qui -->
-        </tbody>
-    </table>
+    <h1>Calcolatore della Culminazione della Luna per Milano  15:00</h1>
+    <p>Data: <strong>1 Febbraio 2025</strong></p>
+    <p>Ora della culminazione della Luna a Milano (CET): <span id="culmination-time">Caricamento...</span></p>
 
     <script>
-        // Funzione per calcolare la culminazione della Luna per un dato giorno
-        function calculateLunarCulmination(date, latitude, longitude) {
-            const JD = julianDate(date); // Calcoliamo la data giuliana
-            const moonPosition = getMoonPosition(JD); // Calcoliamo la posizione della Luna
-            const culminationUTC = calculateCulminationTime(moonPosition, latitude, longitude); // Calcoliamo la culminazione
-            const culminationLocal = convertToCET(culminationUTC); // Convertiamo a CET
-            return culminationLocal;
-        }
-
         // Funzione per calcolare la data giuliana
         function julianDate(date) {
             const julian = new Date(date);
@@ -75,85 +18,72 @@
             return jd;
         }
 
-        // Funzione che converte l'ora UTC in CET (Central European Time)
-        function convertToCET(utcTime) {
-            const cetOffset = 1; // CET (UTC +1)
-            const date = new Date(utcTime);
-            date.setHours(date.getHours() + cetOffset);
-            return date.toLocaleTimeString();
-        }
-
-        // Funzione per calcolare la posizione della Luna (approssimazione)
+        // Funzione per calcolare la posizione della Luna (approssimazione semplificata)
         function getMoonPosition(JD) {
-            // Formula semplificata per la posizione della Luna
             const T = (JD - 2451545.0) / 36525.0;  // Tempo in secoli dal J2000.0
-            const L0 = (280.46646 + 36000.76983 * T + 0.0003032 * T * T) % 360;  // Longitudine media del Sole
-            const M = (357.52911 + 35999.05029 * T - 0.0001537 * T * T) % 360;  // Anomalia media del Sole
-            const e = 0.016708634 - 0.000042037 * T - 0.0000001267 * T * T;  // Eccentricità dell'orbita
-            const C = (1.914602 - 0.004817 * T - 0.000014 * T * T) * Math.sin(M * Math.PI / 180) +
-                (0.019993 - 0.000101 * T) * Math.sin(2 * M * Math.PI / 180) +
-                0.000289 * Math.sin(3 * M * Math.PI / 180); // Correzione dell'orbita
 
-            const sunLongitude = (L0 + C) % 360;  // Longitudine del Sole, includendo la correzione
-            const moonLongitude = (L0 + 180) % 360;  // Approssimazione posizione della Luna
+            // Longitudine media della Luna (approssimazione)
+            const L0 = (218.31617 + 481267.88134 * T) % 360;  // Longitudine media della Luna
+            const M = (134.963 + 477198.867398 * T) % 360;  // Anomalia media della Luna
+            const F = (93.272 + 483202.017538 * T) % 360;  // Argomento del perigeo
 
-            // Return posizioni semplificate: la posizione della Luna rispetto al Sole
+            // Calcoliamo la posizione della Luna (approssimazione semplificata)
+            const lunarLongitude = L0 + 6.289 * Math.sin(M * Math.PI / 180); // Longitudine della Luna
+            const lunarLatitude = 5.128 * Math.sin(F * Math.PI / 180); // Latitudine della Luna
+            const declination = lunarLatitude;  // Approssimazione della declinazione della Luna
+
+            // Restituiamo la posizione approssimata della Luna
             return {
-                ascensionRight: sunLongitude,  // Ascensione retta approssimata
-                declination: 5  // Approssimazione della declinazione
+                longitude: lunarLongitude,
+                declination: declination
             };
         }
 
-        // Funzione per calcolare il tempo di culminazione
-        function calculateCulminationTime(moonPosition, latitude, longitude) {
-            // Approssimazione semplificata per il calcolo della culminazione della Luna
-            const culminationTime = new Date();
-            const hourOfDay = 12 + (moonPosition.ascensionRight / 15);  // Approssimazione dell'ora di culminazione
-            culminationTime.setHours(hourOfDay);  // Impostiamo l'ora della culminazione
-            culminationTime.setMinutes(0);  // Reset minuti
-            return culminationTime;
+        // Funzione per calcolare l'ora di culminazione della Luna (approssimazione)
+        function calculateLunarCulmination(JD, latitude, longitude) {
+            const moonPosition = getMoonPosition(JD);
+
+            // Calcoliamo l'ascensione retta e declinazione della Luna
+            const sinDec = Math.sin(moonPosition.declination * Math.PI / 180);
+            const cosDec = Math.cos(moonPosition.declination * Math.PI / 180);
+
+            const observerLat = latitude * Math.PI / 180;
+            const observerLong = longitude;
+
+            // Calcolo dell'ora di culminazione (in tempo siderale)
+            const H = (observerLong - moonPosition.longitude) / 15; // Risultato in ore
+            const culminationTimeUTC = 12 + H;  // La culminazione avviene a mezzogiorno locale + H
+
+            return culminationTimeUTC;
         }
 
-        // Funzione per calcolare la culminazione della luna per ogni giorno del mese
-        function calculateCulmination() {
-            const latitude = parseFloat(document.getElementById('latitude').value);
-            const longitude = parseFloat(document.getElementById('longitude').value);
-            const year = parseInt(document.getElementById('year').value);
-            const month = parseInt(document.getElementById('month').value);
-
-            const results = [];
-            
-            // Per ogni giorno del mese
-            for (let day = 1; day <= 31; day++) {
-                const date = new Date(year, month - 1, day);
-                
-                // Verifica se la data è valida per il mese
-                if (date.getMonth() === (month - 1)) {
-                    const culmination = calculateLunarCulmination(date, latitude, longitude);
-                    results.push({
-                        date: date.toLocaleDateString(),
-                        culmination: culmination
-                    });
-                }
-            }
-
-            updateTable(results);
+        // Funzione per convertire in CET (fuso orario di Milano, UTC+1)
+        function convertToCET(utcTime) {
+            const cetOffset = 1; // CET (UTC +1)
+            let hours = Math.floor(utcTime);
+            let minutes = Math.floor((utcTime - hours) * 60);
+            hours = (hours + cetOffset) % 24; // Aggiungiamo l'offset CET (1 ora)
+            return `${hours}:${minutes < 10 ? '0' : ''}${minutes}`;
         }
 
-        // Funzione per aggiornare la tabella con i risultati
-        function updateTable(results) {
-            const tbody = document.querySelector('#resultsTable tbody');
-            tbody.innerHTML = '';
+        // Data per il 1 Febbraio 2025 (UTC)
+        const date = new Date("2025-02-01T00:00:00Z");  // 1 Feb 2025, 00:00 UTC
 
-            results.forEach(result => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${result.date}</td>
-                    <td>${result.culmination}</td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
+        // Calcoliamo la data giuliana
+        const JD = julianDate(date);
+
+        // Coordinate di Milano
+        const latitude = 45.4642;
+        const longitude = 9.1900;
+
+        // Calcoliamo l'ora di culminazione in UTC
+        const culminationUTC = calculateLunarCulmination(JD, latitude, longitude);
+
+        // Convertiamo in CET
+        const culminationCET = convertToCET(culminationUTC);
+
+        // Mostriamo il risultato nella pagina HTML
+        document.getElementById('culmination-time').innerText = culminationCET;
     </script>
 </body>
 </html>
