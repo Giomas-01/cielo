@@ -60,18 +60,30 @@
     <script>
         let results = [];
 
+        // Funzione per ottenere la culminazione della luna
         async function getMoonCulmination(latitude, longitude, date) {
             const url = `https://api.open-meteo.com/v1/astronomy?latitude=${latitude}&longitude=${longitude}&start_date=${date}&end_date=${date}`;
             const response = await fetch(url);
             const data = await response.json();
-            return data.daily.moonrise[0]; // Usiamo moonrise come esempio, ma OpenMeteo non fornisce direttamente la culminazione
+            
+            // Log dei dati per il debug
+            console.log(data);
+
+            // Controllo se i dati contengono il campo daily e moonrise
+            if (data.daily && data.daily.moonrise && data.daily.moonrise[0]) {
+                return data.daily.moonrise[0]; // Usa moonrise come esempio
+            } else {
+                throw new Error("I dati per la culminazione della luna non sono disponibili.");
+            }
         }
 
+        // Funzione per calcolare la culminazione
         async function calculateCulmination() {
             const latitude = parseFloat(document.getElementById('latitude').value);
             const longitude = parseFloat(document.getElementById('longitude').value);
             const date = document.getElementById('date').value;
 
+            // Controllo di validità dei dati
             if (isNaN(latitude) || isNaN(longitude) || !date) {
                 alert("Inserisci coordinate e data validi.");
                 return;
@@ -90,6 +102,7 @@
             }
         }
 
+        // Funzione per aggiornare la tabella dei risultati
         function updateTable() {
             const tbody = document.querySelector('#resultsTable tbody');
             tbody.innerHTML = '';
@@ -104,6 +117,7 @@
             });
         }
 
+        // Funzione per scaricare i risultati in formato CSV
         function downloadCSV() {
             if (results.length === 0) {
                 alert("Nessun dato da scaricare.");
