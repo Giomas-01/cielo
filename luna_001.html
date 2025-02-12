@@ -28,7 +28,7 @@
     </style>
 </head>
 <body>
-    <h1>Calcolo Culminazione della Luna 12/2 11:13</h1>
+    <h1>Calcolo Culminazione della Luna  12/2  11:18</h1>
     <form id="moonForm">
         <label for="latitude">Latitudine:</label>
         <input type="text" id="latitude" placeholder="Es. 45.4642" required>
@@ -62,7 +62,7 @@
 
         // Funzione per ottenere la culminazione della luna usando AstronomyAPI
         async function getMoonCulmination(latitude, longitude, date) {
-            const apiKey = '01d7a7d2-fbef-4076-b5f1-03383c67b814';  // Sostituisci con la tua API key di AstronomyAPI
+            const apiKey = '01d7a7d2-fbef-4076-b5f1-03383c67b814';  // La tua API Key di AstronomyAPI
             const url = `https://api.astronomyapi.com/api/v2/studio/moon/culmination?latitude=${latitude}&longitude=${longitude}&date=${date}`;
 
             try {
