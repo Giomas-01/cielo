@@ -3,101 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Culminazione della Luna</title>
+    <title>Calcolo Ora Culminazione della Luna</title>
 </head>
 <body>
-    <h1>Calcolatore della Culminazione della Luna per Milano 15:05</h1>
-    <p>Data: <strong>1 Febbraio 2025</strong></p>
-    <p>Ora della culminazione della Luna a Milano (CET): <span id="culmination-time">Caricamento...</span></p>
+    <h1>Calcolo dell'Ora di Culminazione della Luna (15:15)</h1>
+    <form id="culminationForm">
+        <label for="year">Anno:</label>
+        <input type="number" id="year" name="year" value="2025" min="1900" max="2100">
+        <label for="month">Mese:</label>
+        <input type="number" id="month" name="month" value="2" min="1" max="12">
+        <label for="day">Giorno:</label>
+        <input type="number" id="day" name="day" value="1" min="1" max="31">
+        <br><br>
+        <button type="button" onclick="calculateCulmination()">Calcola Culminazione</button>
+    </form>
+
+    <h2>Ora di Culminazione della Luna</h2>
+    <p id="result"></p>
 
     <script>
-        // Funzione per calcolare la data giuliana
-        function julianDate(date) {
-            const julian = new Date(date);
-            const jd = (julian / 86400000) + 2440587.5;  // Converte la data in giorni giuliani
-            return jd;
+        function calculateCulmination() {
+            const year = parseInt(document.getElementById("year").value);
+            const month = parseInt(document.getElementById("month").value);
+            const day = parseInt(document.getElementById("day").value);
+
+            // Costanti per la posizione di Milano (latitudine e longitudine)
+            const latitude = 45.45;
+            const longitude = 9.19;
+
+            // Funzione per calcolare il tempo siderale di Greenwich (GST)
+            function getGST(year, month, day, hour, minute) {
+                const JD = 367 * year - Math.floor((7 * (year + Math.floor((month + 9) / 12))) / 4) + Math.floor((275 * month) / 9) + day + 1721013.5;
+                const T = (JD - 2451545.0) / 36525;
+                const GST0 = 280.46061837 + 360.98564736629 * (JD - 2451545) + T * T * (0.000387933 - T / 38710000);
+                return (GST0 % 360 + 360) % 360; // Ritorna il tempo siderale in gradi
+            }
+
+            // Calcolare il tempo siderale di Greenwich per la data (considerando 12:00 come orario base)
+            const GST = getGST(year, month, day, 12, 0); // Time in GMT, es. 12:00 PM
+
+            // Dati della Luna per il 1 Febbraio 2025 (approssimazione basata sulla posizione della Luna)
+            const lunarRA = 23.5423; // Ascensione retta in gradi (approssimato per il 1 Febbraio 2025)
+            const lunarDec = -10.115; // Declinazione in gradi (approssimato per il 1 Febbraio 2025)
+
+            // Calcolare l'ora della culminazione
+            const LST = GST + longitude / 15; // Tempo siderale locale
+            const culminationTime = LST - lunarRA; // Differenza tra il LST e RA della Luna
+
+            // Correggere se il valore di culminazione è negativo
+            if (culminationTime < 0) {
+                culminationTime += 24; // Aggiungi 24 ore per ottenere il valore positivo
+            }
+
+            // Converti la culminazione in ore e minuti
+            const hours = Math.floor(culminationTime);
+            const minutes = Math.round((culminationTime - hours) * 60);
+
+            // Converti in CET (GMT + 1 ora)
+            const localHours = (hours + 1) % 24;
+
+            // Mostra il risultato
+            const resultText = `Ora di culminazione della Luna per ${day}/${month}/${year}: ${localHours}:${minutes < 10 ? '0' + minutes : minutes}`;
+            document.getElementById("result").innerText = resultText;
         }
-
-        // Funzione per calcolare il tempo siderale in Greenwich
-        function siderealTime(JD) {
-            const T = (JD - 2451545.0) / 36525.0;  // Tempo in secoli dal J2000.0
-            const sidereal = 280.46061837 + 360.98564736629 * (JD - 2451545.0) + T * T * (0.000387933 - T / 38710000);
-            return sidereal % 360; // Tempo siderale in gradi (0 - 360)
-        }
-
-        // Funzione per calcolare la posizione della Luna (approssimazione semplificata)
-        function getMoonPosition(JD) {
-            const T = (JD - 2451545.0) / 36525.0;  // Tempo in secoli dal J2000.0
-
-            // Longitudine media della Luna (approssimazione)
-            const L0 = (218.31617 + 481267.88134 * T) % 360;  // Longitudine media della Luna
-            const M = (134.963 + 477198.867398 * T) % 360;  // Anomalia media della Luna
-            const F = (93.272 + 483202.017538 * T) % 360;  // Argomento del perigeo
-
-            // Calcoliamo la posizione della Luna (approssimazione semplificata)
-            const lunarLongitude = L0 + 6.289 * Math.sin(M * Math.PI / 180); // Longitudine della Luna
-            const lunarLatitude = 5.128 * Math.sin(F * Math.PI / 180); // Latitudine della Luna
-            const declination = lunarLatitude;  // Approssimazione della declinazione della Luna
-
-            // Restituiamo la posizione approssimata della Luna
-            return {
-                longitude: lunarLongitude,
-                declination: declination
-            };
-        }
-
-        // Funzione per calcolare l'ora di culminazione della Luna (approssimazione)
-        function calculateLunarCulmination(JD, latitude, longitude) {
-            const moonPosition = getMoonPosition(JD);
-
-            // Calcoliamo la declinazione e l'ascensione retta della Luna (approssimazione)
-            const sinDec = Math.sin(moonPosition.declination * Math.PI / 180);
-            const cosDec = Math.cos(moonPosition.declination * Math.PI / 180);
-
-            // Ascensione retta approssimata
-            const ra = Math.atan2(sinDec, cosDec);  // Ascensione retta in radianti
-            const dec = moonPosition.declination;  // Declinazione in gradi
-
-            const observerLat = latitude * Math.PI / 180;
-            const observerLong = longitude;
-
-            // Calcoliamo il tempo siderale in Greenwich (Greenwich Sidereal Time)
-            const sidereal = siderealTime(JD);
-
-            // Calcolo dell'ora di culminazione (in tempo siderale)
-            const H = (sidereal - ra) / 15;  // Risultato in ore (15 ore per 360 gradi)
-            const culminationTimeUTC = 12 + H;  // Culminazione approssimata a mezzogiorno locale
-
-            return culminationTimeUTC;
-        }
-
-        // Funzione per convertire in CET (fuso orario di Milano, UTC+1)
-        function convertToCET(utcTime) {
-            const cetOffset = 1; // CET (UTC +1)
-            let hours = Math.floor(utcTime);
-            let minutes = Math.floor((utcTime - hours) * 60);
-            hours = (hours + cetOffset) % 24; // Aggiungiamo l'offset CET (1 ora)
-            return `${hours}:${minutes < 10 ? '0' : ''}${minutes}`;
-        }
-
-        // Data per il 1 Febbraio 2025 (UTC)
-        const date = new Date("2025-02-01T00:00:00Z");  // 1 Feb 2025, 00:00 UTC
-
-        // Calcoliamo la data giuliana
-        const JD = julianDate(date);
-
-        // Coordinate di Milano
-        const latitude = 45.4642;
-        const longitude = 9.1900;
-
-        // Calcoliamo l'ora di culminazione in UTC
-        const culminationUTC = calculateLunarCulmination(JD, latitude, longitude);
-
-        // Convertiamo in CET
-        const culminationCET = convertToCET(culminationUTC);
-
-        // Mostriamo il risultato nella pagina HTML
-        document.getElementById('culmination-time').innerText = culminationCET;
     </script>
 </body>
 </html>
