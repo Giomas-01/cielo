@@ -1,0 +1,15 @@
+Approccio e struttura del codice
+--------------------------------
+Dato che il codice deve essere eseguito in una pagina HTML su GitHub Pages, utilizzerò JavaScript per i calcoli e per la gestione del form e della tabella.
+
+L'approccio generale sarà il seguente:
+
+Form di input: Creerò un form HTML con i campi necessari (latitudine, longitudine, mese, anno).
+
+Funzione di calcolo: Scriverò una funzione JavaScript che, una volta ricevuti i dati dal form, eseguirà i seguenti passi:
+
+- Calcolo del giorno giuliano: Convertirò la data (mese, anno) in giorno giuliano, un formato numerico che semplifica i calcoli astronomici.
+- Calcolo dell'ora di culminazione: Utilizzerò un algoritmo astronomico appropriato (da ricercare e scegliere) per calcolare l'ora di culminazione della Luna per ogni giorno del mese specificato.
+- Conversione in ora locale: Convertirò l'ora di culminazione (probabilmente in tempo UTC) nell'ora locale del fuso orario specificato dalle coordinate (tenendo conto dell'ora legale).
+- Generazione della tabella: Creerò una tabella HTML con due colonne (data e ora) e popolerò la tabella con i risultati dei calcoli.
+- Gestione dell'ora legale: Implementerò la logica per gestire il passaggio tra ora solare e ora legale, basandomi sul fatto che il cambio avviene l'ultima domenica di marzo e ottobre.
