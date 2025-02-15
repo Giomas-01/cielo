@@ -75,8 +75,17 @@
             );
 
             const L = L_prime + correction; // Corrected longitude of the Moon
-            const ra = L * 15; // Convert degrees to hours for Right Ascension
-            return ra % 360; // Ensure RA is within 0-360 degrees
+
+            // Calculate Right Ascension from corrected longitude
+            const epsilon = 23.4393 - 0.0000003563 * n; // Obliquity of the ecliptic
+            const lambda = L + 1.397 * Math.sin(toRadians(M_prime)) + 0.000165 * Math.sin(toRadians(2 * M_prime)); // Ecliptic longitude
+            const beta = 5.128 * Math.sin(toRadians(F)); // Ecliptic latitude
+
+            const sinRA = Math.sin(toRadians(lambda)) * Math.cos(toRadians(epsilon)) - Math.tan(toRadians(beta)) * Math.sin(toRadians(epsilon));
+            const cosRA = Math.cos(toRadians(lambda));
+            const ra = toDegrees(Math.atan2(sinRA, cosRA)) % 360;
+
+            return ra;
         }
 
         function calculateLocalSiderealTime(date, longitude) {
@@ -101,8 +110,8 @@
             }
 
             const date = new Date(dateInput + 'T00:00:00Z'); // Midnight UTC
-            const latitude = 45.2740; // Latitude of Milano (Italy)
-            const longitude = 09.0934; // Longitude of Milano (Italy)
+            const latitude = 45.2740; // Latitude of Milan (Italy)
+            const longitude = 9.0934; // Longitude of Milan (Italy)
 
             try {
                 const julianDay = calculateJulianDay(date);
@@ -138,6 +147,10 @@
 
         function toRadians(degrees) {
             return degrees * Math.PI / 180;
+        }
+
+        function toDegrees(radians) {
+            return radians * 180 / Math.PI;
         }
     </script>
 </body>
