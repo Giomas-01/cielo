@@ -42,7 +42,7 @@
 <body>
     <h1>Calcolo Culminazione della Luna</h1>
     <div class="container">
-        <label for="date">Data (YYYY-MM-DD):</label>
+        <label for="date">Data (GG-MM-AAAA):</label>
         <input type="date" id="date"><br>
 
         <button onclick="calculateMoonCulmination()">Calcola Culminazione</button>
@@ -126,7 +126,10 @@
                 return;
             }
 
-            const date = new Date(dateInput + 'T00:00:00Z'); // Midnight UTC
+            // Convert date from YYYY-MM-DD to Date object
+            const [year, month, day] = dateInput.split('-').map(Number);
+            const date = new Date(year, month - 1, day);
+
             const latitude = 45.2740; // Latitude of Milan (Italy)
             const longitude = 9.0934; // Longitude of Milan (Italy)
 
@@ -152,10 +155,12 @@
                 // Format the result
                 const hours = localCulminationTime.getUTCHours();
                 const minutes = localCulminationTime.getUTCMinutes();
-                const result = `${hours}:${minutes < 10 ? '0' : ''}${minutes} CET`;
+                const formattedDate = formatDate(date);
+
+                const result = `${formattedDate} | Culminazione della Luna: ${hours}:${minutes < 10 ? '0' : ''}${minutes} CET`;
 
                 // Display the result
-                document.getElementById("culminationTime").innerText = `Culminazione della Luna: ${result}`;
+                document.getElementById("culminationTime").innerText = result;
             } catch (error) {
                 console.error("Errore durante il calcolo:", error);
                 document.getElementById("culminationTime").innerText = "Culminazione della Luna: Errore nel calcolo";
@@ -168,6 +173,13 @@
 
         function toDegrees(radians) {
             return radians * 180 / Math.PI;
+        }
+
+        function formatDate(date) {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}-${month}-${year}`;
         }
     </script>
 </body>
