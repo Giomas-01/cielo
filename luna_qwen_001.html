@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Calcolo Culminazione della Luna</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    label, input { display: block; margin-top: 10px; }
+    button { margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Calcolo orario di culminazione della Luna</h1>
+  <p>Inserisci la data/ora (in formato ISO, ad esempio: <code>2025-02-15T12:00</code>) e la longitudine dell’osservatore (in gradi, Est positivo):</p>
+  
+  <label for="dateInput">Data/ora (ISO):</label>
+  <input type="datetime-local" id="dateInput">
+  
+  <label for="longitudeInput">Longitudine (°):</label>
+  <input type="number" id="longitudeInput" step="0.01">
+  
+  <button onclick="calculateCulmination()">Calcola Culminazione</button>
+  
+  <p id="result"></p>
+  
+  <script>
+    // Converte un oggetto Date in Julian Date
+    function julianDate(date) {
+      return (date.getTime() / 86400000) + 2440587.5;
+    }
+
+    // Calcola il GMST (Greenwich Mean Sidereal Time) in ore
+    function computeGMST(JD) {
+      let D = JD - 2451545.0;
+      let GMST = 18.697374558 + 24.06570982441908 * D;
+      GMST = GMST % 24;
+      if (GMST < 0) GMST += 24;
+      return GMST;
+    }
+
+    // Calcola il Local Sidereal Time in ore, data la longitudine (°)
+    function computeLST(JD, longitude) {
+      let GMST = computeGMST(JD);
+      let LST = GMST + longitude / 15;
+      LST = LST % 24;
+      if (LST < 0) LST += 24;
+      return LST;
+    }
+
+    // Funzione approssimativa per calcolare l'ascensione retta della Luna (in ore)
+    function computeMoonRA(JD) {
+      // Calcolo approssimato basato su alcune componenti principali
+      let daysSinceEpoch = JD - 2451545.0;
+      
+      // Luna: lunghezza media (in gradi)
+      let L = 218.316 + 13.176396 * daysSinceEpoch;
+      L = L % 360;
+      if (L < 0) L += 360;
+      
+      // Luna: anomalia media (in gradi)
+      let M_moon = 134.963 + 13.064993 * daysSinceEpoch;
+      M_moon = M_moon % 360;
+      if (M_moon < 0) M_moon += 360;
+      
+      // Correzione principale per la longitudine ecliptica della Luna (in gradi)
+      let lon = L + 6.289 * Math.sin(M_moon * Math.PI / 180);
+      
+      // Obliquità dell'eclittica (approssimativamente, in gradi)
+      let epsilon = 23.439 - 0.0000004 * daysSinceEpoch;
+      
+      // Conversione in radianti
+      let lon_rad = lon * Math.PI / 180;
+      let eps_rad = epsilon * Math.PI / 180;
+      
+      // Supponiamo latitudine eclittica ≈ 0 (ulteriore semplificazione)
+      // Calcolo dell'ascensione retta (RA) in radianti
+      let RA_rad = Math.atan2(Math.sin(lon_rad) * Math.cos(eps_rad), Math.cos(lon_rad));
+      let RA_deg = RA_rad * 180 / Math.PI;
+      if (RA_deg < 0) RA_deg += 360;
+      
+      // Conversione in ore (15° corrispondono a 1 ora)
+      return RA_deg / 15;
+    }
+
+    // Trova l'istante di culminazione (in JD) risolvendo LST = RA della Luna con un metodo iterativo
+    function findCulmination(JD_initial, longitude) {
+      let JD = JD_initial;
+      let tolerance = 1e-6; // tolleranza in giorni
+      for (let i = 0; i < 10; i++) {
+        let RA = computeMoonRA(JD);      // in ore
+        let LST = computeLST(JD, longitude); // in ore
+        let diff = RA - LST;
+        // Normalizza la differenza nell'intervallo [-12, 12] ore
+        while(diff > 12) diff -= 24;
+        while(diff < -12) diff += 24;
+        
+        // Stima della derivata d(RA)/d(JD) con un piccolo delta
+        let delta = 0.001; // giorni
+        let RA2 = computeMoonRA(JD + delta);
+        let dRA_dt = (RA2 - RA) / delta;
+        let dLST_dt = 24.06570982441908; // velocità siderea approssimativa in ore/giorno
+        let derivative = dRA_dt - dLST_dt;
+        if (Math.abs(derivative) < 1e-6) break;
+        
+        // Aggiornamento Newton-Raphson: Δt = - (differenza) / (derivata)
+        let dt = - diff / derivative;
+        JD += dt;
+        if (Math.abs(dt) < tolerance) break;
+      }
+      return JD;
+    }
+
+    // Converte Julian Date in stringa ISO (in UTC)
+    function formatDateFromJD(JD) {
+      let unixTime = (JD - 2440587.5) * 86400000;
+      return new Date(unixTime).toISOString();
+    }
+
+    // Funzione richiamata al click del pulsante
+    function calculateCulmination() {
+      let dateInput = document.getElementById("dateInput").value;
+      let longitudeInput = parseFloat(document.getElementById("longitudeInput").value);
+      if (!dateInput || isNaN(longitudeInput)) {
+        document.getElementById("result").innerText = "Inserisci una data e una longitudine validi.";
+        return;
+      }
+      let date = new Date(dateInput);
+      let JD_initial = julianDate(date);
+      let JD_culm = findCulmination(JD_initial, longitudeInput);
+      let resultDate = formatDateFromJD(JD_culm);
+      document.getElementById("result").innerText = "La culminazione della Luna avviene il: " + resultDate + " (UTC)";
+    }
+  </script>
+</body>
+</html>
