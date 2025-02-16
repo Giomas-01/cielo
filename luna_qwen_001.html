@@ -42,8 +42,14 @@
 <body>
     <h1>Calcolo Culminazione della Luna</h1>
     <div class="container">
-        <label for="date">Data (GG-MM-AAAA):</label>
+        <label for="date">Data (YYYY-MM-DD):</label>
         <input type="date" id="date"><br>
+
+        <label for="latitude">Latitudine:</label>
+        <input type="number" id="latitude" placeholder="Es. 45.2740"><br>
+
+        <label for="longitude">Longitudine:</label>
+        <input type="number" id="longitude" placeholder="Es. 9.0934"><br>
 
         <button onclick="calculateMoonCulmination()">Calcola Culminazione</button>
     </div>
@@ -55,9 +61,11 @@
     <script>
         function calculateMoonCulmination() {
             const dateInput = document.getElementById('date').value;
+            const latitude = parseFloat(document.getElementById('latitude').value);
+            const longitude = parseFloat(document.getElementById('longitude').value);
 
-            if (!dateInput) {
-                alert("Inserisci una data valida.");
+            if (!dateInput || isNaN(latitude) || isNaN(longitude)) {
+                alert("Inserisci una data valida, latitudine e longitudine.");
                 return;
             }
 
@@ -65,14 +73,14 @@
             const [year, month, day] = dateInput.split('-').map(Number);
             const date = new Date(year, month - 1, day);
 
-            const latitude = 45.2740; // Latitude of Milan (Italy)
-            const longitude = 9.0934; // Longitude of Milan (Italy)
-
             try {
-                // Calcola la culminazione usando SoMoTools
-                const culmination = SoMo.getMoonDayInfo(date, latitude, longitude).Transit;
+                // Calcola effemeridi della Luna per il giorno specificato
+                const moonInfo = SoMo.getMoonDayInfo(date, latitude, longitude);
 
-                if (culmination === null || culmination === undefined) {
+                // Estrai l'ora di culminazione
+                const culmination = moonInfo.Transit;
+
+                if (!culmination) {
                     document.getElementById("culminationTime").innerText = "Culminazione della Luna: Non visibile";
                     return;
                 }
@@ -105,6 +113,8 @@
         // Example usage (auto-calculate on page load)
         window.onload = () => {
             document.getElementById('date').value = '2025-02-01';
+            document.getElementById('latitude').value = 45.2740; // Latitude of Milan (Italy)
+            document.getElementById('longitude').value = 9.0934; // Longitude of Milan (Italy)
             calculateMoonCulmination();
         };
     </script>
