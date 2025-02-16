@@ -73,145 +73,9 @@
         </tbody>
     </table>
 
+    <!-- Include somotools.min.js -->
+    <script src="somotools.min.js"></script>
     <script>
-        function calculateJulianDay(date) {
-            const A = Math.floor((14 - date.getMonth()) / 12);
-            const Y = date.getFullYear() + 4800 - A;
-            const M = date.getMonth() + 12 * A - 3;
-            return date.getDate() + Math.floor((153 * M + 2) / 5) + 365 * Y + Math.floor(Y / 4) - Math.floor(Y / 100) + Math.floor(Y / 400) - 32045;
-        }
-
-        function calculateLunarPosition(julianDay) {
-            const n = julianDay - 2451545.0;
-
-            // Mean elements of the Moon
-            const L_prime = (218.3164 + 481267.8813 * n / 365250) % 360;
-            const M = (357.5291 + 0.985600233 * n) % 360;
-            const M_prime = (134.9634 + 13.0649930 * n) % 360;
-            const D = (297.8502 + 13.17639680 * n) % 360;
-            const F = (93.2721 + 13.22935009 * n) % 360;
-
-            // Corrections to the mean longitude
-            const correction = (
-                6.2887 * Math.sin(toRadians(M_prime)) +
-                1.2740 * Math.sin(toRadians(2 * D - M_prime)) +
-                0.6583 * Math.sin(toRadians(2 * D)) +
-                0.2136 * Math.sin(toRadians(M))
-            );
-
-            const L = L_prime + correction;
-
-            // Obliquity of the ecliptic
-            const epsilon = 23.43929111 - 0.0000003563 * n;
-
-            // Ecliptic coordinates
-            const lambda = (
-                L +
-                6.2887 * Math.sin(toRadians(M_prime)) +
-                1.2741 * Math.sin(toRadians(2 * D - M_prime)) +
-                0.6583 * Math.sin(toRadians(2 * D)) +
-                0.2136 * Math.sin(toRadians(M))
-            ) % 360;
-
-            const beta = (
-                5.1282 * Math.sin(toRadians(F)) +
-                0.2806 * Math.sin(toRadians(M + F)) +
-                0.2722 * Math.sin(toRadians(M - F)) -
-                0.1732 * Math.sin(toRadians(D))
-            );
-
-            // Convert ecliptic coordinates to equatorial coordinates
-            const sinRA = Math.sin(toRadians(lambda)) * Math.cos(toRadians(epsilon)) - Math.tan(toRadians(beta)) * Math.sin(toRadians(epsilon));
-            const cosRA = Math.cos(toRadians(lambda));
-            const ra = toDegrees(Math.atan2(sinRA, cosRA)) % 360;
-
-            return ra;
-        }
-
-        function calculateLocalSiderealTime(date, longitude) {
-            const ut = date.getUTCHours() + date.getUTCMinutes() / 60 + date.getUTCSeconds() / 3600; // Universal Time in decimal hours
-            const jd = calculateJulianDay(date);
-            const t = (jd - 2451545) / 36525; // Julian centuries since J2000
-
-            // Greenwich Sidereal Time at 0h UTC
-            const gst0 = 280.46061837 + 360.98564736629 * t;
-
-            // Add the UT time and convert to Local Sidereal Time
-            const lst = (gst0 + ut * 15 + longitude) % 360;
-            return lst;
-        }
-
-        function calculateMoonCulmination(date, latitude, longitude) {
-            const julianDay = calculateJulianDay(date);
-
-            // Calculate lunar Right Ascension
-            const moonRA = calculateLunarPosition(julianDay); // Degrees
-
-            // Calculate Local Sidereal Time at midnight UTC
-            const lstMidnight = calculateLocalSiderealTime(date, longitude);
-
-            // Find the time when LST equals Moon RA
-            let culminationHours = (moonRA - lstMidnight) / 15; // Hours difference
-            culminationHours = culminationHours < 0 ? culminationHours + 24 : culminationHours;
-
-            // Create a Date object for culmination time
-            const culminationDate = new Date(date);
-            culminationDate.setUTCHours(culminationHours, 0, 0, 0);
-
-            // Check if the Moon is visible above the horizon
-            const altitude = calculateMoonAltitude(culminationDate, latitude, longitude);
-            return altitude > 0 ? culminationDate : null;
-        }
-
-        function calculateMoonAltitude(date, latitude, longitude) {
-            const julianDay = calculateJulianDay(date);
-            const n = julianDay - 2451545.0;
-
-            // Mean elements of the Moon
-            const L_prime = (218.3164 + 481267.8813 * n / 365250) % 360;
-            const M = (357.5291 + 0.985600233 * n) % 360;
-            const M_prime = (134.9634 + 13.0649930 * n) % 360;
-            const D = (297.8502 + 13.17639680 * n) % 360;
-            const F = (93.2721 + 13.22935009 * n) % 360;
-
-            // Corrections to the mean longitude
-            const correction = (
-                6.2887 * Math.sin(toRadians(M_prime)) +
-                1.2740 * Math.sin(toRadians(2 * D - M_prime)) +
-                0.6583 * Math.sin(toRadians(2 * D)) +
-                0.2136 * Math.sin(toRadians(M))
-            );
-
-            const L = L_prime + correction;
-
-            // Obliquity of the ecliptic
-            const epsilon = 23.43929111 - 0.0000003563 * n;
-
-            // Ecliptic coordinates
-            const lambda = (
-                L +
-                6.2887 * Math.sin(toRadians(M_prime)) +
-                1.2741 * Math.sin(toRadians(2 * D - M_prime)) +
-                0.6583 * Math.sin(toRadians(2 * D)) +
-                0.2136 * Math.sin(toRadians(M))
-            ) % 360;
-
-            const beta = (
-                5.1282 * Math.sin(toRadians(F)) +
-                0.2806 * Math.sin(toRadians(M + F)) +
-                0.2722 * Math.sin(toRadians(M - F)) -
-                0.1732 * Math.sin(toRadians(D))
-            );
-
-            // Convert ecliptic coordinates to equatorial coordinates
-            const sinDec = Math.sin(toRadians(beta)) * Math.cos(toRadians(epsilon)) + Math.cos(toRadians(beta)) * Math.sin(toRadians(epsilon)) * Math.sin(toRadians(lambda));
-            const dec = toDegrees(Math.asin(sinDec)); // Declination in degrees
-
-            const ha = (calculateLocalSiderealTime(date, longitude) - moonRA) % 360; // Hour angle
-            const alt = Math.asin(Math.sin(toRadians(latitude)) * Math.sin(toRadians(dec)) + Math.cos(toRadians(latitude)) * Math.cos(toRadians(dec)) * Math.cos(toRadians(ha)));
-            return toDegrees(alt);
-        }
-
         function calculateMonthlyMoonCulmination() {
             const latitude = parseFloat(document.getElementById('latitude').value);
             const longitude = parseFloat(document.getElementById('longitude').value);
@@ -238,11 +102,12 @@
             for (let day = 1; day <= daysInMonth; day++) {
                 const date = new Date(year, month - 1, day); // Create date object
 
-                // Find moon culmination using Jean Meeus formulas
-                const culmination = calculateMoonCulmination(date, latitude, longitude);
+                // Find moon culmination using SoMoTools
+                const moonInfo = SoMo.getMoonDayInfo(date, latitude, longitude, 0); // Altitude is not relevant here
+                const culminationTime = moonInfo.Transit; // Transit is the culmination time
 
-                if (!culmination) {
-                    // If no culmination is found, handle it gracefully
+                if (!culminationTime) {
+                    // If no culmination occurs, handle it gracefully
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${formatDate(date)}</td>
@@ -253,7 +118,7 @@
                 }
 
                 // Convert UTC to CET (+1 hour)
-                const localCulminationTime = new Date(culmination.getTime() + 3600 * 1000);
+                const localCulminationTime = new Date(culminationTime.getTime() + 3600 * 1000);
 
                 // Format the result
                 const hours = localCulminationTime.getUTCHours();
@@ -266,14 +131,6 @@
                 `;
                 resultsBody.appendChild(row);
             }
-        }
-
-        function toRadians(degrees) {
-            return degrees * Math.PI / 180;
-        }
-
-        function toDegrees(radians) {
-            return radians * 180 / Math.PI;
         }
 
         function formatDate(date) {
