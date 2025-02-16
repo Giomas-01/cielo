@@ -74,13 +74,14 @@
             const date = new Date(year, month - 1, day);
 
             try {
-                // Calcola effemeridi della Luna per il giorno specificato
+                // Ottieni effemeridi della Luna per il giorno specificato
                 const moonInfo = SoMo.getMoonDayInfo(date, latitude, longitude);
 
-                // Estrai l'ora di culminazione
+                // Estrai l'ora di culminazione (Transit)
                 const culmination = moonInfo.Transit;
 
-                if (!culmination) {
+                if (!(culmination instanceof Date)) {
+                    // Gestione caso in cui Transit non è un oggetto Date
                     document.getElementById("culminationTime").innerText = "Culminazione della Luna: Non visibile";
                     return;
                 }
@@ -88,14 +89,14 @@
                 // Convert UTC to CET (+1 hour)
                 const localCulminationTime = new Date(culmination.getTime() + 3600 * 1000);
 
-                // Format the result
+                // Formatta il risultato
                 const hours = localCulminationTime.getUTCHours();
                 const minutes = localCulminationTime.getUTCMinutes();
                 const formattedDate = formatDate(date);
 
                 const result = `${formattedDate} | Culminazione della Luna: ${hours}:${minutes < 10 ? '0' : ''}${minutes} CET`;
 
-                // Display the result
+                // Visualizza il risultato
                 document.getElementById("culminationTime").innerText = result;
             } catch (error) {
                 console.error("Errore durante il calcolo:", error);
@@ -110,11 +111,11 @@
             return `${day}-${month}-${year}`;
         }
 
-        // Example usage (auto-calculate on page load)
+        // Esempio di utilizzo (calcolo automatico al caricamento della pagina)
         window.onload = () => {
             document.getElementById('date').value = '2025-02-01';
-            document.getElementById('latitude').value = 45.2740; // Latitude of Milan (Italy)
-            document.getElementById('longitude').value = 9.0934; // Longitude of Milan (Italy)
+            document.getElementById('latitude').value = 45.2740; // Latitudine di Milano (Italia)
+            document.getElementById('longitude').value = 9.0934; // Longitudine di Milano (Italia)
             calculateMoonCulmination();
         };
     </script>
