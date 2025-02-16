@@ -58,15 +58,19 @@
             return date.getDate() + Math.floor((153 * M + 2) / 5) + 365 * Y + Math.floor(Y / 4) - Math.floor(Y / 100) + Math.floor(Y / 400) - 32045;
         }
 
-        function calculateLunarPosition(julianDay) {
-            const n = julianDay - 2451545.0; // Days since J2000
+        function calculateMoonCulmination(date, latitude, longitude) {
+            // Convert date to Julian Day
+            const julianDay = calculateJulianDay(date);
+
+            // Days since J2000
+            const n = julianDay - 2451545.0;
 
             // Mean elements of the Moon
-            const L_prime = (218.3164591 + 481267.8813 * n) % 360; // Mean longitude of the Moon
-            const M = (357.5291092 + 0.985600233 * n) % 360; // Mean anomaly of the Sun
-            const M_prime = (134.9633870 + 13.0649930 * n) % 360; // Mean anomaly of the Moon
-            const F = (93.2720950 + 13.22935009 * n) % 360; // Argument of latitude of the Moon
-            const D = (297.8501955 + 13.17639680 * n) % 360; // Mean elongation of the Moon
+            const L_prime = (218.3164 + 481267.8813 * n / 365250) % 360; // Mean longitude of the Moon
+            const M = (357.5291 + 0.985600233 * n) % 360; // Mean anomaly of the Sun
+            const M_prime = (134.9634 + 13.0649930 * n) % 360; // Mean anomaly of the Moon
+            const D = (297.8502 + 13.17639680 * n) % 360; // Mean elongation of the Moon
+            const F = (93.2721 + 13.22935009 * n) % 360; // Argument of latitude of the Moon
 
             // Corrections to the mean longitude
             const correction = (
@@ -100,71 +104,30 @@
             // Convert ecliptic coordinates to equatorial coordinates
             const sinRA = Math.sin(toRadians(lambda)) * Math.cos(toRadians(epsilon)) - Math.tan(toRadians(beta)) * Math.sin(toRadians(epsilon));
             const cosRA = Math.cos(toRadians(lambda));
-            const ra = toDegrees(Math.atan2(sinRA, cosRA)) % 360;
+            const ra = toDegrees(Math.atan2(sinRA, cosRA)) % 360; // Right Ascension in degrees
 
-            return ra;
-        }
+            // Calculate Local Sidereal Time at midnight UTC
+            const t = (julianDay - 2451545) / 36525; // Julian centuries since J2000
+            const gst0 = 280.46061837 + 360.98564736629 * t; // Greenwich Sidereal Time at 0h UTC
+            const lstMidnight = (gst0 + longitude) % 360; // Local Sidereal Time at midnight
 
-        function calculateLocalSiderealTime(date, longitude) {
-            const ut = date.getUTCHours() + date.getUTCMinutes() / 60 + date.getUTCSeconds() / 3600; // Universal Time in decimal hours
-            const jd = calculateJulianDay(date);
-            const t = (jd - 2451545) / 36525; // Julian centuries since J2000
+            // Find the time when LST equals RA
+            let culminationHours = (ra - lstMidnight) / 15; // Hours difference
+            culminationHours = culminationHours < 0 ? culminationHours + 24 : culminationHours;
 
-            // Greenwich Sidereal Time at 0h UTC
-            const gst0 = 280.46061837 + 360.98564736629 * t;
+            // Create a Date object for culmination time
+            const culminationDate = new Date(date);
+            culminationDate.setUTCHours(culminationHours, 0, 0, 0);
 
-            // Add the UT time and convert to Local Sidereal Time
-            const lst = (gst0 + ut * 15 + longitude) % 360;
-            return lst;
-        }
+            // Convert UTC to CET (+1 hour)
+            const localCulminationTime = new Date(culminationDate.getTime() + 3600 * 1000);
 
-        function calculateMoonCulmination() {
-            const dateInput = document.getElementById('date').value;
+            // Format the result
+            const hours = localCulminationTime.getUTCHours();
+            const minutes = localCulminationTime.getUTCMinutes();
+            const formattedDate = formatDate(date);
 
-            if (!dateInput) {
-                alert("Inserisci una data valida.");
-                return;
-            }
-
-            // Convert date from YYYY-MM-DD to Date object
-            const [year, month, day] = dateInput.split('-').map(Number);
-            const date = new Date(year, month - 1, day);
-
-            const latitude = 45.2740; // Latitude of Milan (Italy)
-            const longitude = 9.0934; // Longitude of Milan (Italy)
-
-            try {
-                const julianDay = calculateJulianDay(date);
-
-                // Calculate lunar Right Ascension
-                const moonRA = calculateLunarPosition(julianDay); // Degrees
-
-                // Calculate Local Sidereal Time at midnight UTC
-                const lstMidnight = calculateLocalSiderealTime(date, longitude);
-
-                // Find the time when LST equals Moon RA
-                let culminationHours = (moonRA - lstMidnight) / 15; // Hours difference
-                culminationHours = culminationHours < 0 ? culminationHours + 24 : culminationHours;
-
-                // Adjust to UTC and create a Date object
-                const culminationDate = new Date(date.getTime() + culminationHours * 3600 * 1000);
-
-                // Convert UTC to CET (+1 hour)
-                const localCulminationTime = new Date(culminationDate.getTime() + 3600 * 1000);
-
-                // Format the result
-                const hours = localCulminationTime.getUTCHours();
-                const minutes = localCulminationTime.getUTCMinutes();
-                const formattedDate = formatDate(date);
-
-                const result = `${formattedDate} | Culminazione della Luna: ${hours}:${minutes < 10 ? '0' : ''}${minutes} CET`;
-
-                // Display the result
-                document.getElementById("culminationTime").innerText = result;
-            } catch (error) {
-                console.error("Errore durante il calcolo:", error);
-                document.getElementById("culminationTime").innerText = "Culminazione della Luna: Errore nel calcolo";
-            }
+            return `${formattedDate} | Culminazione della Luna: ${hours}:${minutes < 10 ? '0' : ''}${minutes} CET`;
         }
 
         function toRadians(degrees) {
@@ -181,6 +144,37 @@
             const year = date.getFullYear();
             return `${day}-${month}-${year}`;
         }
+
+        function calculateMoonCulminationButton() {
+            const dateInput = document.getElementById('date').value;
+
+            if (!dateInput) {
+                alert("Inserisci una data valida.");
+                return;
+            }
+
+            // Parse date from YYYY-MM-DD to Date object
+            const [year, month, day] = dateInput.split('-').map(Number);
+            const date = new Date(year, month - 1, day);
+
+            const latitude = 45.2740; // Latitude of Milan (Italy)
+            const longitude = 9.0934; // Longitude of Milan (Italy)
+
+            try {
+                const culminationTime = calculateMoonCulmination(date, latitude, longitude);
+                document.getElementById("culminationTime").innerText = culminationTime;
+            } catch (error) {
+                console.error("Errore durante il calcolo:", error);
+                document.getElementById("culminationTime").innerText = "Culminazione della Luna: Errore nel calcolo";
+            }
+        }
+
+        // Example usage (auto-calculate on page load)
+        window.onload = () => {
+            // Pre-fill the date input with February 1, 2025
+            document.getElementById('date').value = '2025-02-01';
+            calculateMoonCulminationButton(); // Auto-calculate on page load
+        };
     </script>
 </body>
 </html>
