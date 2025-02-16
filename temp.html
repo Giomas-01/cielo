@@ -1,606 +1,175 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
-	<meta charset="utf-8">
-	<!-- <meta http-equiv="expires" content="0" />  gezwungen neu laden -->
-	<script type="text/javascript">
-		if (top.location != self.location) {
-			top.location = self.location.href // verhindert Framing
-		}
-	</script>
-	<title>MoonCalc - moon phase, lunar eclipse, moon position, lunar calendar, moon calculator, moon calendar, map, moon rising, moonset, moon shadow, moon height, full moon, new moon</title>
-<!-- ****** faviconit.com Favicons ****** -->
-	<link rel="shortcut icon" href="favos/favicon.ico">
-	<link rel="icon" sizes="16x16 32x32 64x64" href="favos/favicon.ico">
-	<link rel="icon" type="image/png" sizes="196x196" href="favos/favicon-192.png">
-	<link rel="icon" type="image/png" sizes="160x160" href="favos/favicon-160.png">
-	<link rel="icon" type="image/png" sizes="96x96" href="favos/favicon-96.png">
-	<link rel="icon" type="image/png" sizes="64x64" href="favos/favicon-64.png">
-	<link rel="icon" type="image/png" sizes="32x32" href="favos/favicon-32.png">
-	<link rel="icon" type="image/png" sizes="16x16" href="favos/favicon-16.png">
-	<link rel="apple-touch-icon" href="favos/favicon-57.png">
-	<link rel="apple-touch-icon" sizes="114x114" href="favos/favicon-114.png">
-	<link rel="apple-touch-icon" sizes="72x72" href="favos/favicon-72.png">
-	<link rel="apple-touch-icon" sizes="144x144" href="favos/favicon-144.png">
-	<link rel="apple-touch-icon" sizes="60x60" href="favos/favicon-60.png">
-	<link rel="apple-touch-icon" sizes="120x120" href="favos/favicon-120.png">
-	<link rel="apple-touch-icon" sizes="76x76" href="favos/favicon-76.png">
-	<link rel="apple-touch-icon" sizes="152x152" href="favos/favicon-152.png">
-	<link rel="apple-touch-icon" sizes="180x180" href="favos/favicon-180.png">
-	<meta name="msapplication-TileColor" content="#FFFFFF">
-	<meta name="msapplication-TileImage" content="favos/favicon-144.png">
-	<meta name="msapplication-config" content="favos/browserconfig.xml">
-	<!-- ****** faviconit.com Favicons ****** -->
-	<meta name="description" content="Online application for determination of lunar history with interactive map, moon phase, moon phases, moon position, lunar calendar, moon calculator, moon rising, moonset, moon shadow, moon height, full moon, new moon" />
-	<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-    <meta name="robots" content="all" />
-	<meta name="keywords" content="MoonCalc, moon phase, lunar eclipse, moon position, lunar calendar, moon calculator, map, moon rising, moonset, moon shadow, moon height, full moon, new moon" />
-	<meta property="og:title" content="MoonCalc moon position- and moon phases calculator" /> 
-    <meta property="og:description" content="Application for determining the moon curve at a desired time and place with interactive map." />
-	<meta property="og:image" content="https://www.mooncalc.org/img/mooncalc.png" /> 
-	<meta property="og:url" content="https://www.mooncalc.org" /> 
-	<!-- style -->
-	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/le-frog/jquery-ui.css" type="text/css" media="screen, projection" />
-	<link rel="stylesheet" href="stylesheets/screen.css?v=1" type="text/css" media="screen, projection" />
-	<link rel="stylesheet" href="stylesheets/fixedheadertable.css?v=1" type="text/css" media="screen, projection" /> <!-- NEU Table -->
-	<link rel="canonical" href="https://www.mooncalc.org" />
-	
-	<!-- OpenLayers -->
-	<link rel="stylesheet" href="https://openlayers.org/en/v5.2.0/css/ol.css" type="text/css">
-    <!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
-    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
-	<script src="https://openlayers.org/en/v5.2.0/build/ol.js"></script>
-	
-	<!-- LayerSwitcher -->
-	<link rel="stylesheet" href="stylesheets/ol-layerswitcher.css" type="text/css">
-	<script src="scripts/ol-layerswitcher.min.js"></script>
-	
-	<!-- libs -->
-	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.0/jquery-ui.min.js"></script>
-	<script type="text/javascript" src="scripts/jquery.ui.touch-punch.min.js"></script>
-	<script type="text/javascript" src="scripts/jquery.address-1.6.min.js"></script>
-	<script type="text/javascript" src="https://cdn.jsdelivr.net/mobile-detect.js/latest/mobile-detect.min.js"></script>
-	<script type="text/javascript" src="scripts/ol-mDis.min.js?v=1"></script><!-- NEU ToolBox -->
-	<script type="text/javascript" src="scripts/jquery.fixedheadertable.min.js?v=1"></script><!-- NEU Table -->
-	<script type="text/javascript" src="scripts/ion.sound-min.js"></script>
-	<!-- <script type="text/javascript" src="https://www.google.com/jsapi"></script> -->
-	<script type="text/javascript" src="scripts/raphael-min.js"></script>
-	<script type="text/javascript" src="scripts/ol-dn-overlay.min.js?v=1"></script>
-	<script type="text/javascript" src="scripts/ol-mondverlauf-overlay.min.js?v=2"></script>
-	<script type="text/javascript" src="scripts/start.min.js?v=10.0"></script>
-	<script type="text/javascript" src="scripts/expcoll.min.js"></script>
-	<script type="text/javascript" src="scripts/moment-min.js"></script>
-	<script type="text/javascript" src="scripts/moment-timezone-with-data-min.js?v=2"></script>
-	<script type="text/javascript" src="scripts/jQuery.print.min.js"></script>
-	<!-- <script type="text/javascript" src="scripts/TimeZoneMapper-min.js"></script> -->
-	<script type="text/javascript" src="scripts/tz.js?v=6.1.7"></script>
-	<script type="text/javascript" src="scripts/jquery.mousewheel.min.js"></script>
-	<script type="text/javascript" src="scripts/somotools.min.js?v=1"></script>
-	<script type="text/javascript" src="scripts/MoFi/mondfinsternis.min.js"></script>
-	<script type="text/javascript" src="scripts/utmconv.min.js?v=1"></script> <!-- NEU Koor -->
-	
-	<script type="text/javascript">
-		animatedcollapse.addDiv('Fenster0', 'fade=1,speed=400,group=links,persist=1,hide=0')
-		animatedcollapse.addDiv('Fenster2', 'fade=1,speed=400,group=links,hide=1')
-		animatedcollapse.addDiv('Fenster3', 'fade=1,speed=400,group=links,hide=1')
-		animatedcollapse.addDiv('Fenster4', 'fade=1,speed=400,group=links,hide=1')
-		animatedcollapse.addDiv('Fenster5', 'fade=1,speed=400,group=links,hide=1')
-		animatedcollapse.addDiv('Fenster6', 'fade=1,speed=400,group=links,hide=1')
-		animatedcollapse.init()
-	</script>
-	
-	<!--
-	<script>
-		var _gaq = _gaq || [];
-		_gaq.push(['_setAccount', 'UA-11220409-12']);
-		_gaq.push(['_trackPageview']);
-		(function() {
-    		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-			var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-  		})();
-	</script>
-	-->
-
-	<!-- Global site tag (gtag.js) - Google Analytics -->
-	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-11220409-12"></script>
-	<script>
-		window.dataLayer = window.dataLayer || [];
-		function gtag(){dataLayer.push(arguments);}
-		gtag('js', new Date());
-		gtag('config', 'UA-11220409-12');
-	</script>
-
-	<!-- NEU AdSense -->
-	<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-	<script>
-     (adsbygoogle = window.adsbygoogle || []).push({
-          google_ad_client: "ca-pub-0313471900092880",
-          enable_page_level_ads: true
-     });
-	</script>
-	<!-- NEU Koor -->
-	<style>
-	.ol-attribution a:link{
-		color: blue;
-	}
-	.ol-attribution a:hover{
-		color: green;
-	}
-	.ui-tooltip{
-		max-width: 500px !important;
-		width: auto !important;
-		overflow:auto !important;
-	}
-	.ui-tooltip-content {
-		font-size: 10pt;
-	}
-	#kreuz {
-		top: 50%;
-		left: 50%;
-		width: 16px;
-		height: 16px;
-		border-radius: 50%;
-		border: 2px solid red;
-		z-index: 90;
-		position: absolute;
-		-webkit-transform: translate(-50%, -50%);
-		transform: translate(-50%, -50%);
-	}
-	.rotate-north {
-		top: 107px;
-		left: .5em;
-		/* width: 60px; */
-	}
-	.ol-popup {
-		position: absolute;
-        background-color: white;
-        -webkit-filter: drop-shadow(0 1px 4px rgba(0,0,0,0.2));
-        filter: drop-shadow(0 1px 4px rgba(0,0,0,0.2));
-        padding: 15px;
-        border-radius: 10px;
-        border: 1px solid #cccccc;
-        bottom: 12px;
-        left: -50px;
-        min-width: 350px;
-		font-size: 12px;
-	}
-	.ol-popup:after, .ol-popup:before {
-        top: 100%;
-        border: solid transparent;
-        content: " ";
-        height: 0;
-        width: 0;
-        position: absolute;
-        pointer-events: none;
-	}
-	.ol-popup:after {
-        border-top-color: white;
-        border-width: 10px;
-        left: 48px;
-        margin-left: -10px;
-	}
-	.ol-popup:before {
-        border-top-color: #cccccc;
-        border-width: 11px;
-        left: 48px;
-        margin-left: -11px;
-	}
-	.ol-popup-closer {
-        text-decoration: none;
-        position: absolute;
-        top: 2px;
-        right: 8px;
-	}
-	.ol-popup-closer:after {
-        content: "?";
-	}
-	</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calcolo Culminazione della Luna</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        .container {
+            display: inline-block;
+            text-align: left;
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        input, button {
+            margin: 10px 0;
+            padding: 8px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        p#culminationTime {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+    </style>
 </head>
-
 <body>
-	<!-- NEU OSM -->
-	<div id="popup" class="ol-popup">
-      <a href="#" id="popup-closer" class="ol-popup-closer"></a>
-      <div id="popup-content"></div>
+    <h1>Calcolo Culminazione della Luna</h1>
+    <div class="container">
+        <label for="date">Data (GG-MM-AAAA):</label>
+        <input type="date" id="date"><br>
+
+        <button onclick="calculateMoonCulmination()">Calcola Culminazione</button>
     </div>
-	<!-- mofi2018 -->
-	<div id = "mofi2018">
-	<!--
-		<h2>Total Lunar Eclipse July 27, 2018</h2>
-		<p>The total lunar eclipse is here. On July 27, 2018, the moon enters the Earth's shadow, the Bloodmoon is visible.</p>
-		<p>The moon plunges into the Earth's shadow, it's the longest total lunar eclipse of the 21st century.</p>
-		<p><strong>All times CEST (Central European Summer Time)</strong></p>
-		<h3>The total lunar eclipse starts at 9:30 pm, arrives at 10:22 pm and ends at 11:13 pm</h3>
-		<p>
-		Details:<br>
-		Penumbral Eclipse Begin 19:15 <br>
-		Partial Eclipse Begin 20:24 <br>
-		Total Eclipse Begin 21:30 <br>
-		Middle Eclipse 22:22 <br>
-		Total Eclipse End 23:13 <br>
-		Partial Eclipse End 00:19 <br>
-		Penumbral Eclipse End 01:29 <br>
-		</p>
-		<h3>This total lunar eclipse is the longest of the century</h3>
-		<p>
-		<strong>The special thing is:</strong> The total lunar eclipse will be the longest of the entire 21st century:
-		<br>The moon is completely immersed in the Earth's shadow for an hour and 43 minutes.
-		<br>This lunar eclipse duration is exceeded only on June 9, 2123 - by two minutes.
-		</p>
-	-->
-	</div>
 
-	<!-- NEU DateSlider -->
-	<div id="dateSliderOut" style="display:none;"> <!-- style="display:none;" -->
-		<div id="dateButtonMinus" title="1 day back"> - </div>
-		<div id="dateSlider"></div>
-		<div id="dateButtonPlus" title="1 day forward"> + </div>
-		<div id="dateSliderScale">
-			<table id="date-scale">
-			<tr><td>Jan</td><td>Feb</td><td>Mar</td><td>Apr</td><td>Mai</td><td>Jun</td><td>Jul</td><td>Aug</td><td>Sep</td><td>Oct</td><td>Nov</td><td>Dec</td></tr>
-			</table>
-		</div>
-	</div>
-	
-	<!-- Container fuer MyLocation usw. -->
-	<div id="location-container">
-		<!-- <button id="go-location">Go</button> -->
-		<button id="detect-location">find my position</button>
-	</div>
+    <p id="culminationTime">Culminazione della Luna: Caricamento...</p>
 
-<div id="print1"></div>
+    <script>
+        function calculateJulianDay(date) {
+            const A = Math.floor((14 - date.getMonth()) / 12);
+            const Y = date.getFullYear() + 4800 - A;
+            const M = date.getMonth() + 12 * A - 3;
+            return date.getDate() + Math.floor((153 * M + 2) / 5) + 365 * Y + Math.floor(Y / 4) - Math.floor(Y / 100) + Math.floor(Y / 400) - 32045;
+        }
 
-<!-- facebook like -->
-<div id="fb-root"></div>
-<script>(function(d, s, id) {
-  var js, fjs = d.getElementsByTagName(s)[0];
-  if (d.getElementById(id)) return;
-  js = d.createElement(s); js.id = id;
-  js.src = 'https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.2';
-  fjs.parentNode.insertBefore(js, fjs);
-}(document, 'script', 'facebook-jssdk'));</script>
-	
-	<!-- HEADER -->
-	<div id="header">
-		<div id="msgbox" title="Achtung"></div>
-		<!-- Fuer App-Werbung -->
-		<div id="msgboxApp" title="Hinweis"></div>
+        function calculateMoonCulmination(date, latitude, longitude) {
+            const julianDay = calculateJulianDay(date);
+            const n = julianDay - 2451545.0;
 
-		<!-- SLIDER -->
-		<div id="time-slider-container">
-			<div id="time-scale-container"></div>
-			<div id="time-slider-2">
-				<div id="time-scale-twilight"></div>
-				<div id="time-scale-twilight-2"></div>
-				<div id="time-scale-sunlight"></div>
-				<div id="time-scale-sunlight-2"></div>
-			</div>
-		</div>
-		
-	</div>
-	
-	<!-- fuer MoFi -->
-	<input type="hidden" name="isMoFi" id="isMoFi" />
-	
-	<!-- LINKS -->
-	<div id="container">
-		<!-- NEU OSM -->
-		<div id="map" class="map">
-			<div id="kreuz" title=""></div>
-		</div>
-	</div>
-	<!-- RECHTS -->
-	<div id="legendeR">
-	
-		<!-- Kopf 1 FEST -->
-			<div class="Fenster_Titel" title="">
-				<table width="100%"><tr>
-				<td width="99%">Computation path of the moon for:</td>
-				</tr></table>
-			</div>
-		<!-- Inhalt 1 -->
-		<div class="Fenster_Inhalt" id="FensterF1">
-				
-					<input class="title" title="Select a location" id="location" type="text" value="" />
+            // Mean elements of the Moon
+            const L_prime = (218.3164 + 481267.8813 * n / 365250) % 360;
+            const M = (357.5291 + 0.985600233 * n) % 360;
+            const M_prime = (134.9634 + 13.0649930 * n) % 360;
+            const D = (297.8502 + 13.17639680 * n) % 360;
+            const F = (93.2721 + 13.22935009 * n) % 360;
 
-			<span id="date-container">
-				<input class="title" id="date" type="text" title="Click here to select a specific date" readonly />
-				<!-- NEU UTC >>> -->
-				<span id="zeit" title="lokale time of the selected location, resulting from the above timeline.">?</span>
-				<a href="#now" id="now-link" class="button" title="Click here to skip to the current date and current time">&gt;|&lt;</a>
-			</span>
-			
-		</div>
-		<!-- Kopf 2 FEST -->
-			<div class="Fenster_Titel" title="">
-				<table width="100%"><tr>
-				<td width="99%">Lunar data for the selected location</td>
-				</tr></table>
-			</div>
-		<!-- Inhalt 2 -->
-		<div class="Fenster_Inhalt" id="FensterF2">
-			<table width="100%">
-				<tr>
-					<td width="73%"><acronym title="For the moon rising of the moment when the upper limb of the Moon touches the horizon">Moon Rise:</acronym></td><td><span style="white-space: nowrap;" id="clickSunrise" class="time-span sunrise sunrise-time">...</span></td>
-				</tr>
-				<tr>
-					<td width="73%"><acronym title="The moment when, in the course of a day, the moon crosses the meridian">Moon Culmination:</acronym></td><td><span id="clickSunpeak" class="time-span transit transit-time">...</span></td>
-				</tr>
-				<tr>
-					<td width="73%"><acronym title="When moonset the moment when the upper limb of the Moon touches the horizon">Moon Set:</acronym></td><td><span style="white-space: nowrap;" id="clickSunset" class="time-span sunset sunset-time">...</span></td>
-				</tr>
-				<tr>
-					<td width="73%"><acronym title="Distance between center of the Earth and Moon.">Moon Distance:</acronym></td><td><span class="time-span twilight dawn-time">...</span></td>
-				</tr>
-				<tr>
-					<td width="73%"><acronym title="The elevation angle h (Altitude) is the angle between the center of moon and the horizon including refraction.">Moon Altitude:</acronym></td><td><span class="time-span transit" id="sunhoehe">...</span></td>
-				</tr>
-				<tr>
-					<td width="73%"><acronym title="The horizontal angle (Azimuth) is the angle between the meridional plane of the earth and the vertical plane of the moon.">Moon Azimuth:</acronym></td><td><span class="time-span transit" id="azimuth">...</span></td>
-				</tr>
-				<tr>
-					<td width="73%" style="padding-top:6px;"><acronym title="The length of the lunar shadow in meters.">Shadow Length:</acronym></td><td style="padding-top:6px;"><span class="time-span grau" id="schatten">...</span></td>
-				</tr>
-				<tr>
-					<td width="73%"><acronym title="The height of the object from which the shadow starts.">at an object level [m]:</acronym></td><td><input maxlength="4" class="title" id="meter" type="text" value="1" title="Enter the object height for shadow calculation" /></td>
-				</tr>
-				<!-- NEU HOFFI -->
-				<tr>
-					<td width="73%">
-					<acronym><img src="img/phase.png" style="vertical-align: middle;" title="Moon Phase">&nbsp;<span class="moontext dusk-time" title="Identification of the Moon Phase / Visibility (Illumination)">...</span></acronym><br>
-					<acronym><img src="img/age.png" style="vertical-align: middle;" title="Moon Age">&nbsp;<span class="moontext alter" title="The time in days that has elapsed since the last New Moon / Duration Lunation">...</span></acronym><br>
-					<acronym><img src="img/neumond.png" style="vertical-align: middle;" title="Next New Moon">&nbsp;<span class="moontext neumond" title="Next New Moon">...</span></acronym><br>
-					<acronym><img src="img/vollmond.png" style="vertical-align: middle;" title="Next Full Moon">&nbsp;<span class="moontext vollmond" title="Next Full Moon">...</span></acronym>
-					</td>
-					<td>
-						<div id="Moon">
-							<acronym title="Moon Phase"><div id="divMoon"></div></acronym>
-							<!-- <svg id="moonbox" width="100px" height="100px" viewBox="0 0 160 160"></svg> -->
-						</div>
-					</td>
-				</tr>
-			</table>
-		</div>
-		<!-- Kopf 3 -->
-			<a href="#" rel="toggle[Fenster0]" data-openimage="img/schliessen.gif" data-closedimage="img/oeffnen.gif">
-			<div class="Fenster_Titel" title="Open / close window">
-				<table width="100%"><tr>
-				<td width="99%">Geo data for the selected location</td><td><img src="img/schliessen.gif" border="0" /></td>
-				</tr></table>
-			</div>
-		</a>
-		<!-- Inhalt 3 -->
-		<div class="Fenster_Inhalt" id="Fenster0">
-			<table width="100%">
-				<tr>
-					<td width="50px"><acronym title="Height for the selected location">Height:</acronym></td><td><span class="Bold" id="hoehe">...</span></td><td style="white-space: nowrap;"><a href="javascript:void(0);" id="setLatLon" title="Set coordinates for desired destination"><span style="border:1px solid silver;padding: 1px;border-radius: 3px;">Set Lat/Lon</span></a></td>
-				</tr>
-				<tr>
-					<td width="50px"><acronym title="Latitude of the selected location">Lat:</acronym></td><td width="170px"><span class="" id="dmsbreite">...</span></td><td width="80px"><span class="Bold" id="dezbreite">...</span></td>
-				</tr>
-				<tr>
-					<td width="50px"><acronym title="Longitude of the selected location">Lng:</acronym></td><td><span class="" id="dmslaenge">...</span></td><td><span class="Bold" id="dezlaenge">...</span></td>
-				</tr>
-				<!-- NEU Koor -->
-				<tr>
-					<td width="50px"><acronym title="<strong>U</strong>niversal <strong>T</strong>ransverse <strong>M</strong>ercator coordinate system (WGS84)">UTM:</acronym></td><td colspan="2"><span class="" id="utm">...</span></td>
-				</tr>
-				<!-- NEU UTC >>> -->
-				<tr>
-					<td colspan="3" style="white-space: nowrap;"><span><acronym title="Timezone of the selected location">TZ:</acronym>&nbsp;<span class="Bold" id="ortsdatum">...</span>&nbsp;<span title="Daylight Saving Time" class="Bold" id="sommerzeit" style="color:yellow;">DST</span>&nbsp;<span class="Bold" id="ortszeit">...</span></td>
-				</tr>
-			</table>
-		</div>
-				
-		<!-- Kopf 6 Drucken -->
-			<a href="#" rel="toggle[Fenster6]" data-openimage="img/schliessen.gif" data-closedimage="img/oeffnen.gif">
-			<div class="Fenster_Titel" title="Open / close window">
-				<table width="100%"><tr>
-				<td width="99%">Print</td><td><img src="img/schliessen.gif" border="0" /></td>
-				</tr></table>
-			</div>
-		</a>
-		<!-- Inhalt 6 Drucken -->
-		<div class="Fenster_Inhalt" id="Fenster6">
-			<table width="100%" cellspacing="16">
-			<tr><td><a href="#printX" id="print01" class="button" title="Prints the current data">Print - Current Data</a></td></tr>
-			<tr><td><a href="#printX" id="print02" class="button" title="Prints the current map">Print - Current Map</a></td></tr>
-			</table>
-		</div>
-		
-		<!-- Kopf 4 -->
-		<a href="#" rel="toggle[Fenster3]" data-openimage="img/schliessen.gif" data-closedimage="img/oeffnen.gif">
-			<div class="Fenster_Titel" title="Open / close window">
-				<table width="100%"><tr>
-				<td width="99%">Contact</td><td><img src="img/schliessen.gif" border="0" /></td>
-				</tr></table>
-			</div>
-		</a>
-		<!-- Inhalt 4 -->
-		<div class="Fenster_InhaltK" id="Fenster3">
-			<p>You can requests, suggestions and criticisms<br>rid of</p>
-			<hr>
-			<form id="Kontakt"> <!-- NEU KONTAKT -->
-				<br>Your e-mail address:<br><input type="text" id="sMail" name="sMail" value="" size="30" maxlength="40">
-				<br>Your first and last name:<br><input type="text" id="sVorZuname" name="sVorZuname" value="" size="30" maxlength="40">
-				<br>Your Request:<br><textarea id="mytextarea" name="sAnfrage" value=""></textarea>
-				<br><br><input id="Abschicken" type="button" class="button" value=" send an inquiry " title="Submit your inquiry now"><br>
-			</form>
-		</div>
-		<!-- Kopf Hilfe 5 -->
-		<a href="#" rel="toggle[Fenster2]" data-openimage="img/schliessen.gif" data-closedimage="img/oeffnen.gif">
-			<div class="Fenster_Titel" title="Open / close window">
-				<table width="100%"><tr>
-				<td width="99%">Help & API</td><td><img src="img/schliessen.gif" border="0" /></td>
-				</tr></table>
-			</div>
-		</a>
-		<!-- Inhalt Hilfe 5 -->
-		<div class="Fenster_Inhalt" id="Fenster2">
-			<p><strong>MoonCalc</strong> shows the motion of the Moon and Moon phase for a particular day at a particular location.</p>
-			<p>You can see the moon positions for <span class="sunrise">moon rising</span>, <span class="transit">selected time</span> and <span class="sunset">Moonset</span>. The thin yellow-colored curve shows the trajectory of the moon. The closer the moon in the middle, the higher the moon above the horizon. The colors in the above time-slider shows the moonlight during the day. The moon on the time slider can be moved by mouse or with the arrow keys of the keyboard</p>
-		<!-- API -->
-			<a href="https://www.torsten-hoffmann.de/apis/suncalcmooncalc/link_en.html" target="_blank">
-			<div style="bottom:0; position:relative; width:270px; height:auto; vertical-align:middle; border-width:1px; border-style:solid; border-color:silver;margin-top:5px;" title="API Development">
-			<table><tr>
-			<td width="90%" style="padding-left:3px;"><span style="font-size:80%;">API to link to this page!</span><br><span style="font-size:100%;">API for developers</span></td>
-			<td><img src="img/api.png" border="0" align="middle"></td>
-			</tr></table>
-			</div></a>
-		</div>
-		<!-- Kopf Compendium -->
-		<a href="#" rel="toggle[Fenster4]" data-openimage="img/schliessen.gif" data-closedimage="img/oeffnen.gif">
-			<div class="Fenster_Titel" title="Open / close window">
-				<table width="100%"><tr>
-				<td width="99%">The same for the Sun</td><td><img src="img/schliessen.gif" border="0" /></td>
-				</tr></table>
-			</div>
-		</a>
-		<!-- Inhalt Compendium -->
-		<div class="Fenster_Inhalt" id="Fenster4">
-			<a href="https://www.suncalc.org" title="go suncalc.org" id="url-schwester" target="_blank"><div> <!-- NEULINK -->
-			<span style="font-size:95%;">To retrieve solar data please go to the following Website:</span><br><span style="font-size:115%;">suncalc.org</span></div></a>
-		</div>
-		<!-- Kopf 8 -->
-		<a href="#" rel="toggle[Fenster5]" data-openimage="img/schliessen.gif" data-closedimage="img/oeffnen.gif">
-			<div class="Fenster_Titel" title="Open / close window">
-				<table width="100%"><tr>
-				<td width="99%">Legal Disclosure / Privacy Policy</td><td><img src="img/schliessen.gif" border="0" /></td>
-				</tr></table>
-			</div>
-		</a>
-		<!-- Inhalt 8 -->
-		<div class="Fenster_Inhalt" id="Fenster5" style="height:auto;">
-			<p>Information in accordance<br>with section 5 TMG:</p><br>
-			<p>Torsten Hoffmann<br>Robert-Schumann-Str. 17<br>67304 Eisenberg<br>Germany</p>
-			<table width="100%" cellspacing="16">
-			<tr><td><a href="privacypolicy.html" target="_blank" id="privacypolicy" class="button" style="padding:5px;display:block;width:228px;text-align:center;">privacy details</a></td></tr>
-			</table>
-		</div>
-		
-		<!-- NEU AdSense 280x250-->
-		<div id="adsKlein" style="bottom:0;position:relative;width:280px;height:auto;align:center;vertical-align:middle;border-width:1px;border-style:solid;border-color:silver;">
-		<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-			<ins class="adsbygoogle"
-			style="display:inline-block;width:280px;height:250px"
-			data-ad-client="ca-pub-0313471900092880"
-			data-ad-slot="6195987625"></ins> <!-- mooncalc.org klein -->
-		<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-		</div>
-		
-		<!-- gefaellt mir -->
-		<div style="position:relative; width:280px; border-width:1px; border-style:solid; border-color:silver;">
-			<div class="fb-like" data-href="https://www.mooncalc.org" data-layout="button_count" data-action="like" data-size="small" data-show-faces="false" data-share="true"></div>
-		</div>
-		
-		<!-- Verweis auf deutsche Seite -->
-		<a href="https://www.mondverlauf.de" id="url-sprache"> <!-- NEULINK -->
-		<div style="bottom:0; position:relative; width:280px; height:41px; vertical-align:middle; border-width:1px; border-style:solid; border-color:silver;" title="Diese Webseite in deutscher Sprache">
-			<table><tr>
-			<td width="90%" style="padding-left:3px;"><span style="font-size:80%;">This website in German language</span><br><span style="font-size:100%;">mondverlauf.de</span></td>
-			<td><img src="img/germany_flag_48.png" border="0" align="middle"></td>
-			</tr></table>
-		</div></a>
-		
-	</div>
-		
-	<div id="legendeW">
-	
-		<!-- NEU AdSense 300x600 -->
-		<div id="adsGross1">
-		<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-			<ins class="adsbygoogle"
-			style="display:inline-block;width:300px;height:600px"
-			data-ad-client="ca-pub-0313471900092880"
-			data-ad-slot="2995109217"></ins> <!-- mooncalc.org gross -->
-		<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-		</div>
-		
-		<div id="copyright" title="HOFFIsoft Software &copy;Torsten Hoffmann"><a href="https://www.torsten-hoffmann.de" target="_blank">MoonCalc.org &copy;Torsten Hoffmann 2015</a></div>
-	</div>
-	
-	<!-- fuer MoFi Tabelle mit Details -->
-	<!-- NEU Table -->
-	<div id="MoFiContainer" style="display:none; opacity:0.55; position:fixed; top:0px; left:0px; background:#000; width:100%; z-index:2000;"></div>
-	<div id="MoFiInner" style="display:none; background:#FFFFFF; position:fixed; width:96%; z-index:2001; opacity:0.99;">
-		<div id="MoFiHeader" style="position:relative; background:#333333; padding:8px">Header</div>
-			<!-- DIV NEU -->
-			<div id="MoFiHeader2" style='width:100%;color:black;'>
-			<table style='width:100%;'>
-				<tr>
-				<!-- Linke Seite oben -->
-				<td><table style='width:50%;border-spacing:10px;border:1px solid white;'>
-				<tr><td style='text-align:right;'>Latitude:</td><td><strong><span id="MoFiLat">Lat</span></strong></td><td style='text-align:right;'>Height:</td><td><strong><span id="MoFiHoehe"></span></strong></td></tr>
-				<tr><td style='text-align:right;'>Longitude:</td><td><strong><span id="MoFiLon">Lon</span></strong></td><td style='text-align:right;'>TimeZone:</td><td style='white-space:nowrap'><strong><span id="MoFiTZ"></span></strong></td></tr>
-				</table></td>
-				<!-- Rechte Seite oben -->
-				<td style='vertical-align:center;'><div><label for='selectMoFiJahr'>Selection date range: </label><select name='selectMoFiJahr' id='selectMoFiJahr'>
-				<optgroup label='before Christ'>
-				<option value='LEm1999min'>-1999 to -1900</option><option value='LEm1899min'>-1899 to -1800</option>
-				<option value='LEm1799min'>-1799 to -1700</option><option value='LEm1699min'>-1699 to -1600</option><option value='LEm1599min'>-1599 to -1500</option>
-				<option value='LEm1499min'>-1499 to -1400</option><option value='LEm1399min'>-1399 to -1300</option><option value='LEm1299min'>-1299 to -1200</option>
-				<option value='LEm1199min'>-1199 to -1100</option><option value='LEm1099min'>-1099 to -1000</option><option value='LEm0999min'>-0999 to -0900</option>
-				<option value='LEm0899min'>-0899 to -0800</option><option value='LEm0799min'>-0799 to -0700</option><option value='LEm0699min'>-0699 to -0600</option>
-				<option value='LEm0599min'>-0599 to -0500</option><option value='LEm0499min'>-0499 to -0400</option><option value='LEm0399min'>-0399 to -0300</option>
-				<option value='LEm0299min'>-0299 to -0200</option><option value='LEm0199min'>-0199 to -0100</option><option value='LEm0099min'>-0099 to -0000</option>
-				</optgroup>
-				<optgroup label='after Christ'>
-				<option value='LE0001min'>0001 - 0100</option><option value='LE0101min'>0101 - 0200</option><option value='LE0201min'>0201 - 0300</option>
-				<option value='LE0301min'>0301 - 0400</option><option value='LE0401min'>0401 - 0500</option><option value='LE0501min'>0501 - 0600</option>
-				<option value='LE0601min'>0601 - 0700</option><option value='LE0701min'>0701 - 0800</option><option value='LE0801min'>0801 - 0900</option>
-				<option value='LE0901min'>0901 - 1000</option><option value='LE1001min'>1001 - 1100</option><option value='LE1101min'>1101 - 1200</option>
-				<option value='LE1201min'>1201 - 1300</option><option value='LE1301min'>1301 - 1400</option><option value='LE1401min'>1401 - 1500</option>
-				<option value='LE1501min'>1501 - 1600</option><option value='LE1601min'>1601 - 1700</option><option value='LE1701min'>1701 - 1800</option>
-				<option value='LE1801min'>1801 - 1900</option><option value='LE1901min'>1901 - 2000</option><option value='LE2001min'>2001 - 2100</option>
-				<option value='LE2101min'>2101 - 2200</option><option value='LE2201min'>2201 - 2300</option><option value='LE2301min'>2301 - 2400</option>
-				<option value='LE2401min'>2401 - 2500</option><option value='LE2501min'>2501 - 2600</option><option value='LE2601min'>2601 - 2700</option>
-				<option value='LE2701min'>2701 - 2800</option><option value='LE2801min'>2801 - 2900</option><option value='LE2901min'>2901 - 3000</option>
-				</optgroup>
-				</select></div></td>
-				</tr>
-			</table>
-			</div>
-			
-		<div id="MoFiMain" style="position:relative; padding:4px; background:#FFFFFF; color:#2E2E2E; top:0px; height:400px; overflow:auto; width:auto;">
-			<table><tr>
-				<!-- Linke Seite AdSense "MOFI Mondverlauf" -->
-				<td style='vertical-align:top;white-space:nowrap;'>
-					<div id="adsgoogle" style="width:310px;"></div>
-				</td>
-				<!-- Rechte Seite Tabelle mit Werten --> <!-- NEU Table -->
-				<td style='vertical-align:top;'>
-					<div id="tblMoFiMain"></div>
-				</td>
-			</tr></table>
-			<!-- NEU -->
-			<div id="divMoreHelp" style="text-size:12px; display:none; position:absolute; background:#ffffff; top:0px; left:0px; z-index:2001; overflow:auto; width:auto;"></div>
-		</div>
-		<!-- Footer  -->
-		<div id="MoFiFooter" style="position:relative; height:auto; background:#333333; padding:4px; width:auto;">Footer</div>
-	</div>
+            // Corrections to the mean longitude
+            const correction = (
+                6.2887 * Math.sin(toRadians(M_prime)) +
+                1.2740 * Math.sin(toRadians(2 * D - M_prime)) +
+                0.6583 * Math.sin(toRadians(2 * D)) +
+                0.2136 * Math.sin(toRadians(M))
+            );
 
-<script type="text/javascript" id="cookieinfo"
-	src="scripts/cookieinfo.min.js"
-	data-bg="#4285F4"
-	data-fg="#FAFAFA"
-	data-link="black"
-	data-linkmsg="more Details"
-	data-linktarget="_blank"
-	data-effect="fade"
-	data-close-text="Got it!"
-	data-moreinfo="privacypolicy.html"
-	data-cookie="CookieInfoScript"
-	data-text-align="left"
-	data-font-size="14px"
-	data-divlinkbg="#FAFAFA"
-	data-divlink="black"
-	data-zindex="10000"
-	data-maxage="365"
-	data-opacity="0.85"
-	>
-</script>
-	
+            const L = L_prime + correction;
+
+            // Obliquity of the ecliptic
+            const epsilon = 23.43929111 - 0.0000003563 * n;
+
+            // Ecliptic coordinates
+            const lambda = (
+                L +
+                6.2887 * Math.sin(toRadians(M_prime)) +
+                1.2741 * Math.sin(toRadians(2 * D - M_prime)) +
+                0.6583 * Math.sin(toRadians(2 * D)) +
+                0.2136 * Math.sin(toRadians(M))
+            ) % 360;
+
+            const beta = (
+                5.1282 * Math.sin(toRadians(F)) +
+                0.2806 * Math.sin(toRadians(M + F)) +
+                0.2722 * Math.sin(toRadians(M - F)) -
+                0.1732 * Math.sin(toRadians(D))
+            );
+
+            // Convert ecliptic coordinates to equatorial coordinates
+            const sinRA = Math.sin(toRadians(lambda)) * Math.cos(toRadians(epsilon)) - Math.tan(toRadians(beta)) * Math.sin(toRadians(epsilon));
+            const cosRA = Math.cos(toRadians(lambda));
+            const ra = toDegrees(Math.atan2(sinRA, cosRA)) % 360;
+
+            // Calculate Local Sidereal Time at midnight UTC
+            const t = (julianDay - 2451545) / 36525;
+            const gst0 = 280.46061837 + 360.98564736629 * t;
+            const lstMidnight = (gst0 + longitude) % 360;
+
+            // Find the time when LST equals RA
+            let culminationHours = (ra - lstMidnight) / 15;
+            culminationHours = culminationHours < 0 ? culminationHours + 24 : culminationHours;
+
+            // Create a Date object for culmination time
+            const culminationDate = new Date(date);
+            culminationDate.setUTCHours(culminationHours, 0, 0, 0);
+
+            // Convert UTC to CET (+1 hour)
+            const localCulminationTime = new Date(culminationDate.getTime() + 3600 * 1000);
+
+            // Format the result
+            const hours = localCulminationTime.getUTCHours();
+            const minutes = localCulminationTime.getUTCMinutes();
+            const formattedDate = formatDate(date);
+
+            return `${formattedDate} | Culminazione della Luna: ${hours}:${minutes < 10 ? '0' : ''}${minutes} CET`;
+        }
+
+        function toRadians(degrees) {
+            return degrees * Math.PI / 180;
+        }
+
+        function toDegrees(radians) {
+            return radians * 180 / Math.PI;
+        }
+
+        function formatDate(date) {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}-${month}-${year}`;
+        }
+
+        function calculateMoonCulminationButton() {
+            const dateInput = document.getElementById('date').value;
+
+            if (!dateInput) {
+                alert("Inserisci una data valida.");
+                return;
+            }
+
+            const [year, month, day] = dateInput.split('-').map(Number);
+            const date = new Date(year, month - 1, day);
+
+            const latitude = 45.2740; // Latitude of Milan (Italy)
+            const longitude = 9.0934; // Longitude of Milan (Italy)
+
+            try {
+                const culminationTime = calculateMoonCulmination(date, latitude, longitude);
+                document.getElementById("culminationTime").innerText = culminationTime;
+            } catch (error) {
+                console.error("Errore durante il calcolo:", error);
+                document.getElementById("culminationTime").innerText = "Culminazione della Luna: Errore nel calcolo";
+            }
+        }
+
+        // Example usage (auto-calculate on page load)
+        window.onload = () => {
+            document.getElementById('date').value = '2025-02-01';
+            calculateMoonCulminationButton();
+        };
+    </script>
 </body>
 </html>
