@@ -1,1 +1,111 @@
-// aaa
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Calendario Lunare Mensile</title>
+    <meta charset="UTF-8">
+    <script src="somo.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        input { margin: 5px; padding: 5px; width: 150px; }
+        button { padding: 8px 15px; background: #007bff; color: white; border: none; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        th { background-color: #f2f2f2; }
+        .warning { color: #ff4444; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Calendario Lunare Mensile</h2>
+        
+        <label>Latitudine: <input type="number" id="lat" step="any" value="41.9028"></label>
+        <label>Longitudine: <input type="number" id="lng" step="any" value="12.4964"></label>
+        <label>Data: <input type="date" id="date" value="2025-02-01"></label>
+        <label>Fuso Orario (min): <input type="number" id="tz" value="60"></label>
+        
+        <button onclick="generateCalendar()">Genera Calendario</button>
+        
+        <div id="calendar"></div>
+    </div>
+
+<script>
+function adjustTime(utcTime, offsetMinutes) {
+    if(!utcTime || utcTime === "Non visibile") return "N/A";
+    
+    const [time, period] = utcTime.split(' ');
+    let [hours, minutes, seconds] = time.split(':');
+    
+    const date = new Date();
+    date.setUTCHours(hours);
+    date.setUTCMinutes(minutes);
+    date.setUTCSeconds(seconds);
+    date.setMinutes(date.getMinutes() + offsetMinutes);
+
+    return date.toLocaleTimeString('it-IT', { 
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    });
+}
+
+function generateCalendar() {
+    // Resetta il calendario
+    const calendarDiv = document.getElementById('calendar');
+    calendarDiv.innerHTML = '<div class="loading">Calcolo in corso...</div>';
+    
+    // Leggi parametri
+    const lat = parseFloat(document.getElementById('lat').value);
+    const lng = parseFloat(document.getElementById('lng').value);
+    const baseDate = new Date(document.getElementById('date').value);
+    const tzOffset = parseInt(document.getElementById('tz').value);
+
+    // Calcola giorni del mese
+    const year = baseDate.getFullYear();
+    const month = baseDate.getMonth();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    
+    // Genera tabella
+    let tableHtml = `
+        <table>
+            <tr>
+                <th>Data</th>
+                <th>Culminazione</th>
+                <th>Alba Lunare</th>
+                <th>Tramonto Lunare</th>
+                <th>Altitudine</th>
+            </tr>`;
+
+    for(let day = 1; day <= daysInMonth; day++) {
+        const currentDate = new Date(year, month, day);
+        const moonData = SoMo.getMoonDayInfo(currentDate, lat, lng, tzOffset);
+        
+        // Formatta le date
+        const formattedDate = currentDate.toLocaleDateString('it-IT');
+        const culmination = adjustTime(moonData.Transit?.toLocaleTimeString('it-IT', {timeZone: 'UTC'}), tzOffset);
+        const rise = adjustTime(moonData.Rise?.toLocaleTimeString('it-IT', {timeZone: 'UTC'}), tzOffset);
+        const set = adjustTime(moonData.Set?.toLocaleTimeString('it-IT', {timeZone: 'UTC'}), tzOffset);
+        const altitude = moonData.TransitAltitude ? `${moonData.TransitAltitude.toFixed(2)}°` : 'N/A';
+
+        // Gestione casi speciali
+        const specialCases = {
+            'circumpolar': '<span class="warning">Luna circumpolare</span>',
+            'never rises': '<span class="warning">Luna non sorge</span>'
+        };
+
+        tableHtml += `
+            <tr>
+                <td>${formattedDate}</td>
+                <td>${specialCases[culmination] || culmination}</td>
+                <td>${specialCases[rise] || rise}</td>
+                <td>${specialCases[set] || set}</td>
+                <td>${altitude}</td>
+            </tr>`;
+    }
+
+    tableHtml += '</table>';
+    calendarDiv.innerHTML = tableHtml;
+}
+</script>
+</body>
+</html>
