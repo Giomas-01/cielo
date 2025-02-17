@@ -175,7 +175,7 @@
             }
         }
 
-        // Funzione per correggere gli orari e gestire il passaggio da un giorno all'altro
+        // Funzione per correggere gli orari e gestire il passaggio al giorno successivo
         function adjustTime(time, timezone, date, day) {
             if (!time || !(time instanceof Date)) {
                 return "-"; // Se l'evento non avviene quel giorno
@@ -188,14 +188,14 @@
             const localTime = new Date(utcAdjustedTime.getTime() + timezone * 3600 * 1000);
 
             // Controlla se l'evento appartiene al giorno successivo
-            const eventDay = localTime.getDate();
-            if (eventDay !== day) {
-                return "-"; // Evento non visibile quel giorno
+            if (localTime.getDate() !== day) {
+                return "-"; // Evento spostato al giorno successivo
             }
 
             // Formatta l'ora
             const hours = localTime.getUTCHours();
             const minutes = localTime.getUTCMinutes();
+
             return `${hours}:${minutes < 10 ? '0' : ''}${minutes}`;
         }
 
