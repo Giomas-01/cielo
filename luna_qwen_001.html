@@ -106,7 +106,7 @@
                 const moonInfo = SoMo.getMoonDayInfo(date, latitude, longitude, 0); // Altitude is not relevant here
                 const culminationTime = moonInfo.Transit; // Transit is the culmination time
 
-                if (!culminationTime) {
+                if (!culminationTime || !(culminationTime instanceof Date)) {
                     // If no culmination occurs, handle it gracefully
                     const row = document.createElement('tr');
                     row.innerHTML = `
