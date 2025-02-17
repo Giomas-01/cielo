@@ -80,12 +80,16 @@
                     let localTime = new Date(d.getTime() + tzOffset * 60000);
                     let localDay = localTime.getUTCDate();
                     let referenceDay = referenceDate.getUTCDate();
+                    
                     if (localDay !== referenceDay) {
-                        localTime.setUTCDate(localTime.getUTCDate() + 1); // Gestisce il cambio di giorno
+                        // Se l'ora locale è nel giorno successivo, deve essere visibile solo il giorno successivo
+                        localTime.setUTCDate(localTime.getUTCDate() + 1);
+                        return localTime.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
                     }
+                    
                     return localTime.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
                 };
-                
+
                 let row = `<tr>
                     <td>${date.toLocaleDateString('it-IT')}</td>
                     <td>${formatTime(moonData.Rise, date)}</td>
