@@ -23,7 +23,11 @@
         <label>Data: <input type="text" id="date" placeholder="DD-MM-YYYY"></label>
         <label>Ora locale: 
             <select id="timezone">
-                " + Array.from({ length: 25 }, (_, i) => `<option value="${i - 12}">${i - 12}</option>`).join('') + "
+                <script>
+                    for (let i = 12; i >= -12; i--) {
+                        document.write(`<option value="${i}">${i}</option>`);
+                    }
+                </script>
             </select>
         </label>
         <button onclick="generateTable()">Calcola</button>
