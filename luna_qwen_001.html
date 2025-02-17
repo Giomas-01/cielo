@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calcolo Effemeridi della Luna Mensili</title>
+    <title>Calcolo Effemeridi della Luna Mensili (UTC)</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -52,42 +52,13 @@
     </style>
 </head>
 <body>
-    <h1>Effemeridi della Luna mensili</h1>
+    <h1>Effemeridi della Luna mensili (UTC)</h1>
     <div class="container">
         <label for="latitude">Latitudine:</label>
         <input type="number" id="latitude" placeholder="Es. 45.2740"><br>
 
         <label for="longitude">Longitudine:</label>
         <input type="number" id="longitude" placeholder="Es. 9.0934"><br>
-
-        <label for="timezone">Fuso Orario Locale (+/- rispetto a UTC):</label>
-        <select id="timezone">
-            <option value="-12">-12</option>
-            <option value="-11">-11</option>
-            <option value="-10">-10</option>
-            <option value="-9">-9</option>
-            <option value="-8">-8</option>
-            <option value="-7">-7</option>
-            <option value="-6">-6</option>
-            <option value="-5">-5</option>
-            <option value="-4">-4</option>
-            <option value="-3">-3</option>
-            <option value="-2">-2</option>
-            <option value="-1">-1</option>
-            <option value="0">0 (UTC)</option>
-            <option value="1" selected>+1 (CET)</option>
-            <option value="2">+2</option>
-            <option value="3">+3</option>
-            <option value="4">+4</option>
-            <option value="5">+5</option>
-            <option value="6">+6</option>
-            <option value="7">+7</option>
-            <option value="8">+8</option>
-            <option value="9">+9</option>
-            <option value="10">+10</option>
-            <option value="11">+11</option>
-            <option value="12">+12</option>
-        </select><br>
 
         <label for="monthYear">Mese-Anno (MM-YYYY):</label>
         <input type="text" id="monthYear" placeholder="Es. 02-2025"><br>
@@ -101,9 +72,9 @@
         <thead>
             <tr>
                 <th>Data</th>
-                <th>Levata</th>
-                <th>Culminazione</th>
-                <th>Tramonto</th>
+                <th>Levata (UTC)</th>
+                <th>Culminazione (UTC)</th>
+                <th>Tramonto (UTC)</th>
                 <th>Altezza Culminazione (°)</th>
             </tr>
         </thead>
@@ -125,11 +96,10 @@
         function calculateMonthlyMoonData() {
             const latitude = parseFloat(document.getElementById('latitude').value);
             const longitude = parseFloat(document.getElementById('longitude').value);
-            const timezone = parseFloat(document.getElementById('timezone').value); // Fuso orario selezionato
             const monthYearInput = document.getElementById('monthYear').value;
 
-            if (isNaN(latitude) || isNaN(longitude) || isNaN(timezone) || !monthYearInput) {
-                alert("Inserisci valori validi per latitudine, longitudine, fuso orario e mese-anno.");
+            if (isNaN(latitude) || isNaN(longitude) || !monthYearInput) {
+                alert("Inserisci valori validi per latitudine, longitudine e mese-anno.");
                 return;
             }
 
@@ -146,23 +116,19 @@
 
             // Calculate moon data for each day of the month
             const daysInMonth = new Date(year, month, 0).getDate(); // Get number of days in the month
-            const moonInfoCache = {}; // Cache per memorizzare le informazioni giornaliere
-
             for (let day = 1; day <= daysInMonth; day++) {
                 const date = new Date(year, month - 1, day); // Create date object
-                const julianDay = calculateJulianDay(date);
 
-                // Ottieni le informazioni sulla Luna per il giorno specificato
+                // Find moon rise, culmination, set, and altitude at culmination using SoMoTools
                 const moonInfo = SoMo.getMoonDayInfo(date, latitude, longitude, 0); // Altitude is not relevant here
-                moonInfoCache[day] = moonInfo;
 
-                // Estrai le proprietà rilevanti
-                const riseTime = adjustTime(moonInfo.Rise, timezone, date, day);
-                const culminationTime = adjustTime(moonInfo.Transit, timezone, date, day);
-                const setTime = adjustTime(moonInfo.Set, timezone, date, day);
+                // Extract relevant properties
+                const riseTime = formatTime(moonInfo.Rise);
+                const culminationTime = formatTime(moonInfo.Transit);
+                const setTime = formatTime(moonInfo.Set);
                 const culminationAltitude = moonInfo.TransitAltitude;
 
-                // Crea una riga per la tabella
+                // Create a row for the table
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${formatDate(date)}</td>
@@ -175,31 +141,20 @@
             }
         }
 
-        // Funzione per correggere gli orari e gestire il passaggio al giorno successivo
-        function adjustTime(time, timezone, date, day) {
+        // Function to format the time
+        function formatTime(time) {
             if (!time || !(time instanceof Date)) {
-                return "-"; // Se l'evento non avviene quel giorno
+                return "-"; // If time is null, show "-"
             }
 
-            // Correggi l'offset UTC aggiungendo 1 ora
-            const utcAdjustedTime = new Date(time.getTime() + 3600 * 1000);
-
-            // Applica il fuso orario selezionato
-            const localTime = new Date(utcAdjustedTime.getTime() + timezone * 3600 * 1000);
-
-            // Controlla se l'evento appartiene al giorno successivo
-            if (localTime.getDate() !== day) {
-                return "-"; // Evento spostato al giorno successivo
-            }
-
-            // Formatta l'ora
-            const hours = localTime.getUTCHours();
-            const minutes = localTime.getUTCMinutes();
+            // Format the result
+            const hours = time.getUTCHours();
+            const minutes = time.getUTCMinutes();
 
             return `${hours}:${minutes < 10 ? '0' : ''}${minutes}`;
         }
 
-        // Funzione per formattare la data
+        // Function to format the date
         function formatDate(date) {
             const day = String(date.getDate()).padStart(2, '0');
             const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -207,23 +162,28 @@
             return `${day}-${month}-${year}`;
         }
 
-        // Funzione per scaricare la tabella come CSV
+        // Function to download the table as CSV
         function downloadTableAsCSV() {
             const table = document.getElementById('moonTimesTable');
             const rows = table.querySelectorAll('tr');
 
-            // Estrai i dati dalla tabella
-            const csvContent = [];
-            rows.forEach(row => {
-                const rowData = Array.from(row.querySelectorAll('td, th')).map(cell => cell.textContent);
-                csvContent.push(rowData.join(','));
-            });
+            // Extract table headers
+            const headers = Array.from(rows[0].cells).map(cell => cell.textContent);
 
-            // Crea un Blob con i dati CSV
-            const blob = new Blob([csvContent.join('\n')], { type: 'text/csv;charset=utf-8;' });
+            // Extract table data
+            const data = [];
+            for (let i = 1; i < rows.length; i++) {
+                const rowData = Array.from(rows[i].cells).map(cell => cell.textContent);
+                data.push(rowData.join(','));
+            }
+
+            // Combine headers and data into CSV format
+            const csvContent = [headers.join(','), ...data].join('\n');
+
+            // Create a downloadable link
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
 
-            // Crea un link di download
             const a = document.createElement('a');
             a.setAttribute('hidden', true);
             a.setAttribute('href', url);
@@ -237,7 +197,6 @@
         window.onload = () => {
             document.getElementById('latitude').value = 45.2740; // Latitude of Milan (Italy)
             document.getElementById('longitude').value = 9.0934; // Longitude of Milan (Italy)
-            document.getElementById('timezone').value = 1; // Default timezone +1 (CET)
             document.getElementById('monthYear').value = '02-2025'; // February 2025
             calculateMonthlyMoonData();
         };
