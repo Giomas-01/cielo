@@ -18,7 +18,7 @@
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        input, button {
+        input, button, select {
             margin: 10px 0;
             padding: 8px;
             font-size: 16px;
@@ -53,10 +53,42 @@
     <div class="container">
         <label for="latitude">Latitudine:</label>
         <input type="number" id="latitude" placeholder="Es. 45.2740"><br>
+
         <label for="longitude">Longitudine:</label>
         <input type="number" id="longitude" placeholder="Es. 9.0934"><br>
+
+        <label for="timezone">Ora Locale (+/- ore rispetto a UTC):</label>
+        <select id="timezone">
+            <option value="-12">-12</option>
+            <option value="-11">-11</option>
+            <option value="-10">-10</option>
+            <option value="-9">-9</option>
+            <option value="-8">-8</option>
+            <option value="-7">-7</option>
+            <option value="-6">-6</option>
+            <option value="-5">-5</option>
+            <option value="-4">-4</option>
+            <option value="-3">-3</option>
+            <option value="-2">-2</option>
+            <option value="-1">-1</option>
+            <option value="0" selected>0 (UTC)</option>
+            <option value="1">+1</option>
+            <option value="2">+2</option>
+            <option value="3">+3</option>
+            <option value="4">+4</option>
+            <option value="5">+5</option>
+            <option value="6">+6</option>
+            <option value="7">+7</option>
+            <option value="8">+8</option>
+            <option value="9">+9</option>
+            <option value="10">+10</option>
+            <option value="11">+11</option>
+            <option value="12">+12</option>
+        </select><br>
+
         <label for="monthYear">Mese-Anno (MM-YYYY):</label>
         <input type="text" id="monthYear" placeholder="Es. 02-2025"><br>
+
         <button onclick="calculateMonthlyMoonCulmination()">Calcola Culminazioni</button>
     </div>
 
@@ -65,7 +97,7 @@
         <thead>
             <tr>
                 <th>Data</th>
-                <th>Culminazione</th>
+                <th>Culminazione (Locale)</th>
             </tr>
         </thead>
         <tbody id="resultsBody">
@@ -76,13 +108,21 @@
     <!-- Include somotools.min.js -->
     <script src="somotools.min.js"></script>
     <script>
+        function calculateJulianDay(date) {
+            const A = Math.floor((14 - date.getMonth()) / 12);
+            const Y = date.getFullYear() + 4800 - A;
+            const M = date.getMonth() + 12 * A - 3;
+            return date.getDate() + Math.floor((153 * M + 2) / 5) + 365 * Y + Math.floor(Y / 4) - Math.floor(Y / 100) + Math.floor(Y / 400) - 32045;
+        }
+
         function calculateMonthlyMoonCulmination() {
             const latitude = parseFloat(document.getElementById('latitude').value);
             const longitude = parseFloat(document.getElementById('longitude').value);
+            const timezone = parseFloat(document.getElementById('timezone').value); // Get the selected timezone
             const monthYearInput = document.getElementById('monthYear').value;
 
-            if (isNaN(latitude) || isNaN(longitude) || !monthYearInput) {
-                alert("Inserisci valori validi per latitudine, longitudine e mese-anno.");
+            if (isNaN(latitude) || isNaN(longitude) || isNaN(timezone) || !monthYearInput) {
+                alert("Inserisci valori validi per latitudine, longitudine, fuso orario e mese-anno.");
                 return;
             }
 
@@ -105,9 +145,10 @@
                 // Find moon culmination using SoMoTools
                 const moonInfo = SoMo.getMoonDayInfo(date, latitude, longitude, 0); // Altitude is not relevant here
                 const culminationTime = moonInfo.Transit; // Transit is the culmination time
+                const culminationAltitude = moonInfo.TransitAltitude; // Altitude at culmination
 
                 if (!culminationTime || !(culminationTime instanceof Date)) {
-                    // If no culmination occurs, handle it gracefully
+                    // If no culmination occurs or altitude is below horizon, handle it gracefully
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${formatDate(date)}</td>
@@ -117,8 +158,8 @@
                     continue;
                 }
 
-                // Convert UTC to CET (+1 hour)
-                const localCulminationTime = new Date(culminationTime.getTime() + 3600 * 1000);
+                // Convert UTC to Local Time based on user-selected timezone
+                const localCulminationTime = new Date(culminationTime.getTime() + timezone * 3600 * 1000);
 
                 // Format the result
                 const hours = localCulminationTime.getUTCHours();
@@ -127,7 +168,7 @@
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${formatDate(date)}</td>
-                    <td>${hours}:${minutes < 10 ? '0' : ''}${minutes} CET</td>
+                    <td>${hours}:${minutes < 10 ? '0' : ''}${minutes}</td>
                 `;
                 resultsBody.appendChild(row);
             }
@@ -144,6 +185,7 @@
         window.onload = () => {
             document.getElementById('latitude').value = 45.2740; // Latitude of Milan (Italy)
             document.getElementById('longitude').value = 9.0934; // Longitude of Milan (Italy)
+            document.getElementById('timezone').value = 1; // Default timezone +1 (CET)
             document.getElementById('monthYear').value = '02-2025'; // February 2025
             calculateMonthlyMoonCulmination();
         };
