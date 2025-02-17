@@ -144,11 +144,15 @@
 
                 // Find moon culmination using SoMoTools
                 const moonInfo = SoMo.getMoonDayInfo(date, latitude, longitude, 0); // Altitude is not relevant here
-                const culminationTime = moonInfo.Transit; // Transit is the culmination time
-                const culminationAltitude = moonInfo.TransitAltitude; // Altitude at culmination
+                let culminationTime = moonInfo.Transit; // Transit is the culmination time
 
+                // Fix UTC offset issue by adding 1 hour to UTC time
+                if (culminationTime && culminationTime instanceof Date) {
+                    culminationTime = new Date(culminationTime.getTime() + 3600 * 1000); // Add 1 hour to fix UTC offset
+                }
+
+                // Check if the Moon is visible above the horizon
                 if (!culminationTime || !(culminationTime instanceof Date)) {
-                    // If no culmination occurs, handle it gracefully
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${formatDate(date)}</td>
