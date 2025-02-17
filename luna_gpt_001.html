@@ -71,17 +71,18 @@
                 let date = new Date(Date.UTC(year, month, i));
                 let moonData = SoMo.getMoonDayInfo(date, lat, lon, 0); // Otteniamo i dati in UTC
                 
-                const formatTime = (d) => {
+                const formatTime = (d, currentDay) => {
                     if (!(d instanceof Date)) return "non visibile";
                     let localTime = new Date(d.getTime() + tzOffset * 60000);
-                    return localTime.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+                    let localDay = localTime.getUTCDate();
+                    return localDay === currentDay ? localTime.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) : "non visibile";
                 };
                 
                 let row = `<tr>
                     <td>${date.toLocaleDateString('it-IT')}</td>
-                    <td>${formatTime(moonData.Rise)}</td>
-                    <td>${formatTime(moonData.Transit)}</td>
-                    <td>${formatTime(moonData.Set)}</td>
+                    <td>${formatTime(moonData.Rise, i)}</td>
+                    <td>${formatTime(moonData.Transit, i)}</td>
+                    <td>${formatTime(moonData.Set, i)}</td>
                     <td>${moonData.TransitAltitude?.toFixed(2) || 'non visibile'}°</td>
                 </tr>`;
                 
