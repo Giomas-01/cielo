@@ -146,61 +146,60 @@
 
             // Calculate moon data for each day of the month
             const daysInMonth = new Date(year, month, 0).getDate(); // Get number of days in the month
+            const moonInfoCache = {}; // Cache per memorizzare le informazioni giornaliere
+
             for (let day = 1; day <= daysInMonth; day++) {
                 const date = new Date(year, month - 1, day); // Create date object
+                const julianDay = calculateJulianDay(date);
 
-                // Find moon rise, culmination, set, and altitude at culmination using SoMoTools
+                // Ottieni le informazioni sulla Luna per il giorno specificato
                 const moonInfo = SoMo.getMoonDayInfo(date, latitude, longitude, 0); // Altitude is not relevant here
+                moonInfoCache[day] = moonInfo;
 
-                // Extract relevant properties
-                const riseTime = adjustTime(moonInfo.Rise, 1); // Add 1 hour to fix UTC offset
-                const culminationTime = adjustTime(moonInfo.Transit, 1); // Add 1 hour to fix UTC offset
-                const setTime = adjustTime(moonInfo.Set, 1); // Add 1 hour to fix UTC offset
-                const culminationAltitude = moonInfo.TransitAltitude; // Altitude at culmination
+                // Estrai le proprietà rilevanti
+                const riseTime = adjustTime(moonInfo.Rise, timezone, date, day);
+                const culminationTime = adjustTime(moonInfo.Transit, timezone, date, day);
+                const setTime = adjustTime(moonInfo.Set, timezone, date, day);
+                const culminationAltitude = moonInfo.TransitAltitude;
 
-                // Convert times to local time based on user-selected timezone
-                const formattedRise = formatTime(riseTime, timezone);
-                const formattedCulmination = formatTime(culminationTime, timezone);
-                const formattedSet = formatTime(setTime, timezone);
-
-                // Create a row for the table
+                // Crea una riga per la tabella
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${formatDate(date)}</td>
-                    <td>${formattedRise}</td>
-                    <td>${formattedCulmination}</td>
-                    <td>${formattedSet}</td>
+                    <td>${riseTime}</td>
+                    <td>${culminationTime}</td>
+                    <td>${setTime}</td>
                     <td>${culminationAltitude.toFixed(2)} °</td>
                 `;
                 resultsBody.appendChild(row);
             }
         }
 
-        // Function to adjust UTC times by adding 1 hour to fix the offset
-        function adjustTime(time, hoursToAdd) {
+        // Funzione per correggere gli orari e gestire il passaggio da un giorno all'altro
+        function adjustTime(time, timezone, date, day) {
             if (!time || !(time instanceof Date)) {
-                return null; // Return null if time is undefined or not a Date object
-            }
-            return new Date(time.getTime() + hoursToAdd * 3600 * 1000); // Add 1 hour to fix UTC offset
-        }
-
-        // Function to format the time according to the selected timezone
-        function formatTime(time, timezone) {
-            if (!time) {
-                return "-"; // If time is null, show "-"
+                return "-"; // Se l'evento non avviene quel giorno
             }
 
-            // Convert UTC to Local Time based on user-selected timezone
-            const localTime = new Date(time.getTime() + timezone * 3600 * 1000);
+            // Correggi l'offset UTC aggiungendo 1 ora
+            const utcAdjustedTime = new Date(time.getTime() + 3600 * 1000);
 
-            // Format the result
+            // Applica il fuso orario selezionato
+            const localTime = new Date(utcAdjustedTime.getTime() + timezone * 3600 * 1000);
+
+            // Controlla se l'evento appartiene al giorno successivo
+            const eventDay = localTime.getDate();
+            if (eventDay !== day) {
+                return "-"; // Evento non visibile quel giorno
+            }
+
+            // Formatta l'ora
             const hours = localTime.getUTCHours();
             const minutes = localTime.getUTCMinutes();
-
             return `${hours}:${minutes < 10 ? '0' : ''}${minutes}`;
         }
 
-        // Function to format the date
+        // Funzione per formattare la data
         function formatDate(date) {
             const day = String(date.getDate()).padStart(2, '0');
             const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -208,28 +207,23 @@
             return `${day}-${month}-${year}`;
         }
 
-        // Function to download the table as CSV
+        // Funzione per scaricare la tabella come CSV
         function downloadTableAsCSV() {
             const table = document.getElementById('moonTimesTable');
             const rows = table.querySelectorAll('tr');
 
-            // Extract table headers
-            const headers = Array.from(rows[0].cells).map(cell => cell.textContent);
+            // Estrai i dati dalla tabella
+            const csvContent = [];
+            rows.forEach(row => {
+                const rowData = Array.from(row.querySelectorAll('td, th')).map(cell => cell.textContent);
+                csvContent.push(rowData.join(','));
+            });
 
-            // Extract table data
-            const data = [];
-            for (let i = 1; i < rows.length; i++) {
-                const rowData = Array.from(rows[i].cells).map(cell => cell.textContent);
-                data.push(rowData.join(','));
-            }
-
-            // Combine headers and data into CSV format
-            const csvContent = [headers.join(','), ...data].join('\n');
-
-            // Create a downloadable link
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            // Crea un Blob con i dati CSV
+            const blob = new Blob([csvContent.join('\n')], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
 
+            // Crea un link di download
             const a = document.createElement('a');
             a.setAttribute('hidden', true);
             a.setAttribute('href', url);
