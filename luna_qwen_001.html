@@ -152,38 +152,46 @@
                 // Find moon rise, culmination, set, and altitude at culmination using SoMoTools
                 const moonInfo = SoMo.getMoonDayInfo(date, latitude, longitude, 0); // Altitude is not relevant here
 
-                // Extract relevant properties
-                const riseTime = formatTime(moonInfo.Rise, timezone, date, day);
-                const culminationTime = formatTime(moonInfo.Transit, timezone, date, day);
-                const setTime = formatTime(moonInfo.Set, timezone, date, day);
+                // Adjust UTC times by adding 1 hour to fix the offset
+                const riseTime = adjustTime(moonInfo.Rise, 1); // Add 1 hour to UTC
+                const culminationTime = adjustTime(moonInfo.Transit, 1); // Add 1 hour to UTC
+                const setTime = adjustTime(moonInfo.Set, 1); // Add 1 hour to UTC
                 const culminationAltitude = moonInfo.TransitAltitude;
+
+                // Format the time for UTC display
+                const formattedRise = formatTime(riseTime, 0); // UTC time
+                const formattedCulmination = formatTime(culminationTime, 0); // UTC time
+                const formattedSet = formatTime(setTime, 0); // UTC time
 
                 // Create a row for the table
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${formatDate(date)}</td>
-                    <td>${riseTime}</td>
-                    <td>${culminationTime}</td>
-                    <td>${setTime}</td>
+                    <td>${formattedRise}</td>
+                    <td>${formattedCulmination}</td>
+                    <td>${formattedSet}</td>
                     <td>${culminationAltitude.toFixed(2)} °</td>
                 `;
                 resultsBody.appendChild(row);
             }
         }
 
-        // Function to format the time
-        function formatTime(time, timezone, date, day) {
+        // Function to adjust the time by adding hours
+        function adjustTime(time, hoursToAdd) {
             if (!time || !(time instanceof Date)) {
+                return null; // If time is null, return null
+            }
+            return new Date(time.getTime() + hoursToAdd * 3600 * 1000); // Add 1 hour to fix UTC offset
+        }
+
+        // Function to format the time
+        function formatTime(time, timezone) {
+            if (!time) {
                 return "-"; // If time is null, show "-"
             }
 
             // Convert UTC to Local Time based on user-selected timezone
             const localTime = new Date(time.getTime() + timezone * 3600 * 1000);
-
-            // Check if the event belongs to the current day
-            if (localTime.getDate() !== day) {
-                return "-"; // Event belongs to another day
-            }
 
             // Format the result
             const hours = localTime.getUTCHours();
@@ -209,19 +217,17 @@
             const headers = Array.from(rows[0].cells).map(cell => cell.textContent);
 
             // Extract table data
-            const data = [];
+            const csvContent = [];
             for (let i = 1; i < rows.length; i++) {
                 const rowData = Array.from(rows[i].cells).map(cell => cell.textContent);
-                data.push(rowData.join(','));
+                csvContent.push(rowData.join(','));
             }
 
             // Combine headers and data into CSV format
-            const csvContent = [headers.join(','), ...data].join('\n');
-
-            // Create a downloadable link
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const blob = new Blob([headers.join(',') + '\n' + csvContent.join('\n')], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
 
+            // Create a downloadable link
             const a = document.createElement('a');
             a.setAttribute('hidden', true);
             a.setAttribute('href', url);
