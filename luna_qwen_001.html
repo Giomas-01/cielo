@@ -57,7 +57,7 @@
         <label for="longitude">Longitudine:</label>
         <input type="number" id="longitude" placeholder="Es. 9.0934"><br>
 
-        <label for="timezone">Ora Locale (+/- ore rispetto a UTC):</label>
+        <label for="timezone">Fuso Orario Locale (+/- rispetto a UTC):</label>
         <select id="timezone">
             <option value="-12">-12</option>
             <option value="-11">-11</option>
@@ -71,8 +71,8 @@
             <option value="-3">-3</option>
             <option value="-2">-2</option>
             <option value="-1">-1</option>
-            <option value="0" selected>0 (UTC)</option>
-            <option value="1">+1</option>
+            <option value="0">0 (UTC)</option>
+            <option value="1" selected>+1 (CET)</option>
             <option value="2">+2</option>
             <option value="3">+3</option>
             <option value="4">+4</option>
@@ -148,7 +148,7 @@
                 const culminationAltitude = moonInfo.TransitAltitude; // Altitude at culmination
 
                 if (!culminationTime || !(culminationTime instanceof Date)) {
-                    // If no culmination occurs or altitude is below horizon, handle it gracefully
+                    // If no culmination occurs, handle it gracefully
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${formatDate(date)}</td>
