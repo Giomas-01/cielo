@@ -1,73 +1,125 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
+    <title>Calendario Lunare Dinamico</title>
     <meta charset="UTF-8">
-    <title>Orari Lunari Dinamici</title>
+    <script src="https://cdn.jsdelivr.net/npm/astronomy-engine/astronomy-engine.min.js"></script>
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        .container { max-width: 600px; margin: 0 auto; }
-        .moon-info { background: #f8f9fa; padding: 20px; border-radius: 10px; }
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            padding: 20px;
+            background: #f0f4f8;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        input, button {
+            padding: 10px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #0056b3;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="moon-info" id="moonData"></div>
+        <h2>🌙 Calendario Lunare - 7 Giorni</h2>
+        
+        <label>Latitudine: <input type="number" id="lat" step="0.0001" value="41.9028"></label>
+        <label>Longitudine: <input type="number" id="lng" step="0.0001" value="12.4964"></label>
+        <button onclick="generateTable()">Genera Tabella</button>
+        
+        <div id="tableContainer"></div>
     </div>
 
 <script>
-// Funzione principale aggiornata
-function updateMoonData() {
-    const now = new Date();
-    const moonAge = calculateMoonAge(now);
-    const phase = getMoonPhase(moonAge);
+function generateTable() {
+    const lat = parseFloat(document.getElementById('lat').value);
+    const lng = parseFloat(document.getElementById('lng').value);
+    const tableContainer = document.getElementById('tableContainer');
     
-    // CALCOLO ORA DINAMICO (corretto)
-    const moonTimes = calculateMoonTimes(now, moonAge);
-    
-    document.getElementById('moonData').innerHTML = `
-        <h2>Fase Lunare - ${now.toLocaleDateString('it-IT')}</h2>
-        <p>⏳ Età: ${moonAge} giorni</p>
-        <p>🌑 Fase: ${phase}</p>
-        <p>🌖 Alba lunare: ${moonTimes.rise}</p>
-        <p>🌘 Tramonto lunare: ${moonTimes.set}</p>
-    `;
+    let tableHTML = `
+        <table>
+            <tr>
+                <th>Data</th>
+                <th>Fase</th>
+                <th>Culminazione</th>
+                <th>Alba</th>
+                <th>Tramonto</th>
+                <th>Altitudine</th>
+            </tr>`;
+
+    // Genera dati per 7 giorni
+    for(let i = 0; i < 7; i++) {
+        const date = new Date();
+        date.setDate(date.getDate() + i);
+        
+        const moonData = Astronomy.MoonPhase(date);
+        const times = Astronomy.MoonRiseSetTimes(date, lat, lng);
+
+        tableHTML += `
+            <tr>
+                <td>${date.toLocaleDateString('it-IT')}</td>
+                <td>${getMoonPhaseName(moonData.phase)}</td>
+                <td>${formatTime(times.culmination)}</td>
+                <td>${formatTime(times.rise)}</td>
+                <td>${formatTime(times.set)}</td>
+                <td>${calculateAltitude(date, lat, lng).toFixed(2)}°</td>
+            </tr>`;
+    }
+
+    tableHTML += '</table>';
+    tableContainer.innerHTML = tableHTML;
 }
 
-// Calcolo preciso età lunare (corretto)
-function calculateMoonAge(date) {
-    const referenceNewMoon = new Date(2024, 0, 11, 11, 57); // Data corretta (11 gennaio 2024 11:57 UTC)
-    const diff = date - referenceNewMoon;
-    const lunarCycle = 29.53058867 * 86400000; // Ciclo in millisecondi
-    return ((diff % lunarCycle) / 86400000).toFixed(1);
-}
-
-// Nuovo sistema di calcolo orari (simulazione realistica)
-function calculateMoonTimes(date, moonAge) {
-    const baseHour = date.getHours();
-    const dayOfYear = Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 86400000);
-
-    // Simula la variazione giornaliera (la Luna sorge ~50 minuti dopo ogni giorno)
-    const dailyOffset = dayOfYear * 50; // 50 minuti di ritardo progressivo
-    const riseHour = ((baseHour * 60 + dailyOffset) % 1440) / 60;
-    const setHour = ((riseHour + 8.5) % 24);
-
-    return {
-        rise: formatTime(riseHour),
-        set: formatTime(setHour)
+function getMoonPhaseName(phase) {
+    const phases = {
+        0: '🌑 Luna Nuova',
+        0.25: '🌓 Primo Quarto',
+        0.5: '🌕 Luna Piena',
+        0.75: '🌗 Ultimo Quarto'
     };
+    return phases[phase] || '🌘 Luna Calante';
 }
 
-function formatTime(hours) {
-    const h = Math.floor(hours);
-    const m = Math.round((hours % 1) * 60);
-    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+function formatTime(date) {
+    return date ? date.toLocaleTimeString('it-IT', {hour: '2-digit', minute: '2-digit'}) : '--:--';
 }
 
-// Aggiornamento automatico
-window.onload = () => {
-    updateMoonData();
-    setInterval(updateMoonData, 3600000); // Aggiorna ogni ora
-};
+function calculateAltitude(date, lat, lng) {
+    const observer = new Astronomy.Observer(lat, lng, 0);
+    const time = Astronomy.MakeTime(date);
+    const body = Astronomy.Body.Moon;
+    return Astronomy.HourAngle(body, time, observer).altitude;
+}
 </script>
 </body>
 </html>
