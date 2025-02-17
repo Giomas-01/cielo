@@ -150,12 +150,12 @@
                 const date = new Date(year, month - 1, day); // Create date object
 
                 // Find moon rise, culmination, set, and altitude at culmination using SoMoTools
-                const moonInfo = SoMo.getMoonDayInfo(date, latitude, longitude, 0); // Altitude is not relevant here
+                const moonInfo = SoMo.getMoonDayInfo(date, latitude, longitude, 0);
 
                 // Extract relevant properties
-                const riseTime = adjustTime(moonInfo.Rise, timezone);
-                const culminationTime = adjustTime(moonInfo.Transit, timezone);
-                const setTime = adjustTime(moonInfo.Set, timezone);
+                const riseTime = adjustTime(moonInfo.Rise, timezone, date, day);
+                const culminationTime = adjustTime(moonInfo.Transit, timezone, date, day);
+                const setTime = adjustTime(moonInfo.Set, timezone, date, day);
                 const culminationAltitude = moonInfo.TransitAltitude;
 
                 // Create a row for the table
@@ -171,21 +171,20 @@
             }
         }
 
-        // Function to adjust the time based on user-selected timezone
-        function adjustTime(time, timezone) {
+        // Function to adjust the time based on user-selected timezone and fix UTC offset
+        function adjustTime(time, timezone, date, day) {
             if (!time || !(time instanceof Date)) {
                 return "-"; // If time is null, show "-"
             }
 
+            // Fix UTC offset by adding 1 hour
+            const utcAdjustedTime = new Date(time.getTime() + 3600 * 1000);
+
             // Convert UTC to Local Time based on user-selected timezone
-            const localTime = new Date(time.getTime() + timezone * 3600 * 1000);
+            const localTime = new Date(utcAdjustedTime.getTime() + timezone * 3600 * 1000);
 
             // Check if the event belongs to the current day
-            const eventDay = localTime.getDate();
-            const eventMonth = localTime.getMonth() + 1;
-            const eventYear = localTime.getFullYear();
-
-            if (eventDay !== time.getDate() || eventMonth !== time.getMonth() + 1 || eventYear !== time.getFullYear()) {
+            if (localTime.getDate() !== day || localTime.getMonth() !== date.getMonth() || localTime.getFullYear() !== date.getFullYear()) {
                 return "-"; // Event belongs to another day
             }
 
