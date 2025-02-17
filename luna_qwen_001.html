@@ -111,13 +111,6 @@
     <!-- Include somotools.min.js -->
     <script src="somotools.min.js"></script>
     <script>
-        function calculateJulianDay(date) {
-            const A = Math.floor((14 - date.getMonth()) / 12);
-            const Y = date.getFullYear() + 4800 - A;
-            const M = date.getMonth() + 12 * A - 3;
-            return date.getDate() + Math.floor((153 * M + 2) / 5) + 365 * Y + Math.floor(Y / 4) - Math.floor(Y / 100) + Math.floor(Y / 400) - 32045;
-        }
-
         function calculateMonthlyMoonData() {
             const latitude = parseFloat(document.getElementById('latitude').value);
             const longitude = parseFloat(document.getElementById('longitude').value);
@@ -149,16 +142,17 @@
                 const moonInfo = SoMo.getMoonDayInfo(date, latitude, longitude, 0); // Altitude is not relevant here
 
                 // Extract relevant properties
-                const riseTime = moonInfo.Rise; // Levata
-                const culminationTime = moonInfo.Transit; // Culminazione
-                const setTime = moonInfo.Set; // Tramonto
-                const culminationAltitude = moonInfo.TransitAltitude; // Altezza al momento di culminazione
+                const riseTime = adjustTime(moonInfo.Rise, 1); // Add 1 hour to fix UTC offset
+                const culminationTime = adjustTime(moonInfo.Transit, 1); // Add 1 hour to fix UTC offset
+                const setTime = adjustTime(moonInfo.Set, 1); // Add 1 hour to fix UTC offset
+                const culminationAltitude = moonInfo.TransitAltitude; // Altitude at culmination
 
-                // Handle cases where moon events are undefined or below horizon
-                const formattedRise = formatTime(riseTime, timezone, "Rise");
-                const formattedCulmination = formatTime(culminationTime, timezone, "Transit");
-                const formattedSet = formatTime(setTime, timezone, "Set");
+                // Convert times to local time based on user-selected timezone
+                const formattedRise = formatTime(riseTime, timezone);
+                const formattedCulmination = formatTime(culminationTime, timezone);
+                const formattedSet = formatTime(setTime, timezone);
 
+                // Create a row for the table
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${formatDate(date)}</td>
@@ -171,16 +165,18 @@
             }
         }
 
-        function formatDate(date) {
-            const day = String(date.getDate()).padStart(2, '0');
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const year = date.getFullYear();
-            return `${day}-${month}-${year}`;
+        // Function to adjust UTC times by adding 1 hour to fix the offset
+        function adjustTime(time, hoursToAdd) {
+            if (!time || !(time instanceof Date)) {
+                return null; // Return null if time is undefined or not a Date object
+            }
+            return new Date(time.getTime() + hoursToAdd * 3600 * 1000); // Add 1 hour to fix UTC offset
         }
 
-        function formatTime(time, timezone, event) {
-            if (!time || !(time instanceof Date)) {
-                return event === "Transit" && time !== null ? "Non visibile" : "-";
+        // Function to format the time according to the selected timezone
+        function formatTime(time, timezone) {
+            if (!time) {
+                return "-"; // If time is null, show "-"
             }
 
             // Convert UTC to Local Time based on user-selected timezone
@@ -191,6 +187,14 @@
             const minutes = localTime.getUTCMinutes();
 
             return `${hours}:${minutes < 10 ? '0' : ''}${minutes}`;
+        }
+
+        // Function to format the date
+        function formatDate(date) {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}-${month}-${year}`;
         }
 
         // Example usage (auto-calculate on page load)
