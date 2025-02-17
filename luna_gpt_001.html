@@ -81,10 +81,9 @@
                     let localDay = localTime.getUTCDate();
                     let referenceDay = referenceDate.getUTCDate();
                     
+                    // Se l'evento è nel giorno successivo rispetto alla data di riferimento
                     if (localDay !== referenceDay) {
-                        // Se l'ora locale è nel giorno successivo, deve essere visibile solo il giorno successivo
-                        localTime.setUTCDate(localTime.getUTCDate() + 1);
-                        return localTime.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+                        return "non visibile"; // Evento visibile solo il giorno successivo
                     }
                     
                     return localTime.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
