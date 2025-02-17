@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calcolo Effemeridi della Luna Mensili (UTC)</title>
+    <title>Calcolo Effemeridi della Luna Mensili</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -52,13 +52,42 @@
     </style>
 </head>
 <body>
-    <h1>Effemeridi della Luna mensili (UTC)</h1>
+    <h1>Effemeridi della Luna mensili</h1>
     <div class="container">
         <label for="latitude">Latitudine:</label>
         <input type="number" id="latitude" placeholder="Es. 45.2740"><br>
 
         <label for="longitude">Longitudine:</label>
         <input type="number" id="longitude" placeholder="Es. 9.0934"><br>
+
+        <label for="timezone">Fuso Orario Locale (+/- rispetto a UTC):</label>
+        <select id="timezone">
+            <option value="-12">-12</option>
+            <option value="-11">-11</option>
+            <option value="-10">-10</option>
+            <option value="-9">-9</option>
+            <option value="-8">-8</option>
+            <option value="-7">-7</option>
+            <option value="-6">-6</option>
+            <option value="-5">-5</option>
+            <option value="-4">-4</option>
+            <option value="-3">-3</option>
+            <option value="-2">-2</option>
+            <option value="-1">-1</option>
+            <option value="0">0 (UTC)</option>
+            <option value="1" selected>+1 (CET)</option>
+            <option value="2">+2</option>
+            <option value="3">+3</option>
+            <option value="4">+4</option>
+            <option value="5">+5</option>
+            <option value="6">+6</option>
+            <option value="7">+7</option>
+            <option value="8">+8</option>
+            <option value="9">+9</option>
+            <option value="10">+10</option>
+            <option value="11">+11</option>
+            <option value="12">+12</option>
+        </select><br>
 
         <label for="monthYear">Mese-Anno (MM-YYYY):</label>
         <input type="text" id="monthYear" placeholder="Es. 02-2025"><br>
@@ -96,10 +125,11 @@
         function calculateMonthlyMoonData() {
             const latitude = parseFloat(document.getElementById('latitude').value);
             const longitude = parseFloat(document.getElementById('longitude').value);
+            const timezone = parseFloat(document.getElementById('timezone').value); // Fuso orario selezionato
             const monthYearInput = document.getElementById('monthYear').value;
 
-            if (isNaN(latitude) || isNaN(longitude) || !monthYearInput) {
-                alert("Inserisci valori validi per latitudine, longitudine e mese-anno.");
+            if (isNaN(latitude) || isNaN(longitude) || isNaN(timezone) || !monthYearInput) {
+                alert("Inserisci valori validi per latitudine, longitudine, fuso orario e mese-anno.");
                 return;
             }
 
@@ -123,9 +153,9 @@
                 const moonInfo = SoMo.getMoonDayInfo(date, latitude, longitude, 0); // Altitude is not relevant here
 
                 // Extract relevant properties
-                const riseTime = formatTime(moonInfo.Rise);
-                const culminationTime = formatTime(moonInfo.Transit);
-                const setTime = formatTime(moonInfo.Set);
+                const riseTime = formatTime(moonInfo.Rise, timezone, date, day);
+                const culminationTime = formatTime(moonInfo.Transit, timezone, date, day);
+                const setTime = formatTime(moonInfo.Set, timezone, date, day);
                 const culminationAltitude = moonInfo.TransitAltitude;
 
                 // Create a row for the table
@@ -142,14 +172,22 @@
         }
 
         // Function to format the time
-        function formatTime(time) {
+        function formatTime(time, timezone, date, day) {
             if (!time || !(time instanceof Date)) {
                 return "-"; // If time is null, show "-"
             }
 
+            // Convert UTC to Local Time based on user-selected timezone
+            const localTime = new Date(time.getTime() + timezone * 3600 * 1000);
+
+            // Check if the event belongs to the current day
+            if (localTime.getDate() !== day) {
+                return "-"; // Event belongs to another day
+            }
+
             // Format the result
-            const hours = time.getUTCHours();
-            const minutes = time.getUTCMinutes();
+            const hours = localTime.getUTCHours();
+            const minutes = localTime.getUTCMinutes();
 
             return `${hours}:${minutes < 10 ? '0' : ''}${minutes}`;
         }
@@ -197,6 +235,7 @@
         window.onload = () => {
             document.getElementById('latitude').value = 45.2740; // Latitude of Milan (Italy)
             document.getElementById('longitude').value = 9.0934; // Longitude of Milan (Italy)
+            document.getElementById('timezone').value = 1; // Default timezone +1 (CET)
             document.getElementById('monthYear').value = '02-2025'; // February 2025
             calculateMonthlyMoonData();
         };
