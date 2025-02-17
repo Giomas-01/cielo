@@ -63,7 +63,7 @@
                 let moonData = SoMo.getMoonDayInfo(date, lat, lon, tzOffset);
                 
                 const formatTime = (d) => 
-                    d instanceof Date ? d.toLocaleTimeString('it-IT', { timeZone: 'UTC' }) : "N/A";
+                    d instanceof Date ? d.toLocaleTimeString('it-IT', { timeZone: 'UTC' }) : "non visibile";
                 
                 let row = `<tr>
                     <td>${date.toLocaleDateString('it-IT')}</td>
