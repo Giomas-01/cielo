@@ -101,9 +101,9 @@
         <thead>
             <tr>
                 <th>Data</th>
-                <th>Levata (UTC)</th>
-                <th>Culminazione (UTC)</th>
-                <th>Tramonto (UTC)</th>
+                <th>Levata (Locale)</th>
+                <th>Culminazione (Locale)</th>
+                <th>Tramonto (Locale)</th>
                 <th>Altezza Culminazione (°)</th>
             </tr>
         </thead>
@@ -152,46 +152,42 @@
                 // Find moon rise, culmination, set, and altitude at culmination using SoMoTools
                 const moonInfo = SoMo.getMoonDayInfo(date, latitude, longitude, 0); // Altitude is not relevant here
 
-                // Adjust UTC times by adding 1 hour to fix the offset
-                const riseTime = adjustTime(moonInfo.Rise, 1); // Add 1 hour to UTC
-                const culminationTime = adjustTime(moonInfo.Transit, 1); // Add 1 hour to UTC
-                const setTime = adjustTime(moonInfo.Set, 1); // Add 1 hour to UTC
+                // Extract relevant properties
+                const riseTime = adjustTime(moonInfo.Rise, timezone);
+                const culminationTime = adjustTime(moonInfo.Transit, timezone);
+                const setTime = adjustTime(moonInfo.Set, timezone);
                 const culminationAltitude = moonInfo.TransitAltitude;
-
-                // Format the time for UTC display
-                const formattedRise = formatTime(riseTime, 0); // UTC time
-                const formattedCulmination = formatTime(culminationTime, 0); // UTC time
-                const formattedSet = formatTime(setTime, 0); // UTC time
 
                 // Create a row for the table
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${formatDate(date)}</td>
-                    <td>${formattedRise}</td>
-                    <td>${formattedCulmination}</td>
-                    <td>${formattedSet}</td>
+                    <td>${riseTime}</td>
+                    <td>${culminationTime}</td>
+                    <td>${setTime}</td>
                     <td>${culminationAltitude.toFixed(2)} °</td>
                 `;
                 resultsBody.appendChild(row);
             }
         }
 
-        // Function to adjust the time by adding hours
-        function adjustTime(time, hoursToAdd) {
+        // Function to adjust the time based on user-selected timezone
+        function adjustTime(time, timezone) {
             if (!time || !(time instanceof Date)) {
-                return null; // If time is null, return null
-            }
-            return new Date(time.getTime() + hoursToAdd * 3600 * 1000); // Add 1 hour to fix UTC offset
-        }
-
-        // Function to format the time
-        function formatTime(time, timezone) {
-            if (!time) {
                 return "-"; // If time is null, show "-"
             }
 
             // Convert UTC to Local Time based on user-selected timezone
             const localTime = new Date(time.getTime() + timezone * 3600 * 1000);
+
+            // Check if the event belongs to the current day
+            const eventDay = localTime.getDate();
+            const eventMonth = localTime.getMonth() + 1;
+            const eventYear = localTime.getFullYear();
+
+            if (eventDay !== time.getDate() || eventMonth !== time.getMonth() + 1 || eventYear !== time.getFullYear()) {
+                return "-"; // Event belongs to another day
+            }
 
             // Format the result
             const hours = localTime.getUTCHours();
