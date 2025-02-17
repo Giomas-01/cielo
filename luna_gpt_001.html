@@ -52,25 +52,29 @@
             const month = parseInt(dateParts[1]) - 1; // Mesi in JavaScript partono da 0
             const year = parseInt(dateParts[2]);
             
-            const date = new Date(year, month, day);
             const tzOffset = 60; // CET (UTC+1)
             const tableBody = document.getElementById("moonTableBody");
             tableBody.innerHTML = ""; // Pulisce la tabella
             
-            let moonData = SoMo.getMoonDayInfo(date, lat, lon, tzOffset);
+            const daysInMonth = new Date(year, month + 1, 0).getDate(); // Ottiene il numero di giorni nel mese
+            
+            for (let i = 1; i <= daysInMonth; i++) {
+                let date = new Date(year, month, i);
+                let moonData = SoMo.getMoonDayInfo(date, lat, lon, tzOffset);
                 
-            const formatTime = (d) => 
-                d instanceof Date ? d.toLocaleTimeString('it-IT', { timeZone: 'UTC' }) : "N/A";
+                const formatTime = (d) => 
+                    d instanceof Date ? d.toLocaleTimeString('it-IT', { timeZone: 'UTC' }) : "N/A";
                 
-            let row = `<tr>
-                <td>${date.toLocaleDateString('it-IT')}</td>
-                <td>${formatTime(moonData.Rise)}</td>
-                <td>${formatTime(moonData.Transit)}</td>
-                <td>${formatTime(moonData.Set)}</td>
-                <td>${moonData.TransitAltitude?.toFixed(2) || 'N/A'}°</td>
-            </tr>`;
+                let row = `<tr>
+                    <td>${date.toLocaleDateString('it-IT')}</td>
+                    <td>${formatTime(moonData.Rise)}</td>
+                    <td>${formatTime(moonData.Transit)}</td>
+                    <td>${formatTime(moonData.Set)}</td>
+                    <td>${moonData.TransitAltitude?.toFixed(2) || 'N/A'}°</td>
+                </tr>`;
                 
-            tableBody.innerHTML += row;
+                tableBody.innerHTML += row;
+            }
         }
     </script>
 </body>
