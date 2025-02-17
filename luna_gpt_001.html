@@ -40,62 +40,60 @@
         <tbody id="moonTableBody"></tbody>
     </table>
     
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const timezoneSelect = document.getElementById("timezone");
-            for (let i = 12; i >= -12; i--) {
-                let option = document.createElement("option");
-                option.value = i;
-                option.textContent = i;
-                timezoneSelect.appendChild(option);
-            }
-        });
-
-        function generateTable() {
-            const lat = parseFloat(document.getElementById("lat").value);
-            const lon = parseFloat(document.getElementById("lon").value);
-            const dateInput = document.getElementById("date").value;
-            const tzOffset = parseInt(document.getElementById("timezone").value) * 60; // Offset in minuti
-            
-            const dateParts = dateInput.split("-");
-            if (dateParts.length !== 3) {
-                alert("Formato data non valido. Usa DD-MM-YYYY.");
-                return;
-            }
-            const day = parseInt(dateParts[0]);
-            const month = parseInt(dateParts[1]) - 1; // Mesi in JavaScript partono da 0
-            const year = parseInt(dateParts[2]);
-            
-            const tableBody = document.getElementById("moonTableBody");
-            tableBody.innerHTML = ""; // Pulisce la tabella
-            
-            const daysInMonth = new Date(year, month + 1, 0).getDate(); // Ottiene il numero di giorni nel mese
-            
-            for (let i = 1; i <= daysInMonth; i++) {
-                let date = new Date(Date.UTC(year, month, i));
-                let moonData = SoMo.getMoonDayInfo(date, lat, lon, 0); // Otteniamo i dati in UTC
-                
-                const formatTime = (d, referenceDate) => {
-                    if (!(d instanceof Date)) return "non visibile";
-                    let localTime = new Date(d.getTime() + tzOffset * 60000);
-                    let localDay = localTime.getUTCDate();
-                    let referenceDay = referenceDate.getUTCDate();
-                    return localDay === referenceDay
-                        ? localTime.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })
-                        : "non visibile";
-                };
-                
-                let row = `<tr>
-                    <td>${date.toLocaleDateString('it-IT')}</td>
-                    <td>${formatTime(moonData.Rise, date)}</td>
-                    <td>${formatTime(moonData.Transit, date)}</td>
-                    <td>${formatTime(moonData.Set, date)}</td>
-                    <td>${moonData.TransitAltitude?.toFixed(2) || 'non visibile'}°</td>
-                </tr>`;
-                
-                tableBody.innerHTML += row;
-            }
+   <script>
+    function generateTable() {
+        const lat = parseFloat(document.getElementById("lat").value);
+        const lon = parseFloat(document.getElementById("lon").value);
+        const dateInput = document.getElementById("date").value;
+        const tzOffset = parseInt(document.getElementById("timezone").value) * 60; // Offset in minuti
+        
+        const dateParts = dateInput.split("-");
+        if (dateParts.length !== 3) {
+            alert("Formato data non valido. Usa DD-MM-YYYY.");
+            return;
         }
-    </script>
+        const day = parseInt(dateParts[0]);
+        const month = parseInt(dateParts[1]) - 1; // Mesi in JavaScript partono da 0
+        const year = parseInt(dateParts[2]);
+        
+        const tableBody = document.getElementById("moonTableBody");
+        tableBody.innerHTML = ""; // Pulisce la tabella
+        
+        const daysInMonth = new Date(year, month + 1, 0).getDate(); // Ottiene il numero di giorni nel mese
+        
+        for (let i = 1; i <= daysInMonth; i++) {
+            let date = new Date(Date.UTC(year, month, i));
+            let moonData = SoMo.getMoonDayInfo(date, lat, lon, 0); // Otteniamo i dati in UTC
+            
+            const formatTime = (d, referenceDate) => {
+                if (!(d instanceof Date)) return "non visibile";
+                
+                let localTime = new Date(d.getTime() + tzOffset * 60000);
+                let localDay = localTime.getUTCDate();
+                let referenceDay = referenceDate.getUTCDate();
+                
+                // Se l'ora locale supera la mezzanotte (è un evento del giorno successivo)
+                if (localDay !== referenceDay) {
+                    localTime.setUTCDate(localTime.getUTCDate() + 1); // Avanza al giorno successivo
+                }
+                
+                return localDay === referenceDay
+                    ? localTime.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })
+                    : "non visibile";
+            };
+            
+            let row = `<tr>
+                <td>${date.toLocaleDateString('it-IT')}</td>
+                <td>${formatTime(moonData.Rise, date)}</td>
+                <td>${formatTime(moonData.Transit, date)}</td>
+                <td>${formatTime(moonData.Set, date)}</td>
+                <td>${moonData.TransitAltitude?.toFixed(2) || 'non visibile'}°</td>
+            </tr>`;
+            
+            tableBody.innerHTML += row;
+        }
+    }
+</script>
+
 </body>
 </html>
