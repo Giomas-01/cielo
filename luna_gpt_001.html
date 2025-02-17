@@ -10,10 +10,20 @@
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         th, td { border: 1px solid black; padding: 8px; text-align: center; }
         th { background-color: #007bff; color: white; }
+        .input-container { margin-bottom: 15px; }
+        label { margin-right: 10px; }
     </style>
 </head>
 <body>
-    <h2>Tabella Culminazione Lunare - Febbraio 2025</h2>
+    <h2>Tabella Culminazione Lunare</h2>
+    
+    <div class="input-container">
+        <label>Latitudine: <input type="number" id="lat" step="any" value="45.274"></label>
+        <label>Longitudine: <input type="number" id="lon" step="any" value="9.0934"></label>
+        <label>Data: <input type="text" id="date" placeholder="DD-MM-YYYY"></label>
+        <button onclick="generateTable()">Calcola</button>
+    </div>
+    
     <table>
         <thead>
             <tr>
@@ -29,31 +39,39 @@
     
     <script>
         function generateTable() {
-            const lat = 45.274;
-            const lon = 9.0934;
+            const lat = parseFloat(document.getElementById("lat").value);
+            const lon = parseFloat(document.getElementById("lon").value);
+            const dateInput = document.getElementById("date").value;
+            
+            const dateParts = dateInput.split("-");
+            if (dateParts.length !== 3) {
+                alert("Formato data non valido. Usa DD-MM-YYYY.");
+                return;
+            }
+            const day = parseInt(dateParts[0]);
+            const month = parseInt(dateParts[1]) - 1; // Mesi in JavaScript partono da 0
+            const year = parseInt(dateParts[2]);
+            
+            const date = new Date(year, month, day);
             const tzOffset = 60; // CET (UTC+1)
             const tableBody = document.getElementById("moonTableBody");
+            tableBody.innerHTML = ""; // Pulisce la tabella
             
-            for (let day = 1; day <= 28; day++) {
-                let date = new Date(2025, 1, day); // Febbraio 2025 (mese 1 perché gennaio è 0)
-                let moonData = SoMo.getMoonDayInfo(date, lat, lon, tzOffset);
+            let moonData = SoMo.getMoonDayInfo(date, lat, lon, tzOffset);
                 
-                const formatTime = (d) => 
-                    d instanceof Date ? d.toLocaleTimeString('it-IT', { timeZone: 'UTC' }) : "N/A";
+            const formatTime = (d) => 
+                d instanceof Date ? d.toLocaleTimeString('it-IT', { timeZone: 'UTC' }) : "N/A";
                 
-                let row = `<tr>
-                    <td>${date.toLocaleDateString('it-IT')}</td>
-                    <td>${formatTime(moonData.Rise)}</td>
-                    <td>${formatTime(moonData.Transit)}</td>
-                    <td>${formatTime(moonData.Set)}</td>
-                    <td>${moonData.TransitAltitude?.toFixed(2) || 'N/A'}°</td>
-                </tr>`;
+            let row = `<tr>
+                <td>${date.toLocaleDateString('it-IT')}</td>
+                <td>${formatTime(moonData.Rise)}</td>
+                <td>${formatTime(moonData.Transit)}</td>
+                <td>${formatTime(moonData.Set)}</td>
+                <td>${moonData.TransitAltitude?.toFixed(2) || 'N/A'}°</td>
+            </tr>`;
                 
-                tableBody.innerHTML += row;
-            }
+            tableBody.innerHTML += row;
         }
-        
-        window.onload = generateTable;
     </script>
 </body>
 </html>
