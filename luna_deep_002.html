@@ -1,91 +1,123 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Calcolo Effemeridi Lunari Mensili</title>
+    <title>Calcolatore Lunare Mensile</title>
+    <meta charset="UTF-8">
+    <script src="somo.min.js"></script>
+    <script src="start.min.js"></script>
     <style>
-        table { border-collapse: collapse; margin: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-        th { background-color: #f2f2f2; }
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px;
+            background: #f0f4f8;
+        }
+        .container { 
+            max-width: 800px; 
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #2c3e50;
+            color: white;
+        }
+        input, button {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        .input-group {
+            margin: 10px 0;
+        }
     </style>
 </head>
 <body>
-    <input type="date" id="inputData" value="2025-02-01">
-    <button onclick="generaTabellaMensile()">Calcola</button>
-    <div id="risultato"></div>
+    <div class="container">
+        <h2>Calcolatore Lunare Mensile</h2>
+        
+        <div class="input-group">
+            <label>Latitudine: <input type="number" id="lat" step="any" value="41.9028"></label>
+            <label>Longitudine: <input type="number" id="lng" step="any" value="12.4964"></label>
+        </div>
+        
+        <div class="input-group">
+            <label>Mese/Anno: <input type="month" id="month" value="2023-10"></label>
+            <label>Fuso Orario (UTC±ore): <input type="number" id="tz" value="2" min="-12" max="14"></label>
+        </div>
+        
+        <button onclick="calculate()">Calcola</button>
+        
+        <div id="result">
+            <!-- La tabella verrà generata qui -->
+        </div>
+    </div>
 
-    <script>
-        // Funzione principale per generare la tabella mensile
-        function generaTabellaMensile() {
-            const dataInput = document.getElementById('inputData').value;
-            const dataRiferimento = new Date(dataInput);
-            const anno = dataRiferimento.getFullYear();
-            const mese = dataRiferimento.getMonth(); // 0-11 (gennaio=0)
+<script>
+function calculate() {
+    // Recupera i parametri di input
+    const lat = parseFloat(document.getElementById('lat').value);
+    const lng = parseFloat(document.getElementById('lng').value);
+    const monthInput = document.getElementById('month').value;
+    const tzOffset = parseInt(document.getElementById('tz').value) * 60; // Converti ore in minuti
 
-            // Calcola il numero di giorni nel mese
-            const ultimoGiorno = new Date(anno, mese + 1, 0).getDate();
+    // Elabora il mese selezionato
+    const [year, month] = monthInput.split('-');
+    const daysInMonth = new Date(year, month, 0).getDate();
+    
+    // Crea l'intestazione della tabella
+    let tableHTML = `
+        <table>
+            <tr>
+                <th>Data</th>
+                <th>Alba Lunare</th>
+                <th>Culminazione</th>
+                <th>Tramonto Lunare</th>
+                <th>Altitudine</th>
+            </tr>`;
 
-            // Genera la tabella HTML
-            let tabellaHTML = `
-                <table>
-                    <tr>
-                        <th>Data</th>
-                        <th>Culminazione</th>
-                        <th>Alba</th>
-                        <th>Tramonto</th>
-                        <th>Altitudine Culm.</th>
-                    </tr>
-            `;
+    // Calcola i dati per ogni giorno del mese
+    for(let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(year, month-1, day);
+        const moonData = SoMo.getMoonDayInfo(date, lat, lng, tzOffset);
 
-            // Calcola gli orari per ogni giorno del mese
-            for (let giorno = 1; giorno <= ultimoGiorno; giorno++) {
-                const data = new Date(anno, mese, giorno);
-                
-                // Esempio di calcolo (sostituire con le tue funzioni)
-                const culminazione = calcolaCulminazione(data);
-                const alba = calcolaAlbaLunare(data);
-                const tramonto = calcolaTramontoLunare(data);
-                const altitudine = calcolaAltitudineCulminazione(data);
+        // Funzione di formattazione
+        const formatTime = (d) => 
+            d instanceof Date ? 
+            d.toLocaleTimeString('it-IT', {timeZone: 'UTC'}) : 
+            "Non visibile";
 
-                // Aggiungi una riga alla tabella
-                tabellaHTML += `
-                    <tr>
-                        <td>${formattaData(data)}</td>
-                        <td>${culminazione}</td>
-                        <td>${alba}</td>
-                        <td>${tramonto}</td>
-                        <td>${altitudine}°</td>
-                    </tr>
-                `;
-            }
+        // Aggiungi riga alla tabella
+        tableHTML += `
+            <tr>
+                <td>${date.toLocaleDateString('it-IT')}</td>
+                <td>${formatTime(moonData.Rise)}</td>
+                <td>${formatTime(moonData.Transit)}</td>
+                <td>${formatTime(moonData.Set)}</td>
+                <td>${moonData.TransitAltitude?.toFixed(2) || 'N/A'}°</td>
+            </tr>`;
+    }
 
-            tabellaHTML += "</table>";
-            document.getElementById('risultato').innerHTML = tabellaHTML;
-        }
-
-        // Funzioni di esempio (da sostituire con il tuo codice esistente)
-        function calcolaCulminazione(data) {
-            // Implementa qui il calcolo della culminazione
-            return "12:34";
-        }
-
-        function calcolaAlbaLunare(data) {
-            // Implementa qui il calcolo dell'alba lunare
-            return "06:12";
-        }
-
-        function calcolaTramontoLunare(data) {
-            // Implementa qui il calcolo del tramonto lunare
-            return "20:45";
-        }
-
-        function calcolaAltitudineCulminazione(data) {
-            // Implementa qui il calcolo dell'altitudine
-            return "62.5";
-        }
-
-        function formattaData(data) {
-            return data.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' });
-        }
-    </script>
+    tableHTML += '</table>';
+    document.getElementById('result').innerHTML = tableHTML;
+}
+</script>
 </body>
 </html>
