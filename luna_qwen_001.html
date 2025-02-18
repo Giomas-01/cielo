@@ -153,9 +153,9 @@
                 const moonInfo = SoMo.getMoonDayInfo(date, latitude, longitude, 0);
 
                 // Extract relevant properties
-                const riseTime = adjustTime(moonInfo.Rise, timezone, date, day);
-                const culminationTime = adjustTime(moonInfo.Transit, timezone, date, day);
-                const setTime = adjustTime(moonInfo.Set, timezone, date, day);
+                const riseTime = formatTime(moonInfo.Rise, timezone, date, day);
+                const culminationTime = formatTime(moonInfo.Transit, timezone, date, day);
+                const setTime = formatTime(moonInfo.Set, timezone, date, day);
                 const culminationAltitude = moonInfo.TransitAltitude;
 
                 // Create a row for the table
@@ -172,7 +172,7 @@
         }
 
         // Function to adjust the time based on user-selected timezone and fix UTC offset
-        function adjustTime(time, timezone, date, day) {
+        function formatTime(time, timezone, date, day) {
             if (!time || !(time instanceof Date)) {
                 return "-"; // If time is null, show "-"
             }
