@@ -71,29 +71,43 @@
             
             const daysInMonth = new Date(year, month + 1, 0).getDate(); // Ottiene il numero di giorni nel mese
             
+            let moonEvents = {}; // Per salvare gli eventi già ricalcolati
+
             for (let i = 1; i <= daysInMonth; i++) {
                 let date = new Date(Date.UTC(year, month, i));
                 let moonData = SoMo.getMoonDayInfo(date, lat, lon, 0); // Otteniamo i dati in UTC
-                
-                const formatTime = (d, referenceDate) => {
+
+                const formatTime = (d, referenceDate, currentDay) => {
                     if (!(d instanceof Date)) return "non visibile";
                     let localTime = new Date(d.getTime() + tzOffset * 60000);
                     let localDay = localTime.getUTCDate();
                     let referenceDay = referenceDate.getUTCDate();
-                    
-                    // Se l'evento è nel giorno successivo rispetto alla data di riferimento
-                    if (localDay !== referenceDay) {
-                        return "non visibile"; // Evento visibile solo il giorno successivo
+                    let utcHours = d.getUTCHours();
+
+                    // Se l'evento UTC avviene tra le 23:01 e le 24:00, e il fuso orario lo sposta oltre la mezzanotte
+                    if (utcHours >= 23 && localDay !== referenceDay) {
+                        moonEvents[currentDay + 1] = moonEvents[currentDay + 1] || {};
+                        moonEvents[currentDay + 1][d] = localTime.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+                        return "non visibile"; // Nasconde l'evento per il giorno corrente
                     }
-                    
+
                     return localTime.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
                 };
 
+                let formattedRise = formatTime(moonData.Rise, date, i);
+                let formattedTransit = formatTime(moonData.Transit, date, i);
+                let formattedSet = formatTime(moonData.Set, date, i);
+
+                // Se il giorno successivo ha un evento ritardato, usiamo quell'orario
+                if (moonEvents[i]) {
+                    formattedTransit = moonEvents[i][moonData.Transit] || formattedTransit;
+                }
+
                 let row = `<tr>
                     <td>${date.toLocaleDateString('it-IT')}</td>
-                    <td>${formatTime(moonData.Rise, date)}</td>
-                    <td>${formatTime(moonData.Transit, date)}</td>
-                    <td>${formatTime(moonData.Set, date)}</td>
+                    <td>${formattedRise}</td>
+                    <td>${formattedTransit}</td>
+                    <td>${formattedSet}</td>
                     <td>${moonData.TransitAltitude?.toFixed(2) || 'non visibile'}°</td>
                 </tr>`;
                 
