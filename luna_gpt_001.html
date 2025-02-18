@@ -88,10 +88,19 @@
                     return localTime.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
                 };
                 
+                let culminazioneLocale = formatTime(moonData.Transit, date);
+                let giornoSuccessivo = new Date(Date.UTC(year, month, i + 1));
+                let moonDataSuccessivo = SoMo.getMoonDayInfo(giornoSuccessivo, lat, lon, 0);
+                let culminazioneSuccessivo = formatTime(moonDataSuccessivo.Transit, giornoSuccessivo);
+                
+                if (culminazioneLocale === "non visibile" && culminazioneSuccessivo !== "non visibile") {
+                    culminazioneLocale = "non visibile";
+                }
+                
                 let row = `<tr>
                     <td>${date.toLocaleDateString('it-IT')}</td>
                     <td>${formatTime(moonData.Rise, date)}</td>
-                    <td>${formatTime(moonData.Transit, date)}</td>
+                    <td>${culminazioneLocale}</td>
                     <td>${formatTime(moonData.Set, date)}</td>
                     <td>${moonData.TransitAltitude?.toFixed(2) || 'non visibile'}°</td>
                 </tr>`;
