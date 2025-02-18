@@ -55,7 +55,7 @@
             const lat = parseFloat(document.getElementById("lat").value);
             const lon = parseFloat(document.getElementById("lon").value);
             const dateInput = document.getElementById("date").value;
-            const tzOffset = parseInt(document.getElementById("timezone").value) * 60; // Offset in minuti
+            const tzOffset = parseInt(document.getElementById("timezone").value) * 60; 
             
             const dateParts = dateInput.split("-");
             if (dateParts.length !== 3) {
@@ -74,7 +74,7 @@
             for (let i = 1; i <= daysInMonth; i++) {
                 let date = new Date(Date.UTC(year, month, i));
                 let moonData = SoMo.getMoonDayInfo(date, lat, lon, 0);
-                
+
                 const formatTime = (d, referenceDate) => {
                     if (!(d instanceof Date)) return "non visibile";
                     let localTime = new Date(d.getTime() + tzOffset * 60000);
@@ -83,16 +83,18 @@
                     let utcHours = d.getUTCHours();
                     
                     if (utcHours >= 23 && localDay !== referenceDay) {
-                        return "non visibile";
+                        return "next-day"; 
                     }
                     return localTime.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
                 };
                 
                 let culminazioneLocale = formatTime(moonData.Transit, date);
                 
-                // Se la culminazione UTC è tra 23:01 e 23:59, deve apparire nel giorno successivo
-                if (moonData.Transit instanceof Date && moonData.Transit.getUTCHours() >= 23) {
+                if (culminazioneLocale === "next-day") {
                     culminazioneLocale = "non visibile";
+                    let nextDate = new Date(Date.UTC(year, month, i + 1));
+                    let nextMoonData = SoMo.getMoonDayInfo(nextDate, lat, lon, 0);
+                    culminazioneLocale = formatTime(nextMoonData.Transit, nextDate);
                 }
                 
                 let row = `<tr>
