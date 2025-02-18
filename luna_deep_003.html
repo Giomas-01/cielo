@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <title>Calendario Lunare Corretto</title>
+    <title>Calendario Lunare Funzionante</title>
     <meta charset="UTF-8">
-    <!-- CDN corretto con MIME type valido -->
-    <script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.0/browser/astronomy-engine.min.js"></script>
+    <!-- CDN CORRETTO con MIME type valido -->
+    <script src="https://unpkg.com/astronomy-engine@2.1.0/browser/astronomy-engine.min.js"></script>
     <style>
         body { 
             font-family: 'Segoe UI', Arial, sans-serif; 
@@ -48,6 +48,10 @@
         button:hover {
             background: #0056b3;
         }
+        .loading {
+            color: #666;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -67,59 +71,66 @@ function generateTable() {
     const lng = parseFloat(document.getElementById('lng').value);
     const tableContainer = document.getElementById('tableContainer');
     
-    tableContainer.innerHTML = '<div class="loading">Caricamento... ⏳</div>';
+    tableContainer.innerHTML = '<div class="loading">Calicamento dati lunari...</div>';
 
-    setTimeout(() => {
-        let tableHTML = `
-            <table>
-                <tr>
-                    <th>Data</th>
-                    <th>Fase</th>
-                    <th>Alba</th>
-                    <th>Tramonto</th>
-                </tr>`;
+    setTimeout(async () => {
+        try {
+            let tableHTML = `
+                <table>
+                    <tr>
+                        <th>Data</th>
+                        <th>Fase</th>
+                        <th>Alba</th>
+                        <th>Tramonto</th>
+                    </tr>`;
 
-        for(let i = 0; i < 7; i++) {
-            const date = new Date();
-            date.setDate(date.getDate() + i);
-            const time = Astronomy.MakeTime(date);
-            
-            try {
-                const phase = Astronomy.MoonPhase(time);
-                const rise = Astronomy.SearchMoonRise(lat, lng, time);
-                const set = Astronomy.SearchMoonSet(lat, lng, time);
-                
-                tableHTML += `
-                    <tr>
-                        <td>${date.toLocaleDateString('it-IT')}</td>
-                        <td>${getMoonPhaseName(phase)}</td>
-                        <td>${formatTime(rise)}</td>
-                        <td>${formatTime(set)}</td>
-                    </tr>`;
-            } catch(error) {
-                console.log(`Errore giorno ${i}:`, error);
-                tableHTML += `
-                    <tr>
-                        <td>${date.toLocaleDateString('it-IT')}</td>
-                        <td colspan="3">${error.message}</td>
-                    </tr>`;
+            for(let i = 0; i < 7; i++) {
+                const date = new Date();
+                date.setDate(date.getDate() + i);
+                const time = Astronomy.MakeTime(date);
+
+                try {
+                    const phase = Astronomy.MoonPhase(time);
+                    const rise = Astronomy.SearchMoonRise(lat, lng, time);
+                    const set = Astronomy.SearchMoonSet(lat, lng, time);
+
+                    tableHTML += `
+                        <tr>
+                            <td>${date.toLocaleDateString('it-IT')}</td>
+                            <td>${getMoonPhase(phase)}</td>
+                            <td>${formatTime(rise)}</td>
+                            <td>${formatTime(set)}</td>
+                        </tr>`;
+                } catch(error) {
+                    console.warn(`Giorno ${i + 1}:`, error);
+                    tableHTML += `
+                        <tr>
+                            <td>${date.toLocaleDateString('it-IT')}</td>
+                            <td colspan="3">${error.message}</td>
+                        </tr>`;
+                }
             }
+
+            tableContainer.innerHTML = tableHTML + '</table>';
+        } catch(mainError) {
+            tableContainer.innerHTML = `<div class="error">Errore: ${mainError.message}</div>`;
         }
-
-        tableContainer.innerHTML = tableHTML + '</table>';
-    }, 100);
+    }, 50);
 }
 
-function getMoonPhaseName(phase) {
-    if(phase < 0.1) return '🌑 Nuova';
-    if(phase < 0.35) return '🌒 Crescente';
-    if(phase < 0.65) return '🌕 Piena';
-    return '🌖 Calante';
+function getMoonPhase(phase) {
+    const phases = [
+        {limit: 0.1, emoji: '🌑', name: 'Nuova'},
+        {limit: 0.35, emoji: '🌒', name: 'Crescente'},
+        {limit: 0.65, emoji: '🌕', name: 'Piena'},
+        {limit: 1, emoji: '🌖', name: 'Calante'}
+    ];
+    return phases.find(p => phase < p.limit).emoji + ' ' + phases.find(p => phase < p.limit).name;
 }
 
-function formatTime(time) {
-    if(!time) return '--:--';
-    const date = new Date(time.ut * 1000);
+function formatTime(event) {
+    if(!event || !event.ut) return '--:--';
+    const date = new Date(event.ut * 1000);
     return date.toLocaleTimeString('it-IT', {hour: '2-digit', minute: '2-digit'});
 }
 </script>
