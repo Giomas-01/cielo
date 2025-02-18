@@ -55,7 +55,7 @@
             const lat = parseFloat(document.getElementById("lat").value);
             const lon = parseFloat(document.getElementById("lon").value);
             const dateInput = document.getElementById("date").value;
-            const tzOffset = parseInt(document.getElementById("timezone").value) * 60; // Offset in minuti
+            const tzOffset = parseInt(document.getElementById("timezone").value) * 60; 
             
             const dateParts = dateInput.split("-");
             if (dateParts.length !== 3) {
@@ -93,7 +93,11 @@
                 let moonDataSuccessivo = SoMo.getMoonDayInfo(giornoSuccessivo, lat, lon, 0);
                 let culminazioneSuccessivo = formatTime(moonDataSuccessivo.Transit, giornoSuccessivo);
                 
-                if (culminazioneLocale === "non visibile" && culminazioneSuccessivo !== "non visibile") {
+                if (moonData.Transit && moonData.Transit.getUTCHours() >= 23) {
+                    culminazioneLocale = "non visibile";
+                }
+                if (moonDataSuccessivo.Transit && moonDataSuccessivo.Transit.getUTCHours() >= 0 && moonDataSuccessivo.Transit.getUTCHours() < 1) {
+                    culminazioneSuccessivo = new Date(moonDataSuccessivo.Transit.getTime() + tzOffset * 60000).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
                     culminazioneLocale = "non visibile";
                 }
                 
