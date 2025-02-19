@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Calcolo Fasi Lunari</title>
+<meta charset="UTF-8">
+</head>
+<body>
+
+<h1>Calcolo Fasi Lunari</h1>
+
+<form id="inputForm">
+  Anno: <input type="number" id="anno" value="2024"><br>
+  Latitudine: <input type="number" id="latitudine" value="41.9028"><br>
+  Longitudine: <input type="number" id="longitudine" value="12.4964"><br>
+  <button type="button" onclick="calcolaFasiLunari()">Calcola</button>
+</form>
+
+<table id="tabellaFasiLunari">
+  <thead>
+    <tr>
+      <th>Fase Lunare</th>
+      <th>Data e Ora</th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+
+<script>
+function calcolaFasiLunari() {
+  const anno = document.getElementById("anno").value;
+  const latitudine = document.getElementById("latitudine").value;
+  const longitudine = document.getElementById("longitudine").value;
+
+  // Funzione per calcolare il giorno giuliano
+  function getJulianDay(year, month, day, hour, minute, second) {
+    let a = Math.floor((14 - month) / 12);
+    let y = year + 4800 - a;
+    let m = month + 12 * a - 3;
+    let jd = day + Math.floor((153 * m + 2) / 5) + 365 * y + Math.floor(y / 4) - Math.floor(y / 100) + Math.floor(y / 400) - 32045;
+    jd += (hour - 12) / 24 + minute / 1440 + second / 86400;
+    return jd;
+  }
+
+  // Funzione per calcolare le fasi lunari (algoritmo semplificato)
+  function getMoonPhase(year, month) {
+    let jd = getJulianDay(year, month, 1, 0, 0, 0);
+    let newMoon = 2451550.0874 + 29.530588853 * (Math.floor((year - 2000) * 12 + month - 1));
+    let phase = (jd - newMoon) / 29.530588853;
+    phase = phase - Math.floor(phase);
+    if (phase < 0) phase += 1;
+    return phase;
+  }
+
+  const tabella = document.getElementById("tabellaFasiLunari").getElementsByTagName("tbody")[0];
+  tabella.innerHTML = ""; // Cancella le righe precedenti
+
+  for (let mese = 1; mese <= 12; mese++) {
+    let phase = getMoonPhase(anno, mese);
+
+    // Calcola le date e le ore delle fasi principali
+    let newMoonDate = new Date(anno, mese - 1, 1);
+    newMoonDate.setDate(newMoonDate.getDate() + Math.round(phase * 29.530588853));
+
+    let firstQuarterDate = new Date(anno, mese - 1, 1);
+    firstQuarterDate.setDate(firstQuarterDate.getDate() + Math.round((phase + 0.25) * 29.530588853));
+
+    let fullMoonDate = new Date(anno, mese - 1, 1);
+    fullMoonDate.setDate(fullMoonDate.getDate() + Math.round((phase + 0.5) * 29.530588853));
+
+    let lastQuarterDate = new Date(anno, mese - 1, 1);
+    lastQuarterDate.setDate(lastQuarterDate.getDate() + Math.round((phase + 0.75) * 29.530588853));
+
+    // Aggiungi le righe alla tabella
+    aggiungiRiga(tabella, "Luna Nuova", newMoonDate);
+    aggiungiRiga(tabella, "Primo Quarto", firstQuarterDate);
+    aggiungiRiga(tabella, "Luna Piena", fullMoonDate);
+    aggiungiRiga(tabella, "Ultimo Quarto", lastQuarterDate);
+  }
+
+  function aggiungiRiga(tabella, fase, data) {
+    let riga = tabella.insertRow();
+    let cellaFase = riga.insertCell();
+    let cellaData = riga.insertCell();
+
+    cellaFase.textContent = fase;
+    cellaData.textContent = data.toLocaleString(); // Formatta la data e l'ora
+  }
+}
+</script>
+
+</body>
+</html>
