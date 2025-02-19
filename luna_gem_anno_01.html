@@ -32,73 +32,53 @@ function calcolaFasiLunari() {
   const latitudine = document.getElementById("latitudine").value;
   const longitudine = document.getElementById("longitudine").value;
 
-  // Funzione per calcolare il giorno giuliano
-  function getJulianDay(year, month, day, hour, minute, second) {
-    let a = Math.floor((14 - month) / 12);
-    let y = year + 4800 - a;
-    let m = month + 12 * a - 3;
-    let jd = day + Math.floor((153 * m + 2) / 5) + 365 * y + Math.floor(y / 4) - Math.floor(y / 100) + Math.floor(y / 400) - 32045;
-    jd += (hour - 12) / 24 + minute / 1440 + second / 86400;
-    return jd;
-  }
-
-  // Funzione per calcolare le fasi lunari (algoritmo semplificato)
-  function getMoonPhase(year, month) {
-    let jd = getJulianDay(year, month, 1, 0, 0, 0);
-    let newMoon = 2451550.0874 + 29.530588853 * (Math.floor((year - 2000) * 12 + month - 1));
-    let phase = (jd - newMoon) / 29.530588853;
-    phase = phase - Math.floor(phase);
-    if (phase < 0) phase += 1;
-    return phase;
-  }
+  // ... (funzioni getJulianDay e getMoonPhase rimangono invariate)
 
   const tabella = document.getElementById("tabellaFasiLunari").getElementsByTagName("tbody")[0];
   tabella.innerHTML = ""; // Cancella le righe precedenti
 
+  // Calcola le fasi lunari per tutto l'anno
   for (let mese = 1; mese <= 12; mese++) {
-    let phase = getMoonPhase(anno, mese);
+    for (let giorno = 1; giorno <= 31; giorno++) {
+      let data = new Date(anno, mese - 1, giorno);
+      if (data.getMonth() !== mese - 1) continue; // Salta i giorni non validi
 
-    // Calcola le date e le ore delle fasi principali
-    let newMoonDate = new Date(anno, mese - 1, 1);
-    newMoonDate.setDate(newMoonDate.getDate() + Math.round(phase * 29.530588853 * 24));
-    newMoonDate.setHours(0, 0, 0, 0); // Imposta l'ora a mezzanotte
+      let phase = getMoonPhase(anno, mese);
 
-    let firstQuarterDate = new Date(anno, mese - 1, 1);
-    firstQuarterDate.setDate(firstQuarterDate.getDate() + Math.round((phase + 0.25) * 29.530588853 * 24));
-    firstQuarterDate.setHours(0, 0, 0, 0); // Imposta l'ora a mezzanotte
+      // Calcola le date e le ore delle fasi principali
+      let newMoonDate = new Date(anno, mese - 1, 1);
+      newMoonDate.setDate(newMoonDate.getDate() + Math.round(phase * 29.530588853 * 24));
+      newMoonDate.setHours(0, 0, 0, 0); // Imposta l'ora a mezzanotte
 
-    let fullMoonDate = new Date(anno, mese - 1, 1);
-    fullMoonDate.setDate(fullMoonDate.getDate() + Math.round((phase + 0.5) * 29.530588853 * 24));
-    fullMoonDate.setHours(0, 0, 0, 0); // Imposta l'ora a mezzanotte
+      let firstQuarterDate = new Date(anno, mese - 1, 1);
+      firstQuarterDate.setDate(firstQuarterDate.getDate() + Math.round((phase + 0.25) * 29.530588853 * 24));
+      firstQuarterDate.setHours(0, 0, 0, 0); // Imposta l'ora a mezzanotte
 
-    let lastQuarterDate = new Date(anno, mese - 1, 1);
-    lastQuarterDate.setDate(lastQuarterDate.getDate() + Math.round((phase + 0.75) * 29.530588853 * 24));
-    lastQuarterDate.setHours(0, 0, 0, 0); // Imposta l'ora a mezzanotte
+      let fullMoonDate = new Date(anno, mese - 1, 1);
+      fullMoonDate.setDate(fullMoonDate.getDate() + Math.round((phase + 0.5) * 29.530588853 * 24));
+      fullMoonDate.setHours(0, 0, 0, 0); // Imposta l'ora a mezzanotte
 
-    // Aggiungi le righe alla tabella
-    aggiungiRiga(tabella, "Luna Nuova", newMoonDate);
-    aggiungiRiga(tabella, "Primo Quarto", firstQuarterDate);
-    aggiungiRiga(tabella, "Luna Piena", fullMoonDate);
-    aggiungiRiga(tabella, "Ultimo Quarto", lastQuarterDate);
+      let lastQuarterDate = new Date(anno, mese - 1, 1);
+      lastQuarterDate.setDate(lastQuarterDate.getDate() + Math.round((phase + 0.75) * 29.530588853 * 24));
+      lastQuarterDate.setHours(0, 0, 0, 0); // Imposta l'ora a mezzanotte
+
+      // Aggiungi le righe alla tabella solo se la data è valida
+      if (newMoonDate.getFullYear() === parseInt(anno)) {
+        aggiungiRiga(tabella, "Luna Nuova", newMoonDate);
+      }
+      if (firstQuarterDate.getFullYear() === parseInt(anno)) {
+        aggiungiRiga(tabella, "Primo Quarto", firstQuarterDate);
+      }
+      if (fullMoonDate.getFullYear() === parseInt(anno)) {
+        aggiungiRiga(tabella, "Luna Piena", fullMoonDate);
+      }
+      if (lastQuarterDate.getFullYear() === parseInt(anno)) {
+        aggiungiRiga(tabella, "Ultimo Quarto", lastQuarterDate);
+      }
+    }
   }
 
-  function aggiungiRiga(tabella, fase, data) {
-    let riga = tabella.insertRow();
-    let cellaFase = riga.insertCell();
-    let cellaData = riga.insertCell();
-
-    cellaFase.textContent = fase;
-    cellaData.textContent = formatDate(data); // Formatta la data e l'ora
-  }
-
-  function formatDate(date) {
-    const giorno = String(date.getDate()).padStart(2, '0');
-    const mese = String(date.getMonth() + 1).padStart(2, '0');
-    const anno = date.getFullYear();
-    const ore = String(date.getHours()).padStart(2, '0');
-    const minuti = String(date.getMinutes()).padStart(2, '0');
-    return `${giorno} ${mese} ${anno} ${ore}:${minuti}`;
-  }
+  // ... (funzioni aggiungiRiga e formatDate rimangono invariate)
 }
 </script>
 
