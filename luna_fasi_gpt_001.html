@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calcolo Fasi Lunari</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+        th, td { border: 1px solid #dddddd; text-align: left; padding: 8px; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h1>Calcolo delle Fasi Lunari</h1>
+    <label for="anno">Anno:</label>
+    <input type="number" id="anno" placeholder="2025" required>
+    <br>
+    <label for="latitudine">Latitudine:</label>
+    <input type="number" id="latitudine" placeholder="41.9" required>
+    <br>
+    <label for="longitudine">Longitudine:</label>
+    <input type="number" id="longitudine" placeholder="12.5" required>
+    <br>
+    <button onclick="calcolaFasiLunari()">Calcola Fasi Lunari</button>
+
+    <table id="fasiTabella">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Ora</th>
+                <th>Fase</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        function calcolaFasiLunari() {
+            const anno = parseInt(document.getElementById("anno").value);
+            const lat = parseFloat(document.getElementById("latitudine").value);
+            const lon = parseFloat(document.getElementById("longitudine").value);
+            const fasi = ["Luna Nuova", "Primo Quarto", "Luna Piena", "Ultimo Quarto"];
+            const fasiLunari = [];
+            const baseDate = new Date(Date.UTC(anno, 0, 1)); // Inizio dell'anno in UTC
+
+            // Approssimazione delle date delle fasi lunari
+            const giorniPerFase = 29.53 / 4; // Ciclo lunare diviso in 4 fasi
+
+            for (let mese = 0; mese < 12; mese++) {
+                for (let fase = 0; fase < 4; fase++) {
+                    let giorniFase = fase * giorniPerFase;
+                    let dataFase = new Date(baseDate);
+                    dataFase.setUTCMonth(mese);
+                    dataFase.setUTCDate(1 + giorniFase);
+                    
+                    // Aggiusta per l'ora legale (considerando UTC+1)
+                    let oreLegali = 1; // Modifica a 0 se non c'è ora legale
+                    let dataLocale = new Date(dataFase.getTime() + (oreLegali * 60 * 60 * 1000));
+
+                    fasiLunari.push({
+                        data: dataLocale.toLocaleDateString("it-IT"), // DD-MM-YYYY
+                        ora: dataLocale.toLocaleTimeString("it-IT", { hour: '2-digit', minute: '2-digit', hour12: false }), // HH:MM
+                        fase: fasi[fase]
+                    });
+                }
+            }
+
+            // Mostra i risultati nella tabella
+            const tbody = document.getElementById("fasiTabella").getElementsByTagName("tbody")[0];
+            tbody.innerHTML = ""; // Pulisce la tabella esistente
+
+            fasiLunari.forEach(fase => {
+                const row = tbody.insertRow();
+                row.insertCell(0).innerText = fase.data;
+                row.insertCell(1).innerText = fase.ora;
+                row.insertCell(2).innerText = fase.fase;
+            });
+        }
+    </script>
+</body>
+</html>
