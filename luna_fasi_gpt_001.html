@@ -42,29 +42,33 @@
             const lon = parseFloat(document.getElementById("longitudine").value);
             const fasi = ["Luna Nuova", "Primo Quarto", "Luna Piena", "Ultimo Quarto"];
             const fasiLunari = [];
-            const baseDate = new Date(Date.UTC(anno, 0, 1)); // Inizio dell'anno in UTC
-
+            
             // Approssimazione delle date delle fasi lunari
-            const giorniPerFase = 29.53 / 4; // Ciclo lunare diviso in 4 fasi
+            const fasiBase = [
+                new Date(Date.UTC(anno, 0, 2, 20, 45)), // Luna Nuova
+                new Date(Date.UTC(anno, 0, 9, 14, 0)),  // Primo Quarto
+                new Date(Date.UTC(anno, 0, 17, 8, 0)),  // Luna Piena
+                new Date(Date.UTC(anno, 0, 24, 1, 15))  // Ultimo Quarto
+            ];
 
-            for (let mese = 0; mese < 12; mese++) {
-                for (let fase = 0; fase < 4; fase++) {
-                    let giorniFase = fase * giorniPerFase;
-                    let dataFase = new Date(baseDate);
-                    dataFase.setUTCMonth(mese);
-                    dataFase.setUTCDate(1 + giorniFase);
+            // Calcola le fasi per ogni mese dell'anno
+            fasiBase.forEach((faseBase, index) => {
+                for (let mese = 0; mese < 12; mese++) {
+                    let faseData = new Date(faseBase);
+                    faseData.setUTCMonth(mese);
+                    faseData.setUTCFullYear(anno);
                     
                     // Aggiusta per l'ora legale (considerando UTC+1)
                     let oreLegali = 1; // Modifica a 0 se non c'è ora legale
-                    let dataLocale = new Date(dataFase.getTime() + (oreLegali * 60 * 60 * 1000));
+                    let dataLocale = new Date(faseData.getTime() + (oreLegali * 60 * 60 * 1000));
 
                     fasiLunari.push({
                         data: dataLocale.toLocaleDateString("it-IT"), // DD-MM-YYYY
                         ora: dataLocale.toLocaleTimeString("it-IT", { hour: '2-digit', minute: '2-digit', hour12: false }), // HH:MM
-                        fase: fasi[fase]
+                        fase: fasi[index]
                     });
                 }
-            }
+            });
 
             // Mostra i risultati nella tabella
             const tbody = document.getElementById("fasiTabella").getElementsByTagName("tbody")[0];
