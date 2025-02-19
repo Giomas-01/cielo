@@ -60,16 +60,20 @@ function calcolaFasiLunari() {
 
     // Calcola le date e le ore delle fasi principali
     let newMoonDate = new Date(anno, mese - 1, 1);
-    newMoonDate.setDate(newMoonDate.getDate() + Math.round(phase * 29.530588853));
+    newMoonDate.setDate(newMoonDate.getDate() + Math.round(phase * 29.530588853 * 24));
+    newMoonDate.setHours(0, 0, 0, 0); // Imposta l'ora a mezzanotte
 
     let firstQuarterDate = new Date(anno, mese - 1, 1);
-    firstQuarterDate.setDate(firstQuarterDate.getDate() + Math.round((phase + 0.25) * 29.530588853));
+    firstQuarterDate.setDate(firstQuarterDate.getDate() + Math.round((phase + 0.25) * 29.530588853 * 24));
+    firstQuarterDate.setHours(0, 0, 0, 0); // Imposta l'ora a mezzanotte
 
     let fullMoonDate = new Date(anno, mese - 1, 1);
-    fullMoonDate.setDate(fullMoonDate.getDate() + Math.round((phase + 0.5) * 29.530588853));
+    fullMoonDate.setDate(fullMoonDate.getDate() + Math.round((phase + 0.5) * 29.530588853 * 24));
+    fullMoonDate.setHours(0, 0, 0, 0); // Imposta l'ora a mezzanotte
 
     let lastQuarterDate = new Date(anno, mese - 1, 1);
-    lastQuarterDate.setDate(lastQuarterDate.getDate() + Math.round((phase + 0.75) * 29.530588853));
+    lastQuarterDate.setDate(lastQuarterDate.getDate() + Math.round((phase + 0.75) * 29.530588853 * 24));
+    lastQuarterDate.setHours(0, 0, 0, 0); // Imposta l'ora a mezzanotte
 
     // Aggiungi le righe alla tabella
     aggiungiRiga(tabella, "Luna Nuova", newMoonDate);
