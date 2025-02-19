@@ -84,7 +84,16 @@ function calcolaFasiLunari() {
     let cellaData = riga.insertCell();
 
     cellaFase.textContent = fase;
-    cellaData.textContent = data.toLocaleString(); // Formatta la data e l'ora
+    cellaData.textContent = formatDate(data); // Formatta la data e l'ora
+  }
+
+  function formatDate(date) {
+    const giorno = String(date.getDate()).padStart(2, '0');
+    const mese = String(date.getMonth() + 1).padStart(2, '0');
+    const anno = date.getFullYear();
+    const ore = String(date.getHours()).padStart(2, '0');
+    const minuti = String(date.getMinutes()).padStart(2, '0');
+    return `${giorno} ${mese} ${anno} ${ore}:${minuti}`;
   }
 }
 </script>
