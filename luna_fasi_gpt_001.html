@@ -42,33 +42,26 @@
             const lon = parseFloat(document.getElementById("longitudine").value);
             const fasi = ["Luna Nuova", "Primo Quarto", "Luna Piena", "Ultimo Quarto"];
             const fasiLunari = [];
-            
-            // Approssimazione delle date delle fasi lunari
-            const fasiBase = [
-                new Date(Date.UTC(anno, 0, 2, 20, 45)), // Luna Nuova
-                new Date(Date.UTC(anno, 0, 9, 14, 0)),  // Primo Quarto
-                new Date(Date.UTC(anno, 0, 17, 8, 0)),  // Luna Piena
-                new Date(Date.UTC(anno, 0, 24, 1, 15))  // Ultimo Quarto
-            ];
 
-            // Calcola le fasi per ogni mese dell'anno
-            fasiBase.forEach((faseBase, index) => {
-                for (let mese = 0; mese < 12; mese++) {
-                    let faseData = new Date(faseBase);
-                    faseData.setUTCMonth(mese);
-                    faseData.setUTCFullYear(anno);
+            // Parametri di calcolo
+            const lunationCycle = 29.53058867; // ciclo lunare in giorni
+            const newMoonBase = new Date(Date.UTC(2000, 0, 6, 19, 14)); // Luna Nuova del 6 gennaio 2000
+            const phaseOffsets = [0, 0.25, 0.5, 0.75]; // offset per le fasi lunari
+
+            for (let mese = 0; mese < 12; mese++) {
+                for (let fase = 0; fase < fasi.length; fase++) {
+                    let phaseDate = new Date(newMoonBase.getTime() + (lunationCycle * 24 * 60 * 60 * 1000) * (phaseOffsets[fase] + Math.floor((anno - 2000) * 12 + mese) / 12));
                     
-                    // Aggiusta per l'ora legale (considerando UTC+1)
-                    let oreLegali = 1; // Modifica a 0 se non c'è ora legale
-                    let dataLocale = new Date(faseData.getTime() + (oreLegali * 60 * 60 * 1000));
+                    // Aggiusta per il fuso orario e l'ora legale
+                    let dataLocale = new Date(phaseDate.getTime() + (1 * 60 * 60 * 1000)); // Considerando ora legale
 
                     fasiLunari.push({
                         data: dataLocale.toLocaleDateString("it-IT"), // DD-MM-YYYY
                         ora: dataLocale.toLocaleTimeString("it-IT", { hour: '2-digit', minute: '2-digit', hour12: false }), // HH:MM
-                        fase: fasi[index]
+                        fase: fasi[fase]
                     });
                 }
-            });
+            }
 
             // Mostra i risultati nella tabella
             const tbody = document.getElementById("fasiTabella").getElementsByTagName("tbody")[0];
