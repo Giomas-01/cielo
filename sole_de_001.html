@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Effemeridi del Sole</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    h1 {
+      text-align: center;
+    }
+    form {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    input {
+      margin-bottom: 10px;
+      padding: 5px;
+      width: 100%;
+      max-width: 200px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+  </style>
+</head>
+<body>
+  <h1>Effemeridi del Sole</h1>
+  <form id="ephemerisForm">
+    <label for="month">Mese (1-12):</label>
+    <input type="number" id="month" name="month" min="1" max="12" required>
+    
+    <label for="year">Anno:</label>
+    <input type="number" id="year" name="year" required>
+    
+    <label for="latitude">Latitudine:</label>
+    <input type="text" id="latitude" name="latitude" required>
+    
+    <label for="longitude">Longitudine:</label>
+    <input type="text" id="longitude" name="longitude" required>
+    
+    <button type="button" onclick="calculateEphemeris()">Calcola</button>
+  </form>
+
+  <table id="resultsTable">
+    <thead>
+      <tr>
+        <th>Data</th>
+        <th>Levata</th>
+        <th>Culminazione</th>
+        <th>Tramonto</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Risultati verranno inseriti qui -->
+    </tbody>
+  </table>
+
+  <script src="meeus-easy.js"></script>
+  <script>
+    function calculateEphemeris() {
+      const month = parseInt(document.getElementById('month').value);
+      const year = parseInt(document.getElementById('year').value);
+      const latitude = parseFloat(document.getElementById('latitude').value);
+      const longitude = parseFloat(document.getElementById('longitude').value);
+      const height = 0; // Altezza sopra il livello del mare (può essere modificata)
+
+      const daysInMonth = new Date(year, month, 0).getDate();
+      const tableBody = document.querySelector('#resultsTable tbody');
+      tableBody.innerHTML = ''; // Pulisce la tabella prima di riempirla
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(Date.UTC(year, month - 1, day));
+        const sunTimes = getSunTimesMeeus(date, latitude, longitude, height);
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${day}/${month}/${year}</td>
+          <td>${sunTimes.rise}</td>
+          <td>${sunTimes.transit}</td>
+          <td>${sunTimes.set}</td>
+        `;
+        tableBody.appendChild(row);
+      }
+    }
+  </script>
+</body>
+</html>
