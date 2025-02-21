@@ -4,37 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Effemeridi del Sole</title>
-    <script src="meeus.js"></script> <!-- Inclusione della libreria -->
+    <script src="meeusjs.1.0.3.min.js"></script>
 </head>
 <body>
     <h1>Effemeridi del Sole</h1>
-
     <form id="ephemerisForm">
-        <label for="month">Mese:</label>
-        <select id="month">
-            <option value="1">Gennaio</option>
-            <option value="2">Febbraio</option>
-            <option value="3">Marzo</option>
-            <option value="4">Aprile</option>
-            <option value="5">Maggio</option>
-            <option value="6">Giugno</option>
-            <option value="7">Luglio</option>
-            <option value="8">Agosto</option>
-            <option value="9">Settembre</option>
-            <option value="10">Ottobre</option>
-            <option value="11">Novembre</option>
-            <option value="12">Dicembre</option>
-        </select>
-
-        <label for="year">Anno:</label>
-        <input type="number" id="year" value="2024" required>
-
-        <label for="latitude">Latitudine:</label>
-        <input type="number" id="latitude" step="0.01" value="41.9" required> 
-
-        <label for="longitude">Longitudine:</label>
-        <input type="number" id="longitude" step="0.01" value="12.5" required>
-
+        <label for="mese">Mese:</label>
+        <input type="number" id="mese" min="1" max="12" value="1">
+        
+        <label for="anno">Anno:</label>
+        <input type="number" id="anno" min="1900" max="2100" value="2025">
+        
+        <label for="lat">Latitudine:</label>
+        <input type="number" id="lat" step="0.01" value="41.9">
+        
+        <label for="lon">Longitudine:</label>
+        <input type="number" id="lon" step="0.01" value="12.5">
+        
         <button type="button" onclick="calcolaEffemeridi()">Calcola</button>
     </form>
 
@@ -43,54 +29,50 @@
         <thead>
             <tr>
                 <th>Data</th>
-                <th>Levata (UTC)</th>
-                <th>Culminazione (UTC)</th>
-                <th>Tramonto (UTC)</th>
+                <th>Levata</th>
+                <th>Culminazione</th>
+                <th>Tramonto</th>
             </tr>
         </thead>
-        <tbody id="results"></tbody>
+        <tbody id="risultati"></tbody>
     </table>
 
     <script>
         function calcolaEffemeridi() {
-            const month = parseInt(document.getElementById("month").value);
-            const year = parseInt(document.getElementById("year").value);
-            const lat = parseFloat(document.getElementById("latitude").value);
-            const lon = parseFloat(document.getElementById("longitude").value);
+            const mese = parseInt(document.getElementById("mese").value);
+            const anno = parseInt(document.getElementById("anno").value);
+            const lat = parseFloat(document.getElementById("lat").value);
+            const lon = parseFloat(document.getElementById("lon").value);
+            const risultati = document.getElementById("risultati");
+
+            risultati.innerHTML = ""; // Pulisce la tabella precedente
             
-            const tbody = document.getElementById("results");
-            tbody.innerHTML = ""; // Pulisce la tabella
-
-            const daysInMonth = new Date(year, month, 0).getDate(); // Numero di giorni nel mese
-
-            for (let day = 1; day <= daysInMonth; day++) {
-                const jd = meeus.JulianCalendar.toJD(year, month, day);
-                const sun = new meeus.Solar(jd);
-
-                const riseSet = meeus.Sun.riseSet(jd, lat, lon);
-                const culmination = meeus.Sun.transit(jd, lon);
-
-                const row = document.createElement("tr");
-
-                row.innerHTML = `
-                    <td>${day}-${month}-${year}</td>
-                    <td>${formatTime(riseSet.rise)}</td>
-                    <td>${formatTime(culmination)}</td>
-                    <td>${formatTime(riseSet.set)}</td>
+            const giorniNelMese = new Date(anno, mese, 0).getDate();
+            
+            for (let giorno = 1; giorno <= giorniNelMese; giorno++) {
+                const jd = Meeus.JulianDay.calendarGregorianToJD(anno, mese, giorno);
+                
+                const sole = new Meeus.Sun();
+                const levata = sole.rise(jd, lat, lon);
+                const culminazione = sole.transit(jd, lat, lon);
+                const tramonto = sole.set(jd, lat, lon);
+                
+                risultati.innerHTML += `
+                    <tr>
+                        <td>${giorno.toString().padStart(2, "0")}-${mese.toString().padStart(2, "0")}-${anno}</td>
+                        <td>${formatTime(levata)}</td>
+                        <td>${formatTime(culminazione)}</td>
+                        <td>${formatTime(tramonto)}</td>
+                    </tr>
                 `;
-
-                tbody.appendChild(row);
             }
         }
 
-        function formatTime(jd) {
-            if (!jd) return "N/A"; // Nel caso il Sole non sorga o tramonti in alcune latitudini
-            const date = meeus.JulianCalendar.fromJD(jd);
-            return `${pad(date.hour)}:${pad(date.minute)}`;
-        }
-
-        function pad(num) {
-            return num.toString().padStart(2, "0");
+        function formatTime(time) {
+            if (!time || isNaN(time)) return "--:--";  
+            const ore = Math.floor(time);
+            const minuti = Math.round((time - ore) * 60);
+            return `${ore.toString().padStart(2, "0")}:${minuti.toString().padStart(2, "0")}`;
         }
     </script>
 </body>
