@@ -168,6 +168,53 @@
 
   <!-- Script per calcolare le effemeridi della Luna -->
   <script>
+    /**
+     * Calcola la fase lunare in base alla data (anno, mese, giorno)
+     * @param {number} year - Anno
+     * @param {number} month - Mese
+     * @param {number} day - Giorno
+     * @returns {number} Fase lunare (0-7)
+     */
+    function getMoonPhase(year, month, day) {
+      var c = e = jd = b = 0;
+
+      if (month < 3) {
+        year--;
+        month += 12;
+      }
+
+      ++month;
+
+      c = 365.25 * year;
+      e = 30.6 * month;
+      jd = c + e + day - 694039.09; // jd è il totale dei giorni trascorsi
+      jd /= 29.5305882; // divide per il ciclo lunare
+      b = parseInt(jd); // prendi la parte intera di jd
+      jd -= b; // sottrai la parte intera per lasciare la parte frazionaria
+      b = Math.round(jd * 8); // scala la frazione da 0 a 8 e arrotonda
+
+      if (b >= 8) {
+        b = 0; // 0 e 8 sono la stessa cosa, quindi trasforma 8 in 0
+      }
+
+      return b;
+    }
+
+    /**
+     * Restituisce la fase lunare principale in base al valore della fase (0-7)
+     * @param {number} phase - Valore della fase (0-7)
+     * @returns {string} Fase lunare principale
+     */
+    function getMainMoonPhase(phase) {
+      switch (phase) {
+        case 0: return "Luna nuova";
+        case 2: return "Primo quarto";
+        case 4: return "Luna piena";
+        case 6: return "Ultimo quarto";
+        default: return "";
+      }
+    }
+
     function calculateEphemeris() {
       const month = parseInt(document.getElementById('month').value);
       const year = parseInt(document.getElementById('year').value);
@@ -198,7 +245,10 @@
         const sunPosition = A.Solar.apparentTopocentric(jdo, coord);
         const phaseAngle = A.MoonIllum.phaseAngleEq2(moonPosition.eq, sunPosition);
         const illuminatedFraction = A.MoonIllum.illuminated(phaseAngle);
-        const phase = getMoonPhase(phaseAngle); // Determina la fase lunare
+
+        // Ottieni la fase lunare principale
+        const moonPhase = getMoonPhase(year, month, day);
+        const mainMoonPhase = getMainMoonPhase(moonPhase);
 
         const row = document.createElement('tr');
         row.innerHTML = `
@@ -207,23 +257,10 @@
           <td>${transitTime}</td>
           <td>${setTime}</td>
           <td>${(illuminatedFraction * 100).toFixed(2)}%</td>
-          <td>${phase}</td>
+          <td>${mainMoonPhase}</td>
         `;
         tableBody.appendChild(row);
       }
-    }
-
-    /**
-     * Determina la fase lunare in base all'angolo di fase
-     * @param {number} phaseAngle - Angolo di fase in gradi
-     * @returns {string} Fase lunare (Luna nuova, Primo quarto, Luna piena, Ultimo quarto)
-     */
-    function getMoonPhase(phaseAngle) {
-      if (phaseAngle < 45 || phaseAngle >= 315) return "Luna nuova";
-      if (phaseAngle >= 45 && phaseAngle < 135) return "Primo quarto";
-      if (phaseAngle >= 135 && phaseAngle < 225) return "Luna piena";
-      if (phaseAngle >= 225 && phaseAngle < 315) return "Ultimo quarto";
-      return "Sconosciuta";
     }
 
     /**
