@@ -39,8 +39,6 @@
   </div>
 
   <!-- Includi le librerie necessarie -->
-  <script src="lib/suncalc.js"></script>
-  <script src="lib/astronomy.js"></script> <!-- Versione browser-friendly -->
   <script src="lib/Astro.js"></script>
   <script src="lib/Astro.Math.js"></script>
   <script src="lib/Astro.DeltaT.js"></script>
@@ -57,6 +55,7 @@
   <script src="lib/Astro.MoonIllum.js"></script>
   <script src="lib/Astro.Sidereal.js"></script>
   <script src="lib/Astro.Solistice.js"></script>
+  <script src="lib/astronomy.js"></script> <!-- Aggiungi astronomy.js -->
 
   <!-- Script per calcolare le effemeridi della Luna -->
   <script>
@@ -129,8 +128,8 @@
         const setTime = addHours(A.Coord.secondsToHMSStr(times.set), timezoneOffset);
 
         // Calcola la fase lunare e l'illuminazione
-        const moonIllumination = SunCalc.getMoonIllumination(date);
-        const illuminatedFraction = moonIllumination.fraction;
+        const moonIllumination = Astronomy.MoonPhase(date);
+        const illuminatedFraction = moonIllumination.phase;
 
         // Verifica se questo giorno ha una fase lunare principale
         const phaseInfo = moonPhases.find(phase => 
