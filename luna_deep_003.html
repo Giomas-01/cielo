@@ -61,27 +61,22 @@
     </table>
   </div>
 
-  <!-- Includi le librerie necessarie -->
-  <script src="lib/Astro.js"></script>
-  <script src="lib/Astro.Moon.js"></script>
-  <script src="lib/Astro.MoonIllum.js"></script>
+  <!-- Includi la libreria astronomy.js -->
   <script src="lib/astronomy.js"></script>
-  <script src="lib/getMoonPhase.js"></script>
-  <script src="lib/suncalc.js"></script>
 
   <!-- Script per calcolare le fasi lunari -->
   <script>
     /**
-     * Restituisce il nome della fase lunare in base al valore della fase (0, 0.25, 0.5, 0.75)
-     * @param {number} phase - Valore della fase (0, 0.25, 0.5, 0.75)
+     * Restituisce il nome della fase lunare in base al valore della fase (0, 1, 2, 3)
+     * @param {number} quarter - Valore della fase (0, 1, 2, 3)
      * @returns {string} Nome della fase lunare
      */
-    function getMoonPhaseName(phase) {
-      switch (phase) {
+    function getMoonPhaseName(quarter) {
+      switch (quarter) {
         case 0: return "Luna nuova";
-        case 0.25: return "Primo quarto";
-        case 0.5: return "Luna piena";
-        case 0.75: return "Ultimo quarto";
+        case 1: return "Primo quarto";
+        case 2: return "Luna piena";
+        case 3: return "Ultimo quarto";
         default: return "";
       }
     }
@@ -99,29 +94,23 @@
 
       console.log("Inizio ricerca fasi lunari per l'anno:", year);
 
-      // Cerca le fasi lunari principali
-      const phaseTypes = [0, 0.25, 0.5, 0.75];
-      for (const phase of phaseTypes) {
-        let currentDate = new Date(startDate);
-        while (currentDate <= endDate) {
-          console.log("Cercando fase:", phase, "a partire da:", currentDate.toISOString());
-          const phaseTime = Astronomy.SearchMoonPhase(phase, currentDate, 30);
-          if (phaseTime && phaseTime.date >= startDate && phaseTime.date <= endDate) {
-            console.log("Fase trovata:", phaseTime.date.toISOString());
-            const phaseName = getMoonPhaseName(phase);
-            const localTime = new Date(phaseTime.date.getTime() + timezoneOffset * 3600 * 1000);
-            const localTimeStr = localTime.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
-            phases.push({ date: phaseTime.date, time: localTimeStr, phase: phaseName });
-            currentDate = new Date(phaseTime.date.getTime() + 24 * 3600 * 1000); // Passa al giorno successivo
-          } else {
-            console.log("Nessuna fase trovata per:", phase);
-            break;
-          }
-        }
-      }
+      let currentDate = Astronomy.MakeTime(startDate);
+      while (currentDate.date <= endDate) {
+        const moonQuarter = Astronomy.SearchMoonQuarter(currentDate);
+        if (moonQuarter.time.date > endDate) break;
 
-      // Ordina le fasi per data
-      phases.sort((a, b) => a.date - b.date);
+        const phaseName = getMoonPhaseName(moonQuarter.quarter);
+        const localTime = new Date(moonQuarter.time.date.getTime() + timezoneOffset * 3600 * 1000);
+        const localTimeStr = localTime.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+
+        phases.push({
+          date: moonQuarter.time.date,
+          time: localTimeStr,
+          phase: phaseName
+        });
+
+        currentDate = moonQuarter.time.AddDays(1); // Passa al giorno successivo
+      }
 
       console.log("Fasi trovate:", phases);
       return phases;
