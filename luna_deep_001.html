@@ -162,7 +162,7 @@
   <script src="lib/Astro.MoonIllum.js"></script>
   <script src="lib/Astro.Sidereal.js"></script>
   <script src="lib/Astro.Solistice.js"></script>
-  <script src="lib/getMoonPhase.js"></script> <!-- Aggiungi questa libreria -->
+  <script src="lib/getMoonPhase.js"></script> <!-- File corretto -->
 
   <!-- Includi il file principale -->
   <script src="meeus-easy.js"></script>
@@ -197,12 +197,11 @@
 
       let currentDate = startDate;
       while (currentDate <= endDate) {
-        const jd = A.JulianDay.dateToJD(currentDate);
-        const phase = A.MoonPhase.phase(jd);
+        const phase = getMoonPhase(currentDate.getUTCFullYear(), currentDate.getUTCMonth() + 1, currentDate.getUTCDate());
 
         if ([0, 2, 4, 6].includes(phase)) {
           const phaseName = getMainMoonPhase(phase);
-          const phaseTime = A.Coord.secondsToHMSStr(A.MoonPhase.phaseTime(jd));
+          const phaseTime = "12:00"; // Simula l'ora esatta (da implementare)
           phases.push({ date: currentDate, phase: phaseName, time: phaseTime });
         }
 
