@@ -184,10 +184,10 @@
         // Calcola i tempi di levata, culminazione e tramonto della Luna
         const times = A.Moon.times(jdo, coord);
 
-        // Applica l'offset orario
-        const riseTime = addHours(A.Coord.secondsToHMSStr(times.rise), timezoneOffset);
-        const transitTime = addHours(A.Coord.secondsToHMSStr(times.transit), timezoneOffset);
-        const setTime = addHours(A.Coord.secondsToHMSStr(times.set), timezoneOffset);
+        // Applica l'offset orario e formatta l'ora come hh:mm
+        const riseTime = formatTime(addHours(A.Coord.secondsToHMSStr(times.rise), timezoneOffset));
+        const transitTime = formatTime(addHours(A.Coord.secondsToHMSStr(times.transit), timezoneOffset));
+        const setTime = formatTime(addHours(A.Coord.secondsToHMSStr(times.set), timezoneOffset));
 
         // Calcola la fase lunare e l'illuminazione
         const moonPosition = A.Moon.topocentricPosition(jdo, coord, true);
@@ -226,6 +226,16 @@
       const newS = totalSeconds % 60;
 
       return `${String(newH).padStart(2, '0')}:${String(newM).padStart(2, '0')}:${String(newS).padStart(2, '0')}`;
+    }
+
+    /**
+     * Formatta l'ora da HH:MM:SS a HH:MM
+     * @param {string} time - Tempo nel formato HH:MM:SS
+     * @returns {string} Tempo nel formato HH:MM
+     */
+    function formatTime(time) {
+      const [h, m] = time.split(':');
+      return `${h}:${m}`;
     }
 
     /**
