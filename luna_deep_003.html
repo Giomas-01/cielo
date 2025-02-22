@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fasi Lunari</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      background-color: #f9f9f9;
+    }
+    .container {
+      width: 80%;
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: white;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    form {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    input, select {
+      margin-bottom: 10px;
+      padding: 5px;
+      width: 100%;
+      max-width: 200px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      margin-bottom: 40px; /* Spazio dopo la tabella */
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Fasi Lunari</h1>
+    <form id="moonPhasesForm">
+      <label for="year">Anno:</label>
+      <input type="number" id="year" name="year" value="2025" required>
+      
+      <label for="timezone">Ora locale (UTC offset):</label>
+      <select id="timezone" name="timezone">
+        <option value="-12">UTC-12</option>
+        <option value="-11">UTC-11</option>
+        <option value="-10">UTC-10</option>
+        <option value="-9">UTC-9</option>
+        <option value="-8">UTC-8</option>
+        <option value="-7">UTC-7</option>
+        <option value="-6">UTC-6</option>
+        <option value="-5">UTC-5</option>
+        <option value="-4">UTC-4</option>
+        <option value="-3">UTC-3</option>
+        <option value="-2">UTC-2</option>
+        <option value="-1">UTC-1</option>
+        <option value="0">UTC±0</option>
+        <option value="1" selected>UTC+1</option>
+        <option value="2">UTC+2</option>
+        <option value="3">UTC+3</option>
+        <option value="4">UTC+4</option>
+        <option value="5">UTC+5</option>
+        <option value="6">UTC+6</option>
+        <option value="7">UTC+7</option>
+        <option value="8">UTC+8</option>
+        <option value="9">UTC+9</option>
+        <option value="10">UTC+10</option>
+        <option value="11">UTC+11</option>
+        <option value="12">UTC+12</option>
+      </select>
+      
+      <button type="button" onclick="calculateMoonPhases()">Calcola</button>
+    </form>
+
+    <table id="resultsTable">
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Ora</th>
+          <th>Fase</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Risultati verranno inseriti qui -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Includi le librerie necessarie -->
+  <script src="lib/Astro.js"></script>
+  <script src="lib/Astro.Moon.js"></script>
+  <script src="lib/Astro.MoonIllum.js"></script>
+  <script src="lib/astronomy.js"></script>
+  <script src="lib/getMoonPhase.js"></script>
+  <script src="lib/suncalc.js"></script>
+
+  <!-- Script per calcolare le fasi lunari -->
+  <script>
+    /**
+     * Restituisce il nome della fase lunare in base al valore della fase (0, 0.25, 0.5, 0.75)
+     * @param {number} phase - Valore della fase (0, 0.25, 0.5, 0.75)
+     * @returns {string} Nome della fase lunare
+     */
+    function getMoonPhaseName(phase) {
+      switch (phase) {
+        case 0: return "Luna nuova";
+        case 0.25: return "Primo quarto";
+        case 0.5: return "Luna piena";
+        case 0.75: return "Ultimo quarto";
+        default: return "";
+      }
+    }
+
+    /**
+     * Trova le fasi lunari principali per l'anno specificato
+     * @param {number} year - Anno
+     * @param {number} timezoneOffset - Offset orario (UTC)
+     * @returns {Array} Array di oggetti con la data, l'ora e la fase lunare
+     */
+    function getMoonPhasesForYear(year, timezoneOffset) {
+      const phases = [];
+      const startDate = new Date(Date.UTC(year, 0, 1));
+      const endDate = new Date(Date.UTC(year, 11, 31));
+
+      // Cerca le fasi lunari principali
+      const phaseTypes = [0, 0.25, 0.5, 0.75];
+      for (const phase of phaseTypes) {
+        let currentDate = new Date(startDate);
+        while (currentDate <= endDate) {
+          const phaseTime = Astronomy.SearchMoonPhase(phase, currentDate, 30);
+          if (phaseTime && phaseTime.date >= startDate && phaseTime.date <= endDate) {
+            const phaseName = getMoonPhaseName(phase);
+            const localTime = new Date(phaseTime.date.getTime() + timezoneOffset * 3600 * 1000);
+            const localTimeStr = localTime.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+            phases.push({ date: phaseTime.date, time: localTimeStr, phase: phaseName });
+            currentDate = new Date(phaseTime.date.getTime() + 24 * 3600 * 1000); // Passa al giorno successivo
+          } else {
+            break;
+          }
+        }
+      }
+
+      // Ordina le fasi per data
+      phases.sort((a, b) => a.date - b.date);
+
+      return phases;
+    }
+
+    /**
+     * Calcola e visualizza le fasi lunari
+     */
+    function calculateMoonPhases() {
+      const year = parseInt(document.getElementById('year').value);
+      const timezoneOffset = parseInt(document.getElementById('timezone').value); // Offset orario
+
+      const tableBody = document.querySelector('#resultsTable tbody');
+      tableBody.innerHTML = ''; // Pulisce la tabella prima di riempirla
+
+      // Ottieni le fasi lunari principali per l'anno specificato
+      const moonPhases = getMoonPhasesForYear(year, timezoneOffset);
+
+      // Popola la tabella
+      moonPhases.forEach(phase => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${phase.date.toLocaleDateString('it-IT')}</td>
+          <td>${phase.time}</td>
+          <td>${phase.phase}</td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+  </script>
+</body>
+</html>
