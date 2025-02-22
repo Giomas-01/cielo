@@ -82,7 +82,20 @@
     </tbody>
   </table>
 
+  <!-- Includi le librerie necessarie -->
+  <script src="lib/Astro.Math.js"></script>
+  <script src="lib/Astro.JulianDay.js"></script>
+  <script src="lib/Astro.Coord.js"></script>
+  <script src="lib/Astro.Globe.js"></script>
+  <script src="lib/Astro.Solar.js"></script>
+  <script src="lib/Astro.Rise.js"></script>
+  <script src="lib/Astro.Refraction.js"></script>
+  <script src="lib/Astro.js"></script>
+
+  <!-- Includi il file principale -->
   <script src="meeus-easy.js"></script>
+
+  <!-- Script per calcolare le effemeridi -->
   <script>
     function calculateEphemeris() {
       const month = parseInt(document.getElementById('month').value);
@@ -97,14 +110,18 @@
 
       for (let day = 1; day <= daysInMonth; day++) {
         const date = new Date(Date.UTC(year, month - 1, day));
-        const sunTimes = getSunTimesMeeus(date, latitude, longitude, height);
+        const jdo = new A.JulianDay(date);
+        const coord = A.EclCoord.fromWgs84(latitude, longitude, height);
+
+        // Calcola i tempi di levata, culminazione e tramonto
+        const times = A.Solar.times(jdo, coord);
 
         const row = document.createElement('tr');
         row.innerHTML = `
           <td>${day}/${month}/${year}</td>
-          <td>${sunTimes.rise}</td>
-          <td>${sunTimes.transit}</td>
-          <td>${sunTimes.set}</td>
+          <td>${A.Coord.secondsToHMSStr(times.rise)}</td>
+          <td>${A.Coord.secondsToHMSStr(times.transit)}</td>
+          <td>${A.Coord.secondsToHMSStr(times.set)}</td>
         `;
         tableBody.appendChild(row);
       }
