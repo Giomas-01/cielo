@@ -7,10 +7,23 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 20px;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      background-color: #f9f9f9;
+    }
+    .container {
+      width: 80%;
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: white;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
     h1 {
       text-align: center;
+      margin-bottom: 20px;
     }
     form {
       margin-bottom: 20px;
@@ -39,6 +52,7 @@
       width: 100%;
       border-collapse: collapse;
       margin-top: 20px;
+      margin-bottom: 40px; /* Spazio dopo la tabella */
     }
     th, td {
       border: 1px solid #ddd;
@@ -48,68 +62,86 @@
     th {
       background-color: #f2f2f2;
     }
+    .export-button {
+      float: right;
+      margin-top: 10px;
+    }
+    .version {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 0.9em;
+      color: #666;
+    }
   </style>
 </head>
 <body>
-  <h1>Effemeridi del Sole</h1>
-  <form id="ephemerisForm">
-    <label for="month">Mese (1-12):</label>
-    <input type="number" id="month" name="month" min="1" max="12" required>
-    
-    <label for="year">Anno:</label>
-    <input type="number" id="year" name="year" required>
-    
-    <label for="latitude">Latitudine:</label>
-    <input type="text" id="latitude" name="latitude" required>
-    
-    <label for="longitude">Longitudine:</label>
-    <input type="text" id="longitude" name="longitude" required>
-    
-    <label for="timezone">Ora locale (UTC offset):</label>
-    <select id="timezone" name="timezone">
-      <option value="-12">UTC-12</option>
-      <option value="-11">UTC-11</option>
-      <option value="-10">UTC-10</option>
-      <option value="-9">UTC-9</option>
-      <option value="-8">UTC-8</option>
-      <option value="-7">UTC-7</option>
-      <option value="-6">UTC-6</option>
-      <option value="-5">UTC-5</option>
-      <option value="-4">UTC-4</option>
-      <option value="-3">UTC-3</option>
-      <option value="-2">UTC-2</option>
-      <option value="-1">UTC-1</option>
-      <option value="0" selected>UTC±0</option>
-      <option value="1">UTC+1</option>
-      <option value="2">UTC+2</option>
-      <option value="3">UTC+3</option>
-      <option value="4">UTC+4</option>
-      <option value="5">UTC+5</option>
-      <option value="6">UTC+6</option>
-      <option value="7">UTC+7</option>
-      <option value="8">UTC+8</option>
-      <option value="9">UTC+9</option>
-      <option value="10">UTC+10</option>
-      <option value="11">UTC+11</option>
-      <option value="12">UTC+12</option>
-    </select>
-    
-    <button type="button" onclick="calculateEphemeris()">Calcola</button>
-  </form>
+  <div class="container">
+    <h1>Effemeridi del Sole</h1>
+    <form id="ephemerisForm">
+      <label for="month">Mese (1-12):</label>
+      <input type="number" id="month" name="month" min="1" max="12" value="1" required>
+      
+      <label for="year">Anno:</label>
+      <input type="number" id="year" name="year" value="2025" required>
+      
+      <label for="latitude">Latitudine:</label>
+      <input type="text" id="latitude" name="latitude" value="45.4628" required>
+      
+      <label for="longitude">Longitudine:</label>
+      <input type="text" id="longitude" name="longitude" value="9.0953" required>
+      
+      <label for="timezone">Ora locale (UTC offset):</label>
+      <select id="timezone" name="timezone">
+        <option value="-12">UTC-12</option>
+        <option value="-11">UTC-11</option>
+        <option value="-10">UTC-10</option>
+        <option value="-9">UTC-9</option>
+        <option value="-8">UTC-8</option>
+        <option value="-7">UTC-7</option>
+        <option value="-6">UTC-6</option>
+        <option value="-5">UTC-5</option>
+        <option value="-4">UTC-4</option>
+        <option value="-3">UTC-3</option>
+        <option value="-2">UTC-2</option>
+        <option value="-1">UTC-1</option>
+        <option value="0">UTC±0</option>
+        <option value="1" selected>UTC+1</option>
+        <option value="2">UTC+2</option>
+        <option value="3">UTC+3</option>
+        <option value="4">UTC+4</option>
+        <option value="5">UTC+5</option>
+        <option value="6">UTC+6</option>
+        <option value="7">UTC+7</option>
+        <option value="8">UTC+8</option>
+        <option value="9">UTC+9</option>
+        <option value="10">UTC+10</option>
+        <option value="11">UTC+11</option>
+        <option value="12">UTC+12</option>
+      </select>
+      
+      <button type="button" onclick="calculateEphemeris()">Calcola</button>
+    </form>
 
-  <table id="resultsTable">
-    <thead>
-      <tr>
-        <th>Data</th>
-        <th>Levata</th>
-        <th>Culminazione</th>
-        <th>Tramonto</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- Risultati verranno inseriti qui -->
-    </tbody>
-  </table>
+    <!-- Pulsante "Esporta CSV" -->
+    <button class="export-button" onclick="exportToCSV()">Esporta CSV</button>
+
+    <table id="resultsTable">
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Levata</th>
+          <th>Culminazione</th>
+          <th>Tramonto</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Risultati verranno inseriti qui -->
+      </tbody>
+    </table>
+
+    <!-- Versione -->
+    <p class="version">v1.2</p>
+  </div>
 
   <!-- Includi le librerie necessarie -->
   <script src="lib/Astro.js"></script>
@@ -189,6 +221,39 @@
       const newS = totalSeconds % 60;
 
       return `${String(newH).padStart(2, '0')}:${String(newM).padStart(2, '0')}:${String(newS).padStart(2, '0')}`;
+    }
+
+    /**
+     * Esporta i dati della tabella in formato CSV
+     */
+    function exportToCSV() {
+      const rows = document.querySelectorAll('#resultsTable tr');
+      let csvContent = "data:text/csv;charset=utf-8,";
+
+      // Aggiungi l'intestazione
+      const headers = [];
+      document.querySelectorAll('#resultsTable th').forEach(header => {
+        headers.push(header.innerText);
+      });
+      csvContent += headers.join(",") + "\n";
+
+      // Aggiungi i dati
+      rows.forEach(row => {
+        const rowData = [];
+        row.querySelectorAll('td').forEach(cell => {
+          rowData.push(cell.innerText);
+        });
+        csvContent += rowData.join(",") + "\n";
+      });
+
+      // Crea un link per il download
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "effemeridi_sole.csv");
+      document.body.appendChild(link);
+      link.click(); // Scarica il file
+      document.body.removeChild(link); // Rimuove il link dopo il download
     }
   </script>
 </body>
