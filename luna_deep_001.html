@@ -162,6 +162,7 @@
   <script src="lib/Astro.MoonIllum.js"></script>
   <script src="lib/Astro.Sidereal.js"></script>
   <script src="lib/Astro.Solistice.js"></script>
+  <script src="lib/Astro.MoonPhase.js"></script> <!-- Aggiungi questa libreria -->
 
   <!-- Includi il file principale -->
   <script src="meeus-easy.js"></script>
@@ -169,56 +170,46 @@
   <!-- Script per calcolare le effemeridi della Luna -->
   <script>
     /**
-     * Calcola la fase lunare in base alla data (anno, mese, giorno)
-     * @param {number} year - Anno
-     * @param {number} month - Mese
-     * @param {number} day - Giorno
-     * @returns {number} Fase lunare (0-7)
+     * Restituisce la fase lunare principale in base al valore della fase (0-7)
+     * @param {number} phase - Valore della fase (0-7)
+     * @returns {string} Fase lunare principale
      */
-    function getMoonPhase(year, month, day) {
-      var c = e = jd = b = 0;
-
-      if (month < 3) {
-        year--;
-        month += 12;
+    function getMainMoonPhase(phase) {
+      switch (phase) {
+        case 0: return "Luna nuova";
+        case 2: return "Primo quarto";
+        case 4: return "Luna piena";
+        case 6: return "Ultimo quarto";
+        default: return "";
       }
-
-      ++month;
-
-      c = 365.25 * year;
-      e = 30.6 * month;
-      jd = c + e + day - 694039.09; // jd è il totale dei giorni trascorsi
-      jd /= 29.5305882; // divide per il ciclo lunare
-      b = parseInt(jd); // prendi la parte intera di jd
-      jd -= b; // sottrai la parte intera per lasciare la parte frazionaria
-      b = Math.round(jd * 8); // scala la frazione da 0 a 8 e arrotonda
-
-      if (b >= 8) {
-        b = 0; // 0 e 8 sono la stessa cosa, quindi trasforma 8 in 0
-      }
-
-      return b;
     }
 
     /**
-     * Restituisce l'ora esatta della fase lunare
+     * Trova la data e l'ora esatta della fase lunare principale per il mese specificato
      * @param {number} year - Anno
      * @param {number} month - Mese
-     * @param {number} day - Giorno
-     * @returns {string} Ora esatta della fase lunare (HH:MM)
+     * @returns {Array} Array di oggetti con la data e l'ora delle fasi lunari principali
      */
-    function getMoonPhaseExactTime(year, month, day) {
-      // Simula il calcolo dell'ora esatta (da implementare con una libreria precisa)
-      // Per ora, restituiamo un'ora fittizia per dimostrare il funzionamento
-      const phases = {
-        0: { time: "01:44", phase: "Luna nuova" },
-        2: { time: "09:01", phase: "Primo quarto" },
-        4: { time: "14:53", phase: "Luna piena" },
-        6: { time: "18:32", phase: "Ultimo quarto" }
-      };
+    function getMoonPhasesForMonth(year, month) {
+      const phases = [];
+      const startDate = new Date(Date.UTC(year, month - 1, 1));
+      const endDate = new Date(Date.UTC(year, month, 0));
 
-      const phase = getMoonPhase(year, month, day);
-      return phases[phase] || { time: "", phase: "" };
+      let currentDate = startDate;
+      while (currentDate <= endDate) {
+        const jd = A.JulianDay.dateToJD(currentDate);
+        const phase = A.MoonPhase.phase(jd);
+
+        if ([0, 2, 4, 6].includes(phase)) {
+          const phaseName = getMainMoonPhase(phase);
+          const phaseTime = A.Coord.secondsToHMSStr(A.MoonPhase.phaseTime(jd));
+          phases.push({ date: currentDate, phase: phaseName, time: phaseTime });
+        }
+
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+
+      return phases;
     }
 
     function calculateEphemeris() {
@@ -232,6 +223,9 @@
       const daysInMonth = new Date(year, month, 0).getDate();
       const tableBody = document.querySelector('#resultsTable tbody');
       tableBody.innerHTML = ''; // Pulisce la tabella prima di riempirla
+
+      // Ottieni le fasi lunari principali per il mese specificato
+      const moonPhases = getMoonPhasesForMonth(year, month);
 
       for (let day = 1; day <= daysInMonth; day++) {
         const date = new Date(Date.UTC(year, month - 1, day));
@@ -252,10 +246,12 @@
         const phaseAngle = A.MoonIllum.phaseAngleEq2(moonPosition.eq, sunPosition);
         const illuminatedFraction = A.MoonIllum.illuminated(phaseAngle);
 
-        // Ottieni l'ora esatta della fase lunare
-        const phaseInfo = getMoonPhaseExactTime(year, month, day);
-        const phaseTime = phaseInfo.time;
-        const phaseName = phaseInfo.phase;
+        // Verifica se questo giorno ha una fase lunare principale
+        const phaseInfo = moonPhases.find(phase => 
+          phase.date.getUTCDate() === day && phase.date.getUTCMonth() === month - 1
+        );
+        const phaseTime = phaseInfo ? phaseInfo.time : "";
+        const phaseName = phaseInfo ? phaseInfo.phase : "";
 
         const row = document.createElement('tr');
         row.innerHTML = `
