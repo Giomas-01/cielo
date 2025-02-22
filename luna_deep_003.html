@@ -153,19 +153,24 @@
       const startDate = new Date(Date.UTC(year, 0, 1));
       const endDate = new Date(Date.UTC(year, 11, 31));
 
+      console.log("Inizio ricerca fasi lunari per l'anno:", year);
+
       // Cerca le fasi lunari principali
       const phaseTypes = [0, 0.25, 0.5, 0.75];
       for (const phase of phaseTypes) {
         let currentDate = new Date(startDate);
         while (currentDate <= endDate) {
+          console.log("Cercando fase:", phase, "a partire da:", currentDate.toISOString());
           const phaseTime = Astronomy.SearchMoonPhase(phase, currentDate, 30);
           if (phaseTime && phaseTime.date >= startDate && phaseTime.date <= endDate) {
+            console.log("Fase trovata:", phaseTime.date.toISOString());
             const phaseName = getMoonPhaseName(phase);
             const localTime = new Date(phaseTime.date.getTime() + timezoneOffset * 3600 * 1000);
             const localTimeStr = localTime.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
             phases.push({ date: phaseTime.date, time: localTimeStr, phase: phaseName });
             currentDate = new Date(phaseTime.date.getTime() + 24 * 3600 * 1000); // Passa al giorno successivo
           } else {
+            console.log("Nessuna fase trovata per:", phase);
             break;
           }
         }
@@ -174,6 +179,7 @@
       // Ordina le fasi per data
       phases.sort((a, b) => a.date - b.date);
 
+      console.log("Fasi trovate:", phases);
       return phases;
     }
 
@@ -183,6 +189,9 @@
     function calculateMoonPhases() {
       const year = parseInt(document.getElementById('year').value);
       const timezoneOffset = parseInt(document.getElementById('timezone').value); // Offset orario
+
+      console.log("Anno selezionato:", year);
+      console.log("Offset UTC selezionato:", timezoneOffset);
 
       const tableBody = document.querySelector('#resultsTable tbody');
       tableBody.innerHTML = ''; // Pulisce la tabella prima di riempirla
@@ -200,6 +209,8 @@
         `;
         tableBody.appendChild(row);
       });
+
+      console.log("Tabella generata con successo.");
     }
   </script>
 </body>
