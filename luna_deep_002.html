@@ -5,14 +5,121 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Effemeridi della Luna</title>
   <style>
-    /* Stili CSS (rimangono invariati) */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      background-color: #f9f9f9;
+    }
+    .container {
+      width: 80%;
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: white;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    form {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    input, select {
+      margin-bottom: 10px;
+      padding: 5px;
+      width: 100%;
+      max-width: 200px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      margin-bottom: 40px; /* Spazio dopo la tabella */
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    .export-button {
+      float: right;
+      margin-top: 10px;
+    }
+    .version {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 0.9em;
+      color: #666;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Effemeridi della Luna</h1>
     <form id="ephemerisForm">
-      <!-- Form (rimane invariato) -->
+      <label for="month">Mese (1-12):</label>
+      <input type="number" id="month" name="month" min="1" max="12" value="2" required>
+      
+      <label for="year">Anno:</label>
+      <input type="number" id="year" name="year" value="2025" required>
+      
+      <label for="latitude">Latitudine:</label>
+      <input type="text" id="latitude" name="latitude" value="45.4628" required>
+      
+      <label for="longitude">Longitudine:</label>
+      <input type="text" id="longitude" name="longitude" value="9.0953" required>
+      
+      <label for="timezone">Ora locale (UTC offset):</label>
+      <select id="timezone" name="timezone">
+        <option value="-12">UTC-12</option>
+        <option value="-11">UTC-11</option>
+        <option value="-10">UTC-10</option>
+        <option value="-9">UTC-9</option>
+        <option value="-8">UTC-8</option>
+        <option value="-7">UTC-7</option>
+        <option value="-6">UTC-6</option>
+        <option value="-5">UTC-5</option>
+        <option value="-4">UTC-4</option>
+        <option value="-3">UTC-3</option>
+        <option value="-2">UTC-2</option>
+        <option value="-1">UTC-1</option>
+        <option value="0">UTC±0</option>
+        <option value="1" selected>UTC+1</option>
+        <option value="2">UTC+2</option>
+        <option value="3">UTC+3</option>
+        <option value="4">UTC+4</option>
+        <option value="5">UTC+5</option>
+        <option value="6">UTC+6</option>
+        <option value="7">UTC+7</option>
+        <option value="8">UTC+8</option>
+        <option value="9">UTC+9</option>
+        <option value="10">UTC+10</option>
+        <option value="11">UTC+11</option>
+        <option value="12">UTC+12</option>
+      </select>
+      
+      <button type="button" onclick="calculateEphemeris()">Calcola</button>
     </form>
 
     <!-- Pulsante "Esporta CSV" -->
@@ -26,7 +133,6 @@
           <th>Culminazione</th>
           <th>Tramonto</th>
           <th>Fase Lunare (%)</th>
-          <th>Fase</th>
         </tr>
       </thead>
       <tbody>
@@ -55,50 +161,9 @@
   <script src="lib/Astro.MoonIllum.js"></script>
   <script src="lib/Astro.Sidereal.js"></script>
   <script src="lib/Astro.Solistice.js"></script>
-  <script src="lib/astronomy.js"></script> <!-- Aggiungi astronomy.js -->
 
   <!-- Script per calcolare le effemeridi della Luna -->
   <script>
-    /**
-     * Restituisce la fase lunare principale in base al valore della fase (0, 0.25, 0.5, 0.75)
-     * @param {number} phase - Valore della fase (0, 0.25, 0.5, 0.75)
-     * @returns {string} Fase lunare principale
-     */
-    function getMainMoonPhase(phase) {
-      switch (phase) {
-        case 0: return "Luna nuova";
-        case 0.25: return "Primo quarto";
-        case 0.5: return "Luna piena";
-        case 0.75: return "Ultimo quarto";
-        default: return "";
-      }
-    }
-
-    /**
-     * Trova la data e l'ora esatta della fase lunare principale per il mese specificato
-     * @param {number} year - Anno
-     * @param {number} month - Mese
-     * @returns {Array} Array di oggetti con la data e l'ora delle fasi lunari principali
-     */
-    function getMoonPhasesForMonth(year, month) {
-      const phases = [];
-      const startDate = new Date(Date.UTC(year, month - 1, 1));
-      const endDate = new Date(Date.UTC(year, month, 0));
-
-      // Cerca le fasi lunari principali
-      const phaseTypes = [0, 0.25, 0.5, 0.75];
-      for (const phase of phaseTypes) {
-        const phaseTime = Astronomy.SearchMoonPhase(phase, startDate, 30);
-        if (phaseTime && phaseTime.date >= startDate && phaseTime.date <= endDate) {
-          const phaseName = getMainMoonPhase(phase);
-          const phaseTimeStr = phaseTime.date.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
-          phases.push({ date: phaseTime.date, phase: phaseName, time: phaseTimeStr });
-        }
-      }
-
-      return phases;
-    }
-
     function calculateEphemeris() {
       const month = parseInt(document.getElementById('month').value);
       const year = parseInt(document.getElementById('year').value);
@@ -110,9 +175,6 @@
       const daysInMonth = new Date(year, month, 0).getDate();
       const tableBody = document.querySelector('#resultsTable tbody');
       tableBody.innerHTML = ''; // Pulisce la tabella prima di riempirla
-
-      // Ottieni le fasi lunari principali per il mese specificato
-      const moonPhases = getMoonPhasesForMonth(year, month);
 
       for (let day = 1; day <= daysInMonth; day++) {
         const date = new Date(Date.UTC(year, month - 1, day));
@@ -128,15 +190,10 @@
         const setTime = addHours(A.Coord.secondsToHMSStr(times.set), timezoneOffset);
 
         // Calcola la fase lunare e l'illuminazione
-        const moonIllumination = Astronomy.MoonPhase(date);
-        const illuminatedFraction = moonIllumination.phase;
-
-        // Verifica se questo giorno ha una fase lunare principale
-        const phaseInfo = moonPhases.find(phase => 
-          phase.date.getUTCDate() === day && phase.date.getUTCMonth() === month - 1
-        );
-        const phaseTime = phaseInfo ? phaseInfo.time : "";
-        const phaseName = phaseInfo ? phaseInfo.phase : "";
+        const moonPosition = A.Moon.topocentricPosition(jdo, coord, true);
+        const sunPosition = A.Solar.apparentTopocentric(jdo, coord);
+        const phaseAngle = A.MoonIllum.phaseAngleEq2(moonPosition.eq, sunPosition);
+        const illuminatedFraction = A.MoonIllum.illuminated(phaseAngle);
 
         const row = document.createElement('tr');
         row.innerHTML = `
@@ -145,7 +202,6 @@
           <td>${transitTime}</td>
           <td>${setTime}</td>
           <td>${(illuminatedFraction * 100).toFixed(2)}%</td>
-          <td>${phaseTime ? `${phaseTime} ${phaseName}` : ""}</td>
         `;
         tableBody.appendChild(row);
       }
