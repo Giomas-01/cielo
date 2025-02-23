@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Effemeridi della Luna</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      background-color: #f9f9f9;
+    }
+    .container {
+      width: 80%;
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: white;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    form {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    input, select {
+      margin-bottom: 10px;
+      padding: 5px;
+      width: 100%;
+      max-width: 200px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      margin-bottom: 40px; /* Spazio dopo la tabella */
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    .export-button {
+      float: right;
+      margin-top: 10px;
+    }
+    .version {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 0.9em;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Effemeridi della Luna</h1>
+    <form id="ephemerisForm">
+      <label for="month">Mese (1-12):</label>
+      <input type="number" id="month" name="month" min="1" max="12" value="2" required>
+      
+      <label for="year">Anno:</label>
+      <input type="number" id="year" name="year" value="2025" required>
+      
+      <label for="latitude">Latitudine:</label>
+      <input type="text" id="latitude" name="latitude" value="45.4628" required>
+      
+      <label for="longitude">Longitudine:</label>
+      <input type="text" id="longitude" name="longitude" value="9.0953" required>
+      
+      <label for="timezone">Ora locale (UTC offset):</label>
+      <select id="timezone" name="timezone">
+        <option value="-12">UTC-12</option>
+        <option value="-11">UTC-11</option>
+        <option value="-10">UTC-10</option>
+        <option value="-9">UTC-9</option>
+        <option value="-8">UTC-8</option>
+        <option value="-7">UTC-7</option>
+        <option value="-6">UTC-6</option>
+        <option value="-5">UTC-5</option>
+        <option value="-4">UTC-4</option>
+        <option value="-3">UTC-3</option>
+        <option value="-2">UTC-2</option>
+        <option value="-1">UTC-1</option>
+        <option value="0">UTC±0</option>
+        <option value="1" selected>UTC+1</option>
+        <option value="2">UTC+2</option>
+        <option value="3">UTC+3</option>
+        <option value="4">UTC+4</option>
+        <option value="5">UTC+5</option>
+        <option value="6">UTC+6</option>
+        <option value="7">UTC+7</option>
+        <option value="8">UTC+8</option>
+        <option value="9">UTC+9</option>
+        <option value="10">UTC+10</option>
+        <option value="11">UTC+11</option>
+        <option value="12">UTC+12</option>
+      </select>
+      
+      <button type="button" onclick="calculateEphemeris()">Calcola</button>
+    </form>
+
+    <!-- Pulsante "Esporta CSV" -->
+    <button class="export-button" onclick="exportToCSV()">Esporta CSV</button>
+
+    <table id="resultsTable">
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Levata</th>
+          <th>Culminazione</th>
+          <th>Tramonto</th>
+          <th>Fase Lunare (%)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Risultati verranno inseriti qui -->
+      </tbody>
+    </table>
+
+    <!-- Versione -->
+    <p class="version">v1.2</p>
+  </div>
+
+  <!-- Includi le librerie necessarie -->
+  <script src="lib/Astro.js"></script>
+  <script src="lib/Astro.Math.js"></script>
+  <script src="lib/Astro.DeltaT.js"></script>
+  <script src="lib/Astro.JulianDay.js"></script>
+  <script src="lib/Astro.Coord.js"></script>
+  <script src="lib/Astro.Globe.js"></script>
+  <script src="lib/Astro.Interp.js"></script>
+  <script src="lib/Astro.Solar.js"></script>
+  <script src="lib/Astro.Rise.js"></script>
+  <script src="lib/Astro.Refraction.js"></script>
+  <script src="lib/Astro.Nutation.js"></script>
+  <script src="lib/Astro.Parallax.js"></script>
+  <script src="lib/Astro.Moon.js"></script>
+  <script src="lib/Astro.MoonIllum.js"></script>
+  <script src="lib/Astro.Sidereal.js"></script>
+  <script src="lib/Astro.Solistice.js"></script>
+
+  <!-- Script per calcolare le effemeridi della Luna -->
+  <script>
+    function calculateEphemeris() {
+      const month = parseInt(document.getElementById('month').value);
+      const year = parseInt(document.getElementById('year').value);
+      const latitude = parseFloat(document.getElementById('latitude').value);
+      const longitude = parseFloat(document.getElementById('longitude').value);
+      const timezoneOffset = parseInt(document.getElementById('timezone').value); // Offset orario
+      const height = 0; // Altezza sopra il livello del mare (può essere modificata)
+
+      const daysInMonth = new Date(year, month, 0).getDate();
+      const tableBody = document.querySelector('#resultsTable tbody');
+      tableBody.innerHTML = ''; // Pulisce la tabella prima di riempirla
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(Date.UTC(year, month - 1, day));
+        const jdo = new A.JulianDay(date);
+        const coord = A.EclCoord.fromWgs84(latitude, longitude, height);
+
+        // Calcola i tempi di levata, culminazione e tramonto della Luna
+        const times = A.Moon.times(jdo, coord);
+
+        // Applica l'offset orario e formatta l'ora come hh:mm
+        const riseTime = formatTime(addHours(A.Coord.secondsToHMSStr(times.rise), timezoneOffset));
+        const transitTime = formatTime(addHours(A.Coord.secondsToHMSStr(times.transit), timezoneOffset));
+        const setTime = formatTime(addHours(A.Coord.secondsToHMSStr(times.set), timezoneOffset));
+
+        // Calcola la fase lunare e l'illuminazione
+        const moonPosition = A.Moon.topocentricPosition(jdo, coord, true);
+        const sunPosition = A.Solar.apparentTopocentric(jdo, coord);
+        const phaseAngle = A.MoonIllum.phaseAngleEq2(moonPosition.eq, sunPosition);
+        const illuminatedFraction = A.MoonIllum.illuminated(phaseAngle);
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${day}/${month}/${year}</td>
+          <td>${riseTime}</td>
+          <td>${transitTime}</td>
+          <td>${setTime}</td>
+          <td>${(illuminatedFraction * 100).toFixed(2)}%</td>
+        `;
+        tableBody.appendChild(row);
+      }
+    }
+
+    /**
+     * Aggiunge ore a una stringa nel formato HH:MM:SS
+     * @param {string} time - Tempo nel formato HH:MM:SS
+     * @param {number} hours - Ore da aggiungere (può essere negativo)
+     * @returns {string} Tempo aggiornato nel formato HH:MM:SS
+     */
+    function addHours(time, hours) {
+      const [h, m, s] = time.split(':').map(Number);
+      let totalSeconds = h * 3600 + m * 60 + s;
+      totalSeconds += hours * 3600; // Aggiungi l'offset in secondi
+
+      // Gestisci il caso in cui il tempo superi 24 ore o sia negativo
+      totalSeconds = (totalSeconds + 86400) % 86400; // Assicura che sia compreso tra 0 e 86400
+
+      const newH = Math.floor(totalSeconds / 3600) % 24;
+      const newM = Math.floor((totalSeconds % 3600) / 60);
+      const newS = totalSeconds % 60;
+
+      return `${String(newH).padStart(2, '0')}:${String(newM).padStart(2, '0')}:${String(newS).padStart(2, '0')}`;
+    }
+
+    /**
+     * Formatta l'ora da HH:MM:SS a HH:MM
+     * @param {string} time - Tempo nel formato HH:MM:SS
+     * @returns {string} Tempo nel formato HH:MM
+     */
+    function formatTime(time) {
+      const [h, m] = time.split(':');
+      return `${h}:${m}`;
+    }
+
+    /**
+     * Esporta i dati della tabella in formato CSV
+     */
+    function exportToCSV() {
+      const rows = document.querySelectorAll('#resultsTable tr');
+      let csvContent = "data:text/csv;charset=utf-8,";
+
+      // Aggiungi l'intestazione
+      const headers = [];
+      document.querySelectorAll('#resultsTable th').forEach(header => {
+        headers.push(header.innerText);
+      });
+      csvContent += headers.join(",") + "\n";
+
+      // Aggiungi i dati
+      rows.forEach(row => {
+        const rowData = [];
+        row.querySelectorAll('td').forEach(cell => {
+          rowData.push(cell.innerText);
+        });
+        csvContent += rowData.join(",") + "\n";
+      });
+
+      // Crea un link per il download
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "effemeridi_luna.csv");
+      document.body.appendChild(link);
+      link.click(); // Scarica il file
+      document.body.removeChild(link); // Rimuove il link dopo il download
+    }
+  </script>
+</body>
+</html>
