@@ -2,15 +2,77 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fasi della Luna</title>
-    <script type="text/javascript" src="lib/astrojs.js"></script>
+    <script src="lib/astrojs.js" defer></script>
+    <script>
+        function calcolaFasi() {
+            const anno = parseInt(document.getElementById("anno").value);
+            const offsetUTC = parseInt(document.getElementById("utcOffset").value);
+            const fasi = [0.00, 0.25, 0.50, 0.75];
+            const nomiFasi = ["Luna Nuova", "Primo Quarto", "Luna Piena", "Ultimo Quarto"];
+            
+            if (isNaN(anno)) {
+                alert("Inserisci un anno valido.");
+                return;
+            }
+            
+            let risultati = [];
+            for (let mese = 1; mese <= 12; mese++) {
+                for (let i = 0; i < fasi.length; i++) {
+                    let jd = cfasi_lunari(mese, anno, fasi[i]);
+                    let dataFase = jdToDate(jd);
+                    dataFase.setHours(dataFase.getHours() + offsetUTC);
+                    risultati.push({ data: dataFase, fase: nomiFasi[i] });
+                }
+            }
+            
+            risultati.sort((a, b) => a.data - b.data);
+            generaTabella(risultati);
+        }
+        
+        function jdToDate(jd) {
+            let Z = Math.floor(jd + 0.5);
+            let F = (jd + 0.5) - Z;
+            let A = Z;
+            if (Z >= 2299161) {
+                let alpha = Math.floor((Z - 1867216.25) / 36524.25);
+                A += 1 + alpha - Math.floor(alpha / 4);
+            }
+            let B = A + 1524;
+            let C = Math.floor((B - 122.1) / 365.25);
+            let D = Math.floor(365.25 * C);
+            let E = Math.floor((B - D) / 30.6001);
+            let day = B - D - Math.floor(30.6001 * E) + F;
+            let month = (E < 14) ? E - 1 : E - 13;
+            let year = (month > 2) ? C - 4716 : C - 4715;
+            
+            let date = new Date(Date.UTC(year, month - 1, Math.floor(day)));
+            let hours = (day - Math.floor(day)) * 24;
+            date.setUTCHours(Math.floor(hours), (hours - Math.floor(hours)) * 60);
+            return date;
+        }
+        
+        function generaTabella(dati) {
+            let tbody = document.getElementById("tabellaFasi");
+            tbody.innerHTML = "";
+            dati.forEach(entry => {
+                let row = tbody.insertRow();
+                let cellData = row.insertCell(0);
+                let cellOra = row.insertCell(1);
+                let cellFase = row.insertCell(2);
+                cellData.textContent = entry.data.toISOString().split("T")[0];
+                cellOra.textContent = entry.data.toISOString().split("T")[1].substring(0, 5);
+                cellFase.textContent = entry.fase;
+            });
+        }
+    </script>
 </head>
 <body>
     <h1>Fasi della Luna</h1>
-    <form id="lunarForm">
-        <label for="year">Anno:</label>
-        <input type="number" id="year" min="1900" max="2100" required>
-        
+    <form onsubmit="event.preventDefault(); calcolaFasi();">
+        <label for="anno">Anno:</label>
+        <input type="number" id="anno" required>
         <label for="utcOffset">UTC Offset:</label>
         <select id="utcOffset">
             <script>
@@ -19,76 +81,18 @@
                 }
             </script>
         </select>
-        
-        <button type="button" onclick="calculatePhases()">Calcola</button>
+        <button type="submit">Calcola</button>
     </form>
     
-    <table border="1" id="resultTable">
+    <table border="1">
         <thead>
             <tr>
                 <th>Data</th>
-                <th>Ora (UTC Offset)</th>
+                <th>Ora (UTC)</th>
                 <th>Fase</th>
             </tr>
         </thead>
-        <tbody></tbody>
+        <tbody id="tabellaFasi"></tbody>
     </table>
-    
-    <script>
-        var emisfero = "N"; // Imposta l'emisfero nord
-        
-        function calculatePhases() {
-            let year = parseInt(document.getElementById("year").value);
-            let utcOffset = parseInt(document.getElementById("utcOffset").value);
-            let tbody = document.querySelector("#resultTable tbody");
-            tbody.innerHTML = "";
-            
-            let phases = ["Luna Nuova", "Primo Quarto", "Luna Piena", "Ultimo Quarto"];
-            let results = [];
-            
-            if (typeof fasi_lunari !== "function") {
-                console.error("Errore: la funzione fasi_lunari() non è definita.");
-                alert("Errore: la funzione fasi_lunari() non è disponibile. Verifica il caricamento di astrojs.js.");
-                return;
-            }
-            
-            let lunarData = fasi_lunari(year);
-            console.log("Dati fasi lunari:", lunarData);
-            
-            if (!Array.isArray(lunarData) || lunarData.length === 0) {
-                console.error("Errore: fasi_lunari() non ha restituito dati validi.");
-                alert("Errore nel calcolo delle fasi lunari. Verifica l'anno inserito.");
-                return;
-            }
-            
-            for (let i = 0; i < lunarData.length; i++) {
-                let dateTime = new Date(lunarData[i]);
-                if (isNaN(dateTime)) {
-                    console.error("Errore: formato data non valido", lunarData[i]);
-                    continue;
-                }
-                dateTime.setHours(dateTime.getHours() + utcOffset); // Applica l'offset UTC
-                
-                let formattedDate = dateTime.toISOString().split("T")[0];
-                let formattedTime = dateTime.toTimeString().split(" ")[0].substring(0, 5);
-                
-                results.push({ date: formattedDate, time: formattedTime, phase: phases[i % 4] });
-            }
-            
-            results.sort((a, b) => new Date(a.date) - new Date(b.date));
-            
-            results.forEach(item => {
-                let row = `<tr><td>${item.date}</td><td>${item.time}</td><td>${item.phase}</td></tr>`;
-                tbody.innerHTML += row;
-            });
-        }
-    </script>
-
-    <script>
-    setTimeout(() => {
-        console.log("Funzioni disponibili:", Object.keys(window));
-    }, 1000);
-    </script>
-    
 </body>
 </html>
