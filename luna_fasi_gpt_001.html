@@ -46,10 +46,27 @@
             let phases = ["Luna Nuova", "Primo Quarto", "Luna Piena", "Ultimo Quarto"];
             let results = [];
             
+            if (typeof fasi_lunari !== "function") {
+                console.error("Errore: la funzione fasi_lunari() non è definita.");
+                alert("Errore: la funzione fasi_lunari() non è disponibile. Verifica il caricamento di astrojs.js.");
+                return;
+            }
+            
             let lunarData = fasi_lunari(year);
+            console.log("Dati fasi lunari:", lunarData);
+            
+            if (!Array.isArray(lunarData) || lunarData.length === 0) {
+                console.error("Errore: fasi_lunari() non ha restituito dati validi.");
+                alert("Errore nel calcolo delle fasi lunari. Verifica l'anno inserito.");
+                return;
+            }
             
             for (let i = 0; i < lunarData.length; i++) {
                 let dateTime = new Date(lunarData[i]);
+                if (isNaN(dateTime)) {
+                    console.error("Errore: formato data non valido", lunarData[i]);
+                    continue;
+                }
                 dateTime.setHours(dateTime.getHours() + utcOffset); // Applica l'offset UTC
                 
                 let formattedDate = dateTime.toISOString().split("T")[0];
