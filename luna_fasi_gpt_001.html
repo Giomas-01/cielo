@@ -35,27 +35,27 @@
     </table>
     
     <script>
+        var emisfero = "N"; // Imposta l'emisfero nord
+        
         function calculatePhases() {
             let year = parseInt(document.getElementById("year").value);
             let utcOffset = parseInt(document.getElementById("utcOffset").value);
             let tbody = document.querySelector("#resultTable tbody");
             tbody.innerHTML = "";
             
-            let phases = ["Nuova Luna", "Primo Quarto", "Luna Piena", "Ultimo Quarto"];
+            let phases = ["Luna Nuova", "Primo Quarto", "Luna Piena", "Ultimo Quarto"];
             let results = [];
             
-            for (let month = 1; month <= 12; month++) {
-                let lunarData = calcola_fasi_lunari(year, month);
+            let lunarData = fasi_lunari(year);
+            
+            for (let i = 0; i < lunarData.length; i++) {
+                let dateTime = new Date(lunarData[i]);
+                dateTime.setHours(dateTime.getHours() + utcOffset); // Applica l'offset UTC
                 
-                for (let i = 0; i < lunarData.length; i++) {
-                    let date = new Date(lunarData[i].data);
-                    date.setHours(date.getHours() + utcOffset); // Applica l'offset UTC
-                    
-                    let formattedDate = date.toISOString().split("T")[0];
-                    let formattedTime = date.toTimeString().split(" ")[0].substring(0, 5);
-                    
-                    results.push({ date: formattedDate, time: formattedTime, phase: phases[i] });
-                }
+                let formattedDate = dateTime.toISOString().split("T")[0];
+                let formattedTime = dateTime.toTimeString().split(" ")[0].substring(0, 5);
+                
+                results.push({ date: formattedDate, time: formattedTime, phase: phases[i % 4] });
             }
             
             results.sort((a, b) => new Date(a.date) - new Date(b.date));
