@@ -38,14 +38,12 @@
                     dataFase.setHours(dataFase.getHours() + offsetUTC);
                     
                     // Gestione ora legale
-                    if (oraLegaleAbilitata) {
-                        if (isOraLegale(dataFase)) {
-                            // Se è ora legale, togli 1 ora
-                            dataFase.setHours(dataFase.getHours() - 1);
-                        }
+                    if (isOraLegale(dataFase)) {
+                        // Se è ora legale, togli 1 ora
+                        dataFase.setHours(dataFase.getHours() - 1);
                     } else {
-                        // Se non è ora legale, togli 2 ore
-                        dataFase.setHours(dataFase.getHours() - 2);
+                        // Se non è ora legale, aggiungi 1 ora
+                        dataFase.setHours(dataFase.getHours() + 1);
                     }
                     
                     risultati.push({ data: dataFase, fase: nomiFasi[i] });
@@ -57,7 +55,6 @@
         }
         
         function isOraLegale(data) {
-            // Logica per determinare se l'ora legale è in vigore
             const anno = data.getFullYear();
             const inizioOraLegale = new Date(anno, 2, 31); // Ultima domenica di marzo
             const fineOraLegale = new Date(anno, 9, 31); // Ultima domenica di ottobre
