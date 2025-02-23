@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fasi della Luna</title>
+    <script src="lib/astrojs.js" defer></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin-left: 100px; /* Margine sinistro di 100 pixel */
+        }
+        form {
+            margin-bottom: 20px; /* Spazio tra il form e la tabella */
+        }
+        .export-button {
+            margin-left: 20px; /* Spazio a sinistra per il pulsante Esporta CSV */
+        }
+        table {
+            display: inline-block; /* Mantiene la tabella a sinistra */
+        }
+        .export-container {
+            display: inline-block; /* Consente di allineare il pulsante a destra della tabella */
+            vertical-align: top; /* Allinea il pulsante con la parte superiore della tabella */
+            margin-left: 20px; /* Distanza di 20 pixel tra la tabella e il pulsante */
+        }
+        button {
+            margin-left: 20px; /* Aggiunta di 20px a sinistra per il pulsante Calcola */
+        }
+    </style>
+    <script>
+        function calcolaFasi() {
+            const anno = parseInt(document.getElementById("anno").value);
+            const offsetUTC = parseInt(document.getElementById("utcOffset").value);
+            const fasi = [0.00, 0.25, 0.50, 0.75];
+            const nomiFasi = ["Luna Nuova", "Primo Quarto", "Luna Piena", "Ultimo Quarto"];
+            
+            if (isNaN(anno)) {
+                alert("Inserisci un anno valido.");
+                return;
+            }
+            
+            let risultati = [];
+            for (let mese = 1; mese <= 12; mese++) {
+                for (let i = 0; i < fasi.length; i++) {
+                    let jd = cfasi_lunari(mese, anno, fasi[i]);
+                    let dataFase = jdToDate(jd);
+                    dataFase.setHours(dataFase.getHours() + offsetUTC);
+                    risultati.push({ data: dataFase, fase: nomiFasi[i] });
+                }
+            }
+            
+            risultati.sort((a, b) => a.data - b.data);
+            generaTabella(risultati);
+        }
+        
+        function jdToDate(jd) {
+            let Z = Math.floor(jd + 0.5);
+            let F = (jd + 0.5) - Z;
+            let A = Z;
+            if (Z >= 2299161) {
+                let alpha = Math.floor((Z - 1867216.25) / 36524.25);
+                A += 1 + alpha - Math.floor(alpha / 4);
+            }
+            let B = A + 1524;
+            let C = Math.floor((B - 122.1) / 365.25);
+            let D = Math.floor(365.25 * C);
+            let E = Math.floor((B - D) / 30.6001);
+            let day = B - D - Math.floor(30.6001 * E) + F;
+            let month = (E < 14) ? E - 1 : E - 13;
+            let year = (month > 2) ? C - 4716 : C - 4715;
+            
+            let date = new Date(Date.UTC(year, month - 1, Math.floor(day)));
+            let hours = (day - Math.floor(day)) * 24;
+            date.setUTCHours(Math.floor(hours), (hours - Math.floor(hours)) * 60);
+            return date;
+        }
+        
+        function generaTabella(dati) {
+            let tbody = document.getElementById("tabellaFasi");
+            tbody.innerHTML = "";
+            dati.forEach(entry => {
+                let row = tbody.insertRow();
+                let cellData = row.insertCell(0);
+                let cellOra = row.insertCell(1);
+                let cellFase = row.insertCell(2);
+                // Formato della data DD-MM-YYYY
+                cellData.textContent = entry.data.toLocaleDateString('it-IT');
+                cellOra.textContent = entry.data.toISOString().split("T")[1].substring(0, 5);
+                cellFase.textContent = entry.fase;
+            });
+        }
+
+        function esportaCSV() {
+            let tbody = document.getElementById("tabellaFasi");
+            let righeCSV = [];
+            righeCSV.push("Data,Ora locale (solare),Fase"); // Intestazione CSV
+            
+            for (let row of tbody.rows) {
+                let cellData = row.cells[0].textContent;
+                let cellOra = row.cells[1].textContent;
+                let cellFase = row.cells[2].textContent;
+                righeCSV.push(`${cellData},${cellOra},${cellFase}`); // Aggiungi i dati delle righe
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8," + righeCSV.join("\n");
+            let encodedUri = encodeURI(csvContent);
+            let link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "fasi_luna.csv");
+            document.body.appendChild(link); // Necessario per Firefox
+
+            link.click(); // Scarica il file CSV
+            document.body.removeChild(link); // Rimuovi il link
+        }
+    </script>
+</head>
+<body>
+    <h1>Fasi della Luna</h1>
+    <form onsubmit="event.preventDefault(); calcolaFasi();">
+        <label for="anno">Anno:</label>
+        <input type="number" id="anno" required>
+        <label for="utcOffset">UTC Offset:</label>
+        <select id="utcOffset">
+            <script>
+                for (let i = -12; i <= 14; i++) {
+                    document.write(`<option value="${i}">${i}</option>`);
+                }
+            </script>
+        </select>
+        <button type="submit">Calcola</button>
+    </form>
+    
+    <div style="display: flex; justify-content: flex-start;">
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Ora locale (solare)</th> <!-- Cambiato il titolo della colonna -->
+                    <th>Fase</th>
+                </tr>
+            </thead>
+            <tbody id="tabellaFasi"></tbody>
+        </table>
+        <div class="export-container">
+            <button class="export-button" onclick="esportaCSV()">Esporta CSV</button>
+        </div>
+    </div>
+</body>
+</html>
