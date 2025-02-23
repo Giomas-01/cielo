@@ -2,76 +2,67 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calcolo Fasi Lunari</title>
-    <style>
-        body { font-family: Arial, sans-serif; }
-        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-        th, td { border: 1px solid #dddddd; text-align: left; padding: 8px; }
-        th { background-color: #f2f2f2; }
-    </style>
+    <title>Fasi della Luna</title>
+    <script type="text/javascript" src="lib/astrojs.js"></script>
 </head>
 <body>
-    <h1>Calcolo delle Fasi Lunari</h1>
-    <label for="anno">Anno:</label>
-    <input type="number" id="anno" placeholder="2025" required>
-    <br>
-    <label for="latitudine">Latitudine:</label>
-    <input type="number" id="latitudine" placeholder="41.9" required>
-    <br>
-    <label for="longitudine">Longitudine:</label>
-    <input type="number" id="longitudine" placeholder="12.5" required>
-    <br>
-    <button onclick="calcolaFasiLunari()">Calcola Fasi Lunari</button>
-
-    <table id="fasiTabella">
+    <h1>Fasi della Luna</h1>
+    <form id="lunarForm">
+        <label for="year">Anno:</label>
+        <input type="number" id="year" min="1900" max="2100" required>
+        
+        <label for="utcOffset">UTC Offset:</label>
+        <select id="utcOffset">
+            <script>
+                for (let i = -12; i <= 14; i++) {
+                    document.write(`<option value="${i}">${i}</option>`);
+                }
+            </script>
+        </select>
+        
+        <button type="button" onclick="calculatePhases()">Calcola</button>
+    </form>
+    
+    <table border="1" id="resultTable">
         <thead>
             <tr>
                 <th>Data</th>
-                <th>Ora</th>
+                <th>Ora (UTC Offset)</th>
                 <th>Fase</th>
             </tr>
         </thead>
         <tbody></tbody>
     </table>
-
+    
     <script>
-        function calcolaFasiLunari() {
-            const anno = parseInt(document.getElementById("anno").value);
-            const lat = parseFloat(document.getElementById("latitudine").value);
-            const lon = parseFloat(document.getElementById("longitudine").value);
-            const fasi = ["Luna Nuova", "Primo Quarto", "Luna Piena", "Ultimo Quarto"];
-            const fasiLunari = [];
-
-            // Parametri di calcolo
-            const lunationCycle = 29.53058867; // ciclo lunare in giorni
-            const newMoonBase = new Date(Date.UTC(2000, 0, 6, 19, 14)); // Luna Nuova del 6 gennaio 2000
-            const phaseOffsets = [0, 0.25, 0.5, 0.75]; // offset per le fasi lunari
-
-            for (let mese = 0; mese < 12; mese++) {
-                for (let fase = 0; fase < fasi.length; fase++) {
-                    let phaseDate = new Date(newMoonBase.getTime() + (lunationCycle * 24 * 60 * 60 * 1000) * (phaseOffsets[fase] + Math.floor((anno - 2000) * 12 + mese) / 12));
+        function calculatePhases() {
+            let year = parseInt(document.getElementById("year").value);
+            let utcOffset = parseInt(document.getElementById("utcOffset").value);
+            let tbody = document.querySelector("#resultTable tbody");
+            tbody.innerHTML = "";
+            
+            let phases = ["Nuova Luna", "Primo Quarto", "Luna Piena", "Ultimo Quarto"];
+            let results = [];
+            
+            for (let month = 1; month <= 12; month++) {
+                let lunarData = calcola_fasi_lunari(year, month);
+                
+                for (let i = 0; i < lunarData.length; i++) {
+                    let date = new Date(lunarData[i].data);
+                    date.setHours(date.getHours() + utcOffset); // Applica l'offset UTC
                     
-                    // Aggiusta per il fuso orario e l'ora legale
-                    let dataLocale = new Date(phaseDate.getTime() + (1 * 60 * 60 * 1000)); // Considerando ora legale
-
-                    fasiLunari.push({
-                        data: dataLocale.toLocaleDateString("it-IT"), // DD-MM-YYYY
-                        ora: dataLocale.toLocaleTimeString("it-IT", { hour: '2-digit', minute: '2-digit', hour12: false }), // HH:MM
-                        fase: fasi[fase]
-                    });
+                    let formattedDate = date.toISOString().split("T")[0];
+                    let formattedTime = date.toTimeString().split(" ")[0].substring(0, 5);
+                    
+                    results.push({ date: formattedDate, time: formattedTime, phase: phases[i] });
                 }
             }
-
-            // Mostra i risultati nella tabella
-            const tbody = document.getElementById("fasiTabella").getElementsByTagName("tbody")[0];
-            tbody.innerHTML = ""; // Pulisce la tabella esistente
-
-            fasiLunari.forEach(fase => {
-                const row = tbody.insertRow();
-                row.insertCell(0).innerText = fase.data;
-                row.insertCell(1).innerText = fase.ora;
-                row.insertCell(2).innerText = fase.fase;
+            
+            results.sort((a, b) => new Date(a.date) - new Date(b.date));
+            
+            results.forEach(item => {
+                let row = `<tr><td>${item.date}</td><td>${item.time}</td><td>${item.phase}</td></tr>`;
+                tbody.innerHTML += row;
             });
         }
     </script>
