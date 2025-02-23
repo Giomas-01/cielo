@@ -1,76 +1,153 @@
-<script>
+// Puoi calcolare le effemeridi di altri pianeti cambiando il secondo parametro di A.Rise.planetPosition:
+// jd => A.Rise.planetPosition(jd, 'venus') // Per Venere
+// jd => A.Rise.planetPosition(jd, 'mars')  // Per Marte
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Effemeridi di Mercurio</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f0f0f0;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #2c3e50;
+      text-align: center;
+    }
+    form {
+      background-color: #f8f9fa;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+    th {
+      background-color: #3498db;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Effemeridi di Mercurio</h1>
+    
+    <form id="ephemerisForm">
+      <div>
+        <label>Mese (1-12):</label>
+        <input type="number" id="month" min="1" max="12" value="1" required>
+      </div>
+      <div>
+        <label>Anno:</label>
+        <input type="number" id="year" value="2024" required>
+      </div>
+      <div>
+        <label>Latitudine:</label>
+        <input type="number" id="latitude" step="any" value="45.4642" required>
+      </div>
+      <div>
+        <label>Longitudine:</label>
+        <input type="number" id="longitude" step="any" value="9.1900" required>
+      </div>
+      <div>
+        <button type="button" onclick="calculateEphemeris()">Calcola</button>
+      </div>
+    </form>
+
+    <table id="resultsTable">
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Levata</th>
+          <th>Culminazione</th>
+          <th>Tramonto</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- Caricamento delle librerie locali -->
+  <script src="lib/Astro.JulianDay.js"></script>
+  <script src="lib/Astro.Coord.js"></script>
+  <script src="lib/Astro.Refraction.js"></script>
+  <script src="lib/Astro.Rise.js"></script>
+
+  <script>
     function calculateEphemeris() {
-      const month = parseInt(document.getElementById('month').value);
-      const year = parseInt(document.getElementById('year').value);
-      const latitude = parseFloat(document.getElementById('latitude').value);
-      const longitude = parseFloat(document.getElementById('longitude').value);
-      const timezoneOffset = parseInt(document.getElementById('timezone').value);
-      const height = 0;
+      // Recupera i valori dal form
+      const month = document.getElementById('month').valueAsNumber
+      const year = document.getElementById('year').valueAsNumber
+      const latitude = document.getElementById('latitude').valueAsNumber
+      const longitude = document.getElementById('longitude').valueAsNumber
 
-      const daysInMonth = new Date(year, month, 0).getDate();
-      const tableBody = document.querySelector('#resultsTable tbody');
-      tableBody.innerHTML = '';
+      // Calcola i giorni del mese
+      const daysInMonth = new Date(year, month, 0).getDate()
+      const tbody = document.querySelector('#resultsTable tbody')
+      tbody.innerHTML = ''
 
-      for (let day = 1; day <= daysInMonth; day++) {
-        const date = new Date(Date.UTC(year, month - 1, day));
-        const jdo = new A.JulianDay(date);
-        const observerCoord = A.GlobeCoord.fromWgs84(latitude, longitude, height);
-
+      // Calcola per ogni giorno
+      for(let day = 1; day <= daysInMonth; day++) {
         try {
-          // Calcola i tempi per Mercurio
-          const times = A.Rise.calculate(jdo, observerCoord, A.Mercury);
+          const date = new Date(Date.UTC(year, month-1, day, 12))
+          const jd = A.JulianDay.fromDate(date).jd
+          const observer = A.GlobeCoord.fromWgs84(latitude, longitude, 0)
 
-          // Estrae i Julian Day per ciascun evento
-          const riseJD = times.rise;
-          const transitJD = times.transit;
-          const setJD = times.set;
+          // Calcola eventi astronomici per Mercurio
+          const events = A.Rise.calculate(
+            jd,
+            observer,
+            jd => A.Rise.planetPosition(jd, 'mercury'), // Usa la funzione integrata per Mercurio
+            A.Refraction.atmospheric()
+          )
 
-          // Converte i Julian Day in ore, minuti, secondi (UTC)
-          const riseTime = convertJDToTime(riseJD, jdo, timezoneOffset);
-          const transitTime = convertJDToTime(transitJD, jdo, timezoneOffset);
-          const setTime = convertJDToTime(setJD, jdo, timezoneOffset);
+          // Formatta la data
+          const formattedDate = `${day.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${year}`
 
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${day}/${month}/${year}</td>
-            <td>${riseTime}</td>
-            <td>${transitTime}</td>
-            <td>${setTime}</td>
-          `;
-          tableBody.appendChild(row);
-        } catch (error) {
-          console.error(`Errore per il giorno ${day}:`, error);
-          // Aggiungi una riga con dati vuoti in caso di errore
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${day}/${month}/${year}</td>
-            <td>-</td>
-            <td>-</td>
-            <td>-</td>
-          `;
-          tableBody.appendChild(row);
+          // Formatta gli orari
+          const formatTime = jd => {
+            if(!jd) return '-'
+            const d = A.JulianDay.toDate(jd)
+            return d.toISOString().substr(11, 8)
+          }
+
+          // Crea riga della tabella
+          tbody.innerHTML += `
+            <tr>
+              <td>${formattedDate}</td>
+              <td>${formatTime(events.rise)}</td>
+              <td>${formatTime(events.transit)}</td>
+              <td>${formatTime(events.set)}</td>
+            </tr>
+          `
+        } catch(e) {
+          console.error(`Errore giorno ${day}:`, e)
         }
       }
     }
-
-    /**
-     * Converte un Julian Day in una stringa oraria con l'offset applicato
-     */
-    function convertJDToTime(jd, baseJD, timezoneOffset) {
-      if (jd === null) return '-'; // Nessun evento (es. Sole di mezzanotte)
-      
-      // Differenza in giorni rispetto al JD base (mezzanotte UTC)
-      const diffDays = jd - baseJD.jd;
-      // Converte in ore e applica l'offset
-      const totalHours = diffDays * 24 + timezoneOffset;
-      
-      // Formatta in HH:MM:SS
-      const hours = Math.floor(totalHours % 24);
-      const minutes = Math.floor((totalHours % 1) * 60);
-      const seconds = Math.floor(((totalHours % 1) * 60 - minutes) * 60);
-      
-      return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-    }
-
-    // Resto del codice invariato...
   </script>
+</body>
+</html>
