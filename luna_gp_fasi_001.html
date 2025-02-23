@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Calcolo delle Fasi Lunari</title>
+    <script src="https://cdn.jsdelivr.net/gh/cosinekitty/astronomy@2.1.19/astronomy.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h1>Calcolo delle Fasi Lunari</h1>
+    <form id="moonPhaseForm">
+        <label for="year">Anno:</label>
+        <input type="number" id="year" name="year" value="2025" required>
+        <label for="timezone">Fuso Orario (UTC):</label>
+        <select id="timezone" name="timezone">
+            <!-- Opzioni per i fusi orari da -12 a +14 -->
+            <!-- ... -->
+        </select>
+        <button type="submit">Calcola</button>
+    </form>
+    <table id="resultsTable" style="display:none;">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Ora Locale</th>
+                <th>Fase</th>
+            </tr>
+        </thead>
+        <tbody id="resultsBody">
+            <!-- Risultati verranno inseriti qui -->
+        </tbody>
+    </table>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('moonPhaseForm');
+            const resultsTable = document.getElementById('resultsTable');
+            const resultsBody = document.getElementById('resultsBody');
+
+            // Popola il menu a tendina dei fusi orari
+            const timezoneSelect = document.getElementById('timezone');
+            for (let i = -12; i <= 14; i++) {
+                const option = document.createElement('option');
+                const sign = i >= 0 ? '+' : '';
+                option.value = i;
+                option.textContent = `UTC ${sign}${i}`;
+                timezoneSelect.appendChild(option);
+            }
+
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+                const year = parseInt(document.getElementById('year').value);
+                const timezoneOffset = parseInt(document.getElementById('timezone').value);
+                calculateMoonPhases(year, timezoneOffset);
+            });
+
+            function calculateMoonPhases(year, timezoneOffset) {
+                resultsBody.innerHTML = '';
+                const phases = ['NewMoon', 'FirstQuarter', 'FullMoon', 'LastQuarter'];
+                const phaseNames = {
+                    'NewMoon': 'Luna Nuova',
+                    'FirstQuarter': 'Primo Quarto',
+                    'FullMoon': 'Luna Piena',
+                    'LastQuarter': 'Ultimo Quarto'
+                };
+
+                phases.forEach(phase => {
+                    let date = Astronomy.SearchMoonPhase(phase, new Date(Date.UTC(year, 0, 1)));
+                    while (date.date.getUTCFullYear() === year) {
+                        const localDate = new Date(date.date.getTime() + timezoneOffset * 60 * 60 * 1000);
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${localDate.toLocaleDateString('it-IT')}</td>
+                            <td>${localDate.toLocaleTimeString('it-IT', { timeZone: 'UTC', timeZoneName: 'short' })}</td>
+                            <td>${phaseNames[phase]}</td>
+                        `;
+                        resultsBody.appendChild(row);
+                        date = Astronomy.SearchMoonPhase(phase, new Date(date.date.getTime() + 1 * 24 * 60 * 60 * 1000));
+                    }
+                });
+
+                resultsTable.style.display = 'table';
+            }
+        });
+    </script>
+</body>
+</html>
