@@ -16,6 +16,10 @@
         .export-button {
             float: right; /* Allinea il pulsante a destra */
             margin-bottom: 10px; /* Spazio sotto il pulsante */
+            margin-left: 20px; /* Spazio a sinistra per allineamento */
+        }
+        button {
+            margin-left: 20px; /* Aggiunta di 20px a sinistra per il pulsante Calcola */
         }
     </style>
     <script>
@@ -84,7 +88,7 @@
         function esportaCSV() {
             let tbody = document.getElementById("tabellaFasi");
             let righeCSV = [];
-            righeCSV.push("Data,Ora (locale),Fase"); // Intestazione CSV
+            righeCSV.push("Data,Ora locale (solare),Fase"); // Intestazione CSV
             
             for (let row of tbody.rows) {
                 let cellData = row.cells[0].textContent;
@@ -121,13 +125,15 @@
         <button type="submit">Calcola</button>
     </form>
     
-    <button class="export-button" onclick="esportaCSV()">Esporta CSV</button>
+    <div style="text-align: right;">
+        <button class="export-button" onclick="esportaCSV()">Esporta CSV</button>
+    </div>
 
     <table border="1">
         <thead>
             <tr>
                 <th>Data</th>
-                <th>Ora (UTC)</th>
+                <th>Ora locale (solare)</th> <!-- Cambiato il titolo della colonna -->
                 <th>Fase</th>
             </tr>
         </thead>
