@@ -5,6 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fasi della Luna</title>
     <script src="lib/astrojs.js" defer></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin-left: 100px; /* Margine sinistro di 100 pixel */
+        }
+        form {
+            margin-bottom: 20px; /* Spazio tra il form e la tabella */
+        }
+        .export-button {
+            float: right; /* Allinea il pulsante a destra */
+            margin-bottom: 10px; /* Spazio sotto il pulsante */
+        }
+    </style>
     <script>
         function calcolaFasi() {
             const anno = parseInt(document.getElementById("anno").value);
@@ -61,10 +74,34 @@
                 let cellData = row.insertCell(0);
                 let cellOra = row.insertCell(1);
                 let cellFase = row.insertCell(2);
-                cellData.textContent = entry.data.toISOString().split("T")[0];
+                // Formato della data DD-MM-YYYY
+                cellData.textContent = entry.data.toLocaleDateString('it-IT');
                 cellOra.textContent = entry.data.toISOString().split("T")[1].substring(0, 5);
                 cellFase.textContent = entry.fase;
             });
+        }
+
+        function esportaCSV() {
+            let tbody = document.getElementById("tabellaFasi");
+            let righeCSV = [];
+            righeCSV.push("Data,Ora (UTC),Fase"); // Intestazione CSV
+            
+            for (let row of tbody.rows) {
+                let cellData = row.cells[0].textContent;
+                let cellOra = row.cells[1].textContent;
+                let cellFase = row.cells[2].textContent;
+                righeCSV.push(`${cellData},${cellOra},${cellFase}`); // Aggiungi i dati delle righe
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8," + righeCSV.join("\n");
+            let encodedUri = encodeURI(csvContent);
+            let link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "fasi_luna.csv");
+            document.body.appendChild(link); // Necessario per Firefox
+
+            link.click(); // Scarica il file CSV
+            document.body.removeChild(link); // Rimuovi il link
         }
     </script>
 </head>
@@ -84,6 +121,8 @@
         <button type="submit">Calcola</button>
     </form>
     
+    <button class="export-button" onclick="esportaCSV()">Esporta CSV</button>
+
     <table border="1">
         <thead>
             <tr>
