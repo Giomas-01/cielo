@@ -33,9 +33,9 @@
                 for (let i = 0; i < fasi.length; i++) {
                     let jd = cfasi_lunari(mese, anno, fasi[i]);
                     let dataFase = jdToDate(jd);
-                    dataFase.setHours(dataFase.getHours() + offsetUTC);
+                    dataFase.setHours(dataFase.getHours() + offsetUTC + 1); // Aggiungi sempre 1 ora
 
-                    // Aggiusta l'orario se l'ora legale è abilitata e la data è nel periodo di ora legale
+                    // Se l'ora legale è abilitata e la data è nel periodo di ora legale, aggiungi 1 ora in più
                     if (oraLegaleAbilitata && isOraLegale(dataFase)) {
                         dataFase.setHours(dataFase.getHours() + 1);
                     }
