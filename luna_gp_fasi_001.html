@@ -2,23 +2,103 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <title>Test Astronomy.js</title>
-    <script src="lib/astronomy.js"></script>
-</head>
-<body>
-    <h1>Test Astronomy.js</h1>
-    <button onclick="testAstronomy()">Verifica</button>
-    <p id="output"></p>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fasi della Luna</title>
+    <script src="lib/astrojs.js" defer></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin-left: 100px;
+        }
+    </style>
     <script>
-        function testAstronomy() {
-            if (typeof Astronomy === "undefined") {
-                document.getElementById("output").innerText = "Errore: Astronomy.js non caricato!";
-            } else {
-                document.getElementById("output").innerText = "Astronomy.js caricato con successo!";
-                console.log(Astronomy);
+        function calcolaFasi() {
+            const anno = parseInt(document.getElementById("anno").value);
+            const offsetUTC = parseInt(document.getElementById("utcOffset").value);
+            const fasi = [0.00, 0.25, 0.50, 0.75];
+            const nomiFasi = ["Luna Nuova", "Primo Quarto", "Luna Piena", "Ultimo Quarto"];
+            
+            if (isNaN(anno)) {
+                alert("Inserisci un anno valido.");
+                return;
             }
+            
+            let risultati = [];
+            for (let mese = 1; mese <= 12; mese++) {
+                for (let i = 0; i < fasi.length; i++) {
+                    let jd = cfasi_lunari(mese, anno, fasi[i]);
+                    let dataFase = jdToDate(jd);
+                    dataFase.setHours(dataFase.getHours() + offsetUTC);
+                    risultati.push({ data: dataFase, fase: nomiFasi[i] });
+                }
+            }
+            
+            risultati.sort((a, b) => a.data - b.data);
+            generaTabella(risultati);
+        }
+        
+        function jdToDate(jd) {
+            let Z = Math.floor(jd + 0.5);
+            let F = (jd + 0.5) - Z;
+            let A = Z;
+            if (Z >= 2299161) {
+                let alpha = Math.floor((Z - 1867216.25) / 36524.25);
+                A += 1 + alpha - Math.floor(alpha / 4);
+            }
+            let B = A + 1524;
+            let C = Math.floor((B - 122.1) / 365.25);
+            let D = Math.floor(365.25 * C);
+            let E = Math.floor((B - D) / 30.6001);
+            let day = B - D - Math.floor(30.6001 * E) + F;
+            let month = (E < 14) ? E - 1 : E - 13;
+            let year = (month > 2) ? C - 4716 : C - 4715;
+            
+            let date = new Date(Date.UTC(year, month - 1, Math.floor(day)));
+            let hours = (day - Math.floor(day)) * 24;
+            date.setUTCHours(Math.floor(hours), (hours - Math.floor(hours)) * 60);
+            return date;
+        }
+        
+        function generaTabella(dati) {
+            let tbody = document.getElementById("tabellaFasi");
+            tbody.innerHTML = "";
+            dati.forEach(entry => {
+                let row = tbody.insertRow();
+                let cellData = row.insertCell(0);
+                let cellOra = row.insertCell(1);
+                let cellFase = row.insertCell(2);
+                cellData.textContent = entry.data.toISOString().split("T")[0];
+                cellOra.textContent = entry.data.toISOString().split("T")[1].substring(0, 5);
+                cellFase.textContent = entry.fase;
+            });
         }
     </script>
+</head>
+<body>
+    <h1>Fasi della Luna</h1>
+    <form onsubmit="event.preventDefault(); calcolaFasi();">
+        <label for="anno">Anno:</label>
+        <input type="number" id="anno" required>
+        <label for="utcOffset">UTC Offset:</label>
+        <select id="utcOffset">
+            <script>
+                for (let i = -12; i <= 14; i++) {
+                    document.write(`<option value="${i}">${i}</option>`);
+                }
+            </script>
+        </select>
+        <button type="submit">Calcola</button>
+    </form>
+    
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Ora locale</th>
+                <th>Fase</th>
+            </tr>
+        </thead>
+        <tbody id="tabellaFasi"></tbody>
+    </table>
 </body>
 </html>
