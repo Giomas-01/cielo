@@ -84,7 +84,7 @@
         function esportaCSV() {
             let tbody = document.getElementById("tabellaFasi");
             let righeCSV = [];
-            righeCSV.push("Data,Ora (UTC),Fase"); // Intestazione CSV
+            righeCSV.push("Data,Ora (locale),Fase"); // Intestazione CSV
             
             for (let row of tbody.rows) {
                 let cellData = row.cells[0].textContent;
