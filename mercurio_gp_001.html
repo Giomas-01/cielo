@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calcolo Orari di Mercurio per un Mese</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        .container {
+            display: inline-block;
+            text-align: left;
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        input, button {
+            margin: 10px 0;
+            padding: 8px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background-color: #007BFF;
+            color: white;
+        }
+        #downloadButton {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Effemeridi di Mercurio mensili</h1>
+    <div class="container">
+        <label for="latitude">Latitudine:</label>
+        <input type="number" id="latitude" placeholder="Es. 45.28"><br>
+
+        <label for="longitude">Longitudine:</label>
+        <input type="number" id="longitude" placeholder="Es. 9.12"><br>
+
+        <label for="monthYear">Mese-Anno (MM-YYYY):</label>
+        <input type="text" id="monthYear" placeholder="Es. 02-2025"><br>
+
+        <button onclick="calculateMonthlyMercuryTimes()">Calcola</button>
+    </div>
+
+    <!-- Download Button -->
+    <button id="downloadButton" onclick="downloadTableAsCSV()">Scarica Tabella come CSV</button>
+
+    <!-- Tabella dei risultati -->
+    <table id="mercuryTimesTable">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Ascensione</th>
+                <th>Declinazione</th>
+                <th>Fase</th>
+            </tr>
+        </thead>
+        <tbody id="resultsBody">
+            <!-- I risultati verranno inseriti qui -->
+        </tbody>
+    </table>
+
+    <script>
+        function calculateMonthlyMercuryTimes() {
+            const latitude = parseFloat(document.getElementById('latitude').value);
+            const longitude = parseFloat(document.getElementById('longitude').value);
+            const monthYearInput = document.getElementById('monthYear').value;
+
+            if (isNaN(latitude) || isNaN(longitude) || !monthYearInput) {
+                alert("Inserisci valori validi per latitudine, longitudine e mese-anno.");
+                return;
+            }
+
+            // Parse month and year from input (format MM-YYYY)
+            const [month, year] = monthYearInput.split('-').map(Number);
+            if (isNaN(month) || isNaN(year) || month < 1 || month > 12) {
+                alert("Inserisci un mese e un anno validi nel formato MM-YYYY.");
+                return;
+            }
+
+            // Clear previous results
+            const resultsBody = document.getElementById('resultsBody');
+            resultsBody.innerHTML = '';
+
+            // Calculate Mercury positions for each day of the month
+            const daysInMonth = new Date(year, month, 0).getDate(); // Get number of days in the month
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(year, month - 1, day); // Create date object
+                
+                // Calcola le posizioni di Mercurio
+                const mercuryPosition = calculateMercuryPosition(date, latitude, longitude); // Sostituisci con la tua logica per Mercurio
+
+                // Create a row for the table
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${date.toLocaleDateString('it-IT')}</td>
+                    <td>${mercuryPosition.ascension}</td>
+                    <td>${mercuryPosition.declination}</td>
+                    <td>${mercuryPosition.phase}</td>
+                `;
+                resultsBody.appendChild(row);
+            }
+        }
+
+        function calculateMercuryPosition(date, latitude, longitude) {
+            // Implementa la logica per calcolare l'ascensione, la declinazione e la fase di Mercurio
+            // Restituisce un oggetto con ascensione, declinazione e fase
+            return {
+                ascension: "Es. 12:00", // Sostituisci con i calcoli reali
+                declination: "Es. -5°", // Sostituisci con i calcoli reali
+                phase: "Es. Crescente"    // Sostituisci con i calcoli reali
+            };
+        }
+
+        function downloadTableAsCSV() {
+            const table = document.getElementById('mercuryTimesTable');
+            const rows = table.querySelectorAll('tr');
+
+            // Extract table headers
+            const headers = Array.from(rows[0].cells).map(cell => cell.textContent);
+
+            // Extract table data
+            const data = [];
+            for (let i = 1; i < rows.length; i++) {
+                const rowData = Array.from(rows[i].cells).map(cell => cell.textContent);
+                data.push(rowData.join(','));
+            }
+
+            // Combine headers and data into CSV format
+            const csvContent = [headers.join(','), ...data].join('\n');
+
+            // Create a downloadable link
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.setAttribute('hidden', true);
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'mercury_times.csv');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    </script>
+</body>
+</html>
