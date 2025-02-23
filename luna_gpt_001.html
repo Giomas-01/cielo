@@ -42,14 +42,14 @@
                             // Nei giorni in cui c'è l'ora legale: togli 1 ora
                             dataFase.setHours(dataFase.getHours() - 1);
                         } else {
-                            // Nei giorni in cui non c'è l'ora legale: togli 2 ore
-                            dataFase.setHours(dataFase.getHours() - 2);
+                            // Nei giorni in cui non c'è l'ora legale: togli 2 ore e aggiungi 1 ora
+                            dataFase.setHours(dataFase.getHours() - 2 + 1); // Togli 2 ore e aggiungi 1 ora
                         }
                     } else {
                         // Se l'ora legale è disabilitata
                         // Nei giorni in cui c'è l'ora legale: togli 2 ore
-                        // Nei giorni in cui non c'è l'ora legale: togli 2 ore
-                        dataFase.setHours(dataFase.getHours() - 2);
+                        // Nei giorni in cui non c'è l'ora legale: togli 2 ore e aggiungi 1 ora
+                        dataFase.setHours(dataFase.getHours() - 2 + 1); // Togli 2 ore e aggiungi 1 ora
                     }
 
                     risultati.push({ data: dataFase, fase: nomiFasi[i] });
