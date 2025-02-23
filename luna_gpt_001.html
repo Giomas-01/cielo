@@ -35,7 +35,7 @@
                     let dataFase = jdToDate(jd);
                     dataFase.setHours(dataFase.getHours() + offsetUTC);
 
-                    // Aggiusta l'orario se l'ora legale è abilitata
+                    // Aggiusta l'orario se l'ora legale è abilitata e la data è nel periodo di ora legale
                     if (oraLegaleAbilitata && isOraLegale(dataFase)) {
                         dataFase.setHours(dataFase.getHours() + 1);
                     }
@@ -49,9 +49,10 @@
         }
         
         function isOraLegale(data) {
-            // Logica semplificata per determinare se l'ora legale è in vigore
-            const inizioOraLegale = new Date(data.getFullYear(), 2, 31); // Ultima domenica di marzo
-            const fineOraLegale = new Date(data.getFullYear(), 9, 31); // Ultima domenica di ottobre
+            // Logica per determinare se l'ora legale è in vigore
+            const anno = data.getFullYear();
+            const inizioOraLegale = new Date(anno, 2, 31); // Ultima domenica di marzo
+            const fineOraLegale = new Date(anno, 9, 31); // Ultima domenica di ottobre
             inizioOraLegale.setDate(31 - (7 + inizioOraLegale.getDay()) % 7); // Calcola l'ultima domenica di marzo
             fineOraLegale.setDate(31 - (7 + fineOraLegale.getDay()) % 7); // Calcola l'ultima domenica di ottobre
             
