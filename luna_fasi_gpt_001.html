@@ -14,9 +14,15 @@
             margin-bottom: 20px; /* Spazio tra il form e la tabella */
         }
         .export-button {
-            float: right; /* Allinea il pulsante a destra */
-            margin-bottom: 10px; /* Spazio sotto il pulsante */
-            margin-left: 20px; /* Spazio a sinistra per allineamento */
+            margin-left: 20px; /* Spazio a sinistra per il pulsante Esporta CSV */
+        }
+        table {
+            display: inline-block; /* Mantiene la tabella a sinistra */
+        }
+        .export-container {
+            display: inline-block; /* Consente di allineare il pulsante a destra della tabella */
+            vertical-align: top; /* Allinea il pulsante con la parte superiore della tabella */
+            margin-left: 20px; /* Distanza di 20 pixel tra la tabella e il pulsante */
         }
         button {
             margin-left: 20px; /* Aggiunta di 20px a sinistra per il pulsante Calcola */
@@ -125,19 +131,20 @@
         <button type="submit">Calcola</button>
     </form>
     
-    <div style="text-align: right;">
-        <button class="export-button" onclick="esportaCSV()">Esporta CSV</button>
+    <div style="display: flex; justify-content: flex-start;">
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Ora locale (solare)</th> <!-- Cambiato il titolo della colonna -->
+                    <th>Fase</th>
+                </tr>
+            </thead>
+            <tbody id="tabellaFasi"></tbody>
+        </table>
+        <div class="export-container">
+            <button class="export-button" onclick="esportaCSV()">Esporta CSV</button>
+        </div>
     </div>
-
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Data</th>
-                <th>Ora locale (solare)</th> <!-- Cambiato il titolo della colonna -->
-                <th>Fase</th>
-            </tr>
-        </thead>
-        <tbody id="tabellaFasi"></tbody>
-    </table>
 </body>
 </html>
