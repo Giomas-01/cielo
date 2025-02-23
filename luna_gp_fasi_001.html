@@ -10,11 +10,16 @@
             font-family: Arial, sans-serif;
             margin-left: 100px;
         }
+        /* Spazio tra il form e la tabella */
+        form {
+            margin-bottom: 20px;
+        }
     </style>
     <script>
         function calcolaFasi() {
             const anno = parseInt(document.getElementById("anno").value);
             const offsetUTC = parseInt(document.getElementById("utcOffset").value);
+            const oraLegaleAbilitata = document.getElementById("oraLegale").checked;
             const fasi = [0.00, 0.25, 0.50, 0.75];
             const nomiFasi = ["Luna Nuova", "Primo Quarto", "Luna Piena", "Ultimo Quarto"];
             
@@ -28,13 +33,38 @@
                 for (let i = 0; i < fasi.length; i++) {
                     let jd = cfasi_lunari(mese, anno, fasi[i]);
                     let dataFase = jdToDate(jd);
+                    
+                    // Applica l'offset UTC
                     dataFase.setHours(dataFase.getHours() + offsetUTC);
+                    
+                    // Gestione ora legale
+                    if (oraLegaleAbilitata) {
+                        if (isOraLegale(dataFase)) {
+                            // Se è ora legale, togli 1 ora
+                            dataFase.setHours(dataFase.getHours() - 1);
+                        }
+                    } else {
+                        // Se non è ora legale, togli 2 ore
+                        dataFase.setHours(dataFase.getHours() - 2);
+                    }
+                    
                     risultati.push({ data: dataFase, fase: nomiFasi[i] });
                 }
             }
             
             risultati.sort((a, b) => a.data - b.data);
             generaTabella(risultati);
+        }
+        
+        function isOraLegale(data) {
+            // Logica per determinare se l'ora legale è in vigore
+            const anno = data.getFullYear();
+            const inizioOraLegale = new Date(anno, 2, 31); // Ultima domenica di marzo
+            const fineOraLegale = new Date(anno, 9, 31); // Ultima domenica di ottobre
+            inizioOraLegale.setDate(31 - (7 + inizioOraLegale.getDay()) % 7); // Calcola l'ultima domenica di marzo
+            fineOraLegale.setDate(31 - (7 + fineOraLegale.getDay()) % 7); // Calcola l'ultima domenica di ottobre
+            
+            return data >= inizioOraLegale && data < fineOraLegale;
         }
         
         function jdToDate(jd) {
@@ -67,8 +97,9 @@
                 let cellData = row.insertCell(0);
                 let cellOra = row.insertCell(1);
                 let cellFase = row.insertCell(2);
-                cellData.textContent = entry.data.toISOString().split("T")[0];
-                cellOra.textContent = entry.data.toISOString().split("T")[1].substring(0, 5);
+                // Formato data DD-MM-YYYY
+                cellData.textContent = entry.data.toLocaleDateString("it-IT");
+                cellOra.textContent = entry.data.toLocaleTimeString("it-IT", { hour: '2-digit', minute: '2-digit' });
                 cellFase.textContent = entry.fase;
             });
         }
@@ -87,6 +118,8 @@
                 }
             </script>
         </select>
+        <label for="oraLegale">Ora legale abilitata:</label>
+        <input type="checkbox" id="oraLegale">
         <button type="submit">Calcola</button>
     </form>
     
