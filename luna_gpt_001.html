@@ -33,11 +33,23 @@
                 for (let i = 0; i < fasi.length; i++) {
                     let jd = cfasi_lunari(mese, anno, fasi[i]);
                     let dataFase = jdToDate(jd);
-                    dataFase.setHours(dataFase.getHours() + offsetUTC + 1); // Aggiungi sempre 1 ora
-
-                    // Se l'ora legale è abilitata e la data è nel periodo di ora legale, aggiungi 1 ora in più
-                    if (oraLegaleAbilitata && isOraLegale(dataFase)) {
-                        dataFase.setHours(dataFase.getHours() + 1);
+                    dataFase.setHours(dataFase.getHours() + offsetUTC); // Aggiungi l'offset UTC
+                    
+                    // Logica per il calcolo delle ore
+                    if (oraLegaleAbilitata) {
+                        // Se l'ora legale è abilitata
+                        if (isOraLegale(dataFase)) {
+                            // Nei giorni in cui c'è l'ora legale: togli 1 ora
+                            dataFase.setHours(dataFase.getHours() - 1);
+                        } else {
+                            // Nei giorni in cui non c'è l'ora legale: togli 2 ore
+                            dataFase.setHours(dataFase.getHours() - 2);
+                        }
+                    } else {
+                        // Se l'ora legale è disabilitata
+                        // Nei giorni in cui c'è l'ora legale: togli 2 ore
+                        // Nei giorni in cui non c'è l'ora legale: togli 2 ore
+                        dataFase.setHours(dataFase.getHours() - 2);
                     }
 
                     risultati.push({ data: dataFase, fase: nomiFasi[i] });
