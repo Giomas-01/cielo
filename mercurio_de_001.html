@@ -96,11 +96,12 @@
           const jd = A.JulianDay.dateToJD(date);
           console.log("Julian Day:", jd);
 
-          const observer = A.GlobeCoord.fromWgs84(latitude, longitude, 0);
+          // Crea l'oggetto delle coordinate dell'osservatore utilizzando A.EclCoord.fromWgs84
+          const observer = A.EclCoord.fromWgs84(latitude, longitude, 0);
           console.log("Coordinate osservatore:", observer);
 
           // Verifica che le coordinate siano valide
-          if (!observer || typeof observer.latitude !== 'number' || typeof observer.longitude !== 'number') {
+          if (!observer || typeof observer.lat !== 'number' || typeof observer.lng !== 'number') {
             throw new Error("Coordinate osservatore non valide.");
           }
 
@@ -170,11 +171,11 @@
      */
     function calculateRiseSet(jd, observer, bodyPosition, type) {
       console.log("Calcolo angolo orario...");
-      const ha = A.Sidereal.hourAngle(jd, observer.longitude, bodyPosition.ra);
+      const ha = A.Sidereal.hourAngle(jd, observer.lng, bodyPosition.ra);
       console.log("Angolo orario:", ha);
 
       console.log("Calcolo altitudine...");
-      const altitude = A.Coord.equatorialToHorizontal(ha, bodyPosition.dec, observer.latitude).alt;
+      const altitude = A.Coord.equatorialToHorizontal(ha, bodyPosition.dec, observer.lat).alt;
       console.log("Altitudine:", altitude);
 
       // Correzione per rifrazione atmosferica
@@ -196,7 +197,7 @@
      */
     function calculateTransit(jd, observer, bodyPosition) {
       console.log("Calcolo angolo orario per culminazione...");
-      const ha = A.Sidereal.hourAngle(jd, observer.longitude, bodyPosition.ra);
+      const ha = A.Sidereal.hourAngle(jd, observer.lng, bodyPosition.ra);
       console.log("Angolo orario:", ha);
 
       return jd + (ha / 360);
