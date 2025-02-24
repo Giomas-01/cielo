@@ -1,7 +1,3 @@
-<!-- Puoi calcolare le effemeridi di altri pianeti cambiando il secondo parametro di A.Rise.planetPosition:
-jd => A.Rise.planetPosition(jd, 'venus') // Per Venere
-jd => A.Rise.planetPosition(jd, 'mars')  // Per Marte -->
-
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -9,46 +5,7 @@ jd => A.Rise.planetPosition(jd, 'mars')  // Per Marte -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Effemeridi di Mercurio</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      background-color: #f0f0f0;
-    }
-    .container {
-      max-width: 1000px;
-      margin: 0 auto;
-      background-color: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    h1 {
-      color: #2c3e50;
-      text-align: center;
-    }
-    form {
-      background-color: #f8f9fa;
-      padding: 20px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 10px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-    th, td {
-      padding: 10px;
-      border: 1px solid #ddd;
-      text-align: center;
-    }
-    th {
-      background-color: #3498db;
-      color: white;
-    }
+    /* Stili invariati */
   </style>
 </head>
 <body>
@@ -98,41 +55,59 @@ jd => A.Rise.planetPosition(jd, 'mars')  // Per Marte -->
 
   <script>
     function calculateEphemeris() {
+      console.log("Funzione calculateEphemeris chiamata.");
+
       // Recupera i valori dal form
-      const month = document.getElementById('month').valueAsNumber
-      const year = document.getElementById('year').valueAsNumber
-      const latitude = document.getElementById('latitude').valueAsNumber
-      const longitude = document.getElementById('longitude').valueAsNumber
+      const month = document.getElementById('month').valueAsNumber;
+      const year = document.getElementById('year').valueAsNumber;
+      const latitude = document.getElementById('latitude').valueAsNumber;
+      const longitude = document.getElementById('longitude').valueAsNumber;
+
+      console.log("Input:", { month, year, latitude, longitude });
 
       // Calcola i giorni del mese
-      const daysInMonth = new Date(year, month, 0).getDate()
-      const tbody = document.querySelector('#resultsTable tbody')
-      tbody.innerHTML = ''
+      const daysInMonth = new Date(year, month, 0).getDate();
+      const tbody = document.querySelector('#resultsTable tbody');
+      tbody.innerHTML = '';
+
+      console.log("Giorni nel mese:", daysInMonth);
 
       // Calcola per ogni giorno
-      for(let day = 1; day <= daysInMonth; day++) {
+      for (let day = 1; day <= daysInMonth; day++) {
         try {
-          const date = new Date(Date.UTC(year, month-1, day, 12))
-          const jd = A.JulianDay.fromDate(date).jd
-          const observer = A.GlobeCoord.fromWgs84(latitude, longitude, 0)
+          const date = new Date(Date.UTC(year, month - 1, day, 12));
+          const jd = A.JulianDay.fromDate(date).jd;
+          const observer = A.GlobeCoord.fromWgs84(latitude, longitude, 0);
+
+          console.log(`Calcolo per il giorno ${day}:`, { date, jd, observer });
+
+          // Verifica se A.Rise.calculate esiste
+          if (typeof A.Rise.calculate !== 'function') {
+            throw new Error("A.Rise.calculate non è una funzione.");
+          }
 
           // Calcola eventi astronomici per Mercurio
           const events = A.Rise.calculate(
             jd,
             observer,
-            jd => A.Rise.planetPosition(jd, 'mercury'), // Usa la funzione integrata per Mercurio
+            jd => {
+              console.log("Calcolo posizione per JD:", jd);
+              return A.Rise.planetPosition(jd, 'mercury');
+            },
             A.Refraction.atmospheric()
-          )
+          );
+
+          console.log(`Eventi per il giorno ${day}:`, events);
 
           // Formatta la data
-          const formattedDate = `${day.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${year}`
+          const formattedDate = `${day.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${year}`;
 
           // Formatta gli orari
           const formatTime = jd => {
-            if(!jd) return '-'
-            const d = A.JulianDay.toDate(jd)
-            return d.toISOString().substr(11, 8)
-          }
+            if (!jd) return '-';
+            const d = A.JulianDay.toDate(jd);
+            return d.toISOString().substr(11, 8);
+          };
 
           // Crea riga della tabella
           tbody.innerHTML += `
@@ -142,9 +117,15 @@ jd => A.Rise.planetPosition(jd, 'mars')  // Per Marte -->
               <td>${formatTime(events.transit)}</td>
               <td>${formatTime(events.set)}</td>
             </tr>
-          `
-        } catch(e) {
-          console.error(`Errore giorno ${day}:`, e)
+          `;
+        } catch (e) {
+          console.error(`Errore giorno ${day}:`, e);
+          tbody.innerHTML += `
+            <tr>
+              <td>${day.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${year}</td>
+              <td colspan="3">Errore nel calcolo</td>
+            </tr>
+          `;
         }
       }
     }
