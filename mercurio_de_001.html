@@ -52,6 +52,7 @@
   <script src="lib/Astro.Coord.js"></script>
   <script src="lib/Astro.Refraction.js"></script>
   <script src="lib/Astro.Rise.js"></script>
+  <script src="lib/Astro.Solar.js"></script> <!-- Aggiunto per calcolare la posizione dei pianeti -->
 
   <script>
     function calculateEphemeris() {
@@ -86,14 +87,16 @@
             throw new Error("A.Rise.calculate non è una funzione.");
           }
 
+          // Calcola la posizione di Mercurio usando Astro.Solar
+          const mercuryPosition = A.Solar.mercury(jd);
+
+          console.log("Posizione di Mercurio:", mercuryPosition);
+
           // Calcola eventi astronomici per Mercurio
           const events = A.Rise.calculate(
             jd,
             observer,
-            jd => {
-              console.log("Calcolo posizione per JD:", jd);
-              return A.Rise.planetPosition(jd, 'mercury');
-            },
+            () => mercuryPosition, // Usa la posizione di Mercurio
             A.Refraction.atmospheric()
           );
 
