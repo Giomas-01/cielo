@@ -50,9 +50,8 @@
   <!-- Caricamento delle librerie locali -->
   <script src="lib/Astro.JulianDay.js"></script>
   <script src="lib/Astro.Coord.js"></script>
-  <script src="lib/Astro.Refraction.js"></script>
   <script src="lib/Astro.Solar.js"></script>
-  <script src="lib/Astro.Rise.js"></script>
+  <script src="lib/Astro.Sidereal.js"></script>
 
   <script>
     function calculateEphemeris() {
@@ -92,9 +91,9 @@
           }
 
           // Calcola levata, culminazione e tramonto
-          const rise = A.Rise.calculateRise(jd, observer, mercuryPosition);
-          const transit = A.Rise.calculateTransit(jd, observer, mercuryPosition);
-          const set = A.Rise.calculateSet(jd, observer, mercuryPosition);
+          const rise = calculateRiseSet(jd, observer, mercuryPosition, 'rise');
+          const transit = calculateTransit(jd, observer, mercuryPosition);
+          const set = calculateRiseSet(jd, observer, mercuryPosition, 'set');
 
           console.log(`Eventi per il giorno ${day}:`, { rise, transit, set });
 
@@ -127,6 +126,38 @@
           `;
         }
       }
+    }
+
+    /**
+     * Calcola levata o tramonto di un corpo celeste.
+     * @param {number} jd - Julian Day.
+     * @param {Object} observer - Coordinate dell'osservatore.
+     * @param {Object} bodyPosition - Posizione del corpo celeste (ra, dec).
+     * @param {string} type - Tipo di evento ('rise' o 'set').
+     * @returns {number} Julian Day dell'evento.
+     */
+    function calculateRiseSet(jd, observer, bodyPosition, type) {
+      const ha = A.Sidereal.hourAngle(jd, observer.longitude, bodyPosition.ra);
+      const altitude = A.Coord.equatorialToHorizontal(ha, bodyPosition.dec, observer.latitude).alt;
+
+      // Correzione per rifrazione atmosferica
+      const correctedAltitude = altitude + A.Refraction.atmospheric(altitude);
+
+      // Calcola il tempo di levata/tramonto
+      const deltaT = (type === 'rise') ? -correctedAltitude : correctedAltitude;
+      return jd + (deltaT / 360);
+    }
+
+    /**
+     * Calcola la culminazione di un corpo celeste.
+     * @param {number} jd - Julian Day.
+     * @param {Object} observer - Coordinate dell'osservatore.
+     * @param {Object} bodyPosition - Posizione del corpo celeste (ra, dec).
+     * @returns {number} Julian Day della culminazione.
+     */
+    function calculateTransit(jd, observer, bodyPosition) {
+      const ha = A.Sidereal.hourAngle(jd, observer.longitude, bodyPosition.ra);
+      return jd + (ha / 360);
     }
   </script>
 </body>
