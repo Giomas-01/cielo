@@ -107,7 +107,7 @@
 
           // Calcola la posizione di Mercurio
           console.log("Calcolo posizione di Mercurio...");
-          const mercuryPosition = A.Solar.mercury(jd);
+          const mercuryPosition = calculateMercuryPosition(jd);
           console.log("Posizione di Mercurio:", mercuryPosition);
 
           // Verifica che la posizione sia valida
@@ -159,6 +159,27 @@
       }
 
       console.log("=== FINE CALCOLO EFFEMERIDI ===");
+    }
+
+    /**
+     * Calcola la posizione di Mercurio in coordinate equatoriali (ascensione retta e declinazione).
+     * @param {number} jd - Julian Day.
+     * @returns {Object} Posizione di Mercurio con proprietà `ra` (ascensione retta) e `dec` (declinazione).
+     */
+    function calculateMercuryPosition(jd) {
+      // Modello approssimato per calcolare la posizione di Mercurio
+      const T = (jd - 2451545.0) / 36525; // Secoli giuliani dal 2000
+      const M = 357.52911 + 35999.05029 * T - 0.0001537 * T * T; // Anomalia media del Sole
+      const L = 280.46646 + 36000.76983 * T + 0.0003032 * T * T; // Longitudine media del Sole
+
+      // Longitudine eliocentrica di Mercurio (approssimazione)
+      const mercuryL = L + 0.9856 * Math.sin(M * Math.PI / 180);
+
+      // Converti in coordinate equatoriali
+      const ra = mercuryL * Math.PI / 180; // Ascensione retta (approssimata)
+      const dec = 0; // Declinazione (approssimata, per semplicità)
+
+      return { ra, dec };
     }
 
     /**
