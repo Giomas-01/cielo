@@ -47,12 +47,18 @@
     </table>
   </div>
 
+  <!-- Inizializza l'oggetto globale A -->
+  <script>
+    window.A = {};
+  </script>
+
   <!-- Caricamento delle librerie locali -->
   <script src="lib/Astro.JulianDay.js"></script>
   <script src="lib/Astro.Coord.js"></script>
   <script src="lib/Astro.Solar.js"></script>
   <script src="lib/Astro.Sidereal.js"></script>
 
+  <!-- Script principale -->
   <script>
     function calculateEphemeris() {
       console.log("=== INIZIO CALCOLO EFFEMERIDI ===");
@@ -66,7 +72,7 @@
       console.log("Input:", { month, year, latitude, longitude });
 
       // Verifica che i valori di input siano validi
-      if (isNaN(month) throw new Error("Mese non valido.");
+      if (isNaN(month)) throw new Error("Mese non valido.");
       if (isNaN(year)) throw new Error("Anno non valido.");
       if (isNaN(latitude)) throw new Error("Latitudine non valida.");
       if (isNaN(longitude)) throw new Error("Longitudine non valida.");
