@@ -52,7 +52,7 @@
   <script src="lib/Astro.Coord.js"></script>
   <script src="lib/Astro.Refraction.js"></script>
   <script src="lib/Astro.Rise.js"></script>
-  <script src="lib/Astro.Solar.js"></script> <!-- Aggiunto per calcolare la posizione dei pianeti -->
+  <script src="lib/Astro.Solar.js"></script>
 
   <script>
     function calculateEphemeris() {
@@ -87,20 +87,34 @@
             throw new Error("A.Rise.calculate non è una funzione.");
           }
 
-          // Calcola la posizione di Mercurio usando Astro.Solar
-          const mercuryPosition = A.Solar.mercury(jd);
+          // Verifica se A.Solar.mercury esiste
+          if (typeof A.Solar.mercury !== 'function') {
+            throw new Error("A.Solar.mercury non è una funzione.");
+          }
 
+          // Calcola la posizione di Mercurio
+          const mercuryPosition = A.Solar.mercury(jd);
           console.log("Posizione di Mercurio:", mercuryPosition);
+
+          // Verifica che la posizione sia valida
+          if (!mercuryPosition || typeof mercuryPosition.ra !== 'number' || typeof mercuryPosition.dec !== 'number') {
+            throw new Error("Posizione di Mercurio non valida.");
+          }
 
           // Calcola eventi astronomici per Mercurio
           const events = A.Rise.calculate(
             jd,
             observer,
-            () => mercuryPosition, // Usa la posizione di Mercurio
+            () => ({ ra: mercuryPosition.ra, dec: mercuryPosition.dec }), // Passa le coordinate
             A.Refraction.atmospheric()
           );
 
           console.log(`Eventi per il giorno ${day}:`, events);
+
+          // Verifica che gli eventi siano validi
+          if (!events || typeof events.rise !== 'number' || typeof events.transit !== 'number' || typeof events.set !== 'number') {
+            throw new Error("Eventi non validi.");
+          }
 
           // Formatta la data
           const formattedDate = `${day.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${year}`;
