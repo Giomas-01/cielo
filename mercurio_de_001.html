@@ -51,8 +51,8 @@
   <script src="lib/Astro.JulianDay.js"></script>
   <script src="lib/Astro.Coord.js"></script>
   <script src="lib/Astro.Refraction.js"></script>
-  <script src="lib/Astro.Rise.js"></script>
   <script src="lib/Astro.Solar.js"></script>
+  <script src="lib/Astro.Rise.js"></script>
 
   <script>
     function calculateEphemeris() {
@@ -82,16 +82,6 @@
 
           console.log(`Calcolo per il giorno ${day}:`, { date, jd, observer });
 
-          // Verifica se A.Rise.calculate esiste
-          if (typeof A.Rise.calculate !== 'function') {
-            throw new Error("A.Rise.calculate non è una funzione.");
-          }
-
-          // Verifica se A.Solar.mercury esiste
-          if (typeof A.Solar.mercury !== 'function') {
-            throw new Error("A.Solar.mercury non è una funzione.");
-          }
-
           // Calcola la posizione di Mercurio
           const mercuryPosition = A.Solar.mercury(jd);
           console.log("Posizione di Mercurio:", mercuryPosition);
@@ -101,20 +91,12 @@
             throw new Error("Posizione di Mercurio non valida.");
           }
 
-          // Calcola eventi astronomici per Mercurio
-          const events = A.Rise.calculate(
-            jd,
-            observer,
-            () => ({ ra: mercuryPosition.ra, dec: mercuryPosition.dec }), // Passa le coordinate
-            A.Refraction.atmospheric()
-          );
+          // Calcola levata, culminazione e tramonto
+          const rise = A.Rise.calculateRise(jd, observer, mercuryPosition);
+          const transit = A.Rise.calculateTransit(jd, observer, mercuryPosition);
+          const set = A.Rise.calculateSet(jd, observer, mercuryPosition);
 
-          console.log(`Eventi per il giorno ${day}:`, events);
-
-          // Verifica che gli eventi siano validi
-          if (!events || typeof events.rise !== 'number' || typeof events.transit !== 'number' || typeof events.set !== 'number') {
-            throw new Error("Eventi non validi.");
-          }
+          console.log(`Eventi per il giorno ${day}:`, { rise, transit, set });
 
           // Formatta la data
           const formattedDate = `${day.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${year}`;
@@ -130,9 +112,9 @@
           tbody.innerHTML += `
             <tr>
               <td>${formattedDate}</td>
-              <td>${formatTime(events.rise)}</td>
-              <td>${formatTime(events.transit)}</td>
-              <td>${formatTime(events.set)}</td>
+              <td>${formatTime(rise)}</td>
+              <td>${formatTime(transit)}</td>
+              <td>${formatTime(set)}</td>
             </tr>
           `;
         } catch (e) {
