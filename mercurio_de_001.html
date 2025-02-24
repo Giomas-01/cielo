@@ -92,7 +92,8 @@
           const date = new Date(Date.UTC(year, month - 1, day, 12));
           console.log("Data (UTC):", date);
 
-          const jd = A.JulianDay.fromDate(date).jd;
+          // Utilizza A.JulianDay.dateToJD invece di A.JulianDay.fromDate
+          const jd = A.JulianDay.dateToJD(date);
           console.log("Julian Day:", jd);
 
           const observer = A.GlobeCoord.fromWgs84(latitude, longitude, 0);
@@ -132,7 +133,7 @@
           // Formatta gli orari
           const formatTime = jd => {
             if (!jd) return '-';
-            const d = A.JulianDay.toDate(jd);
+            const d = A.JulianDay.jdToDate(jd);
             return d.toISOString().substr(11, 8);
           };
 
