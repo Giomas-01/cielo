@@ -1,39 +1,175 @@
-function calculateMonthlyMercuryTimes() {
-    const latitude = parseFloat(document.getElementById('latitude').value);
-    const longitude = parseFloat(document.getElementById('longitude').value);
-    const monthYearInput = document.getElementById('monthYear').value;
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Effemeridi di Mercurio</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        .container {
+            display: inline-block;
+            text-align: left;
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        input, button {
+            margin: 10px 0;
+            padding: 8px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background-color: #007BFF;
+            color: white;
+        }
+        #downloadButton {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Effemeridi di Mercurio</h1>
+    <div class="container">
+        <label for="latitude">Latitudine:</label>
+        <input type="number" id="latitude" placeholder="Es. 45.28"><br>
 
-    // Verifica i valori di input
-    if (isNaN(latitude) || isNaN(longitude) || !monthYearInput) {
-        alert("Inserisci valori validi per latitudine, longitudine e mese-anno.");
-        return;
-    }
+        <label for="longitude">Longitudine:</label>
+        <input type="number" id="longitude" placeholder="Es. 9.12"><br>
 
-    const [month, year] = monthYearInput.split('-').map(Number);
-    if (isNaN(month) || isNaN(year) || month < 1 || month > 12) {
-        alert("Inserisci un mese e un anno validi nel formato MM-YYYY.");
-        return;
-    }
+        <label for="monthYear">Mese-Anno (MM-YYYY):</label>
+        <input type="text" id="monthYear" placeholder="Es. 02-2025"><br>
 
-    const resultsBody = document.getElementById('resultsBody');
-    resultsBody.innerHTML = '';
+        <button onclick="calculateMonthlyMercuryTimes()">Calcola</button>
+    </div>
 
-    const daysInMonth = new Date(year, month, 0).getDate();
-    for (let day = 1; day <= daysInMonth; day++) {
-        const date = new Date(year, month - 1, day);
-        const mercuryPosition = getMercuryPosition(date, latitude, longitude); // Funzione da definire in astrojs.js
+    <button id="downloadButton" onclick="downloadTableAsCSV()">Scarica Tabella come CSV</button>
 
-        const sunriseLocal = formatTime(mercuryPosition.sunrise);
-        const solarNoonLocal = formatTime(mercuryPosition.solarNoon);
-        const sunsetLocal = formatTime(mercuryPosition.sunset);
+    <table id="mercuryTimesTable">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Levata</th>
+                <th>Culminazione</th>
+                <th>Tramonto</th>
+            </tr>
+        </thead>
+        <tbody id="resultsBody">
+            <!-- I risultati verranno inseriti qui -->
+        </tbody>
+    </table>
 
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${date.toLocaleDateString('it-IT')}</td>
-            <td>${sunriseLocal}</td>
-            <td>${solarNoonLocal}</td>
-            <td>${sunsetLocal}</td>
-        `;
-        resultsBody.appendChild(row);
-    }
-}
+    <!-- Includi la libreria astrojs.js dal tuo repository -->
+    <script src="lib/astrojs.js"></script>
+    <script>
+        async function calculateMonthlyMercuryTimes() {
+            const latitude = parseFloat(document.getElementById('latitude').value);
+            const longitude = parseFloat(document.getElementById('longitude').value);
+            const monthYearInput = document.getElementById('monthYear').value;
+
+            if (isNaN(latitude) || isNaN(longitude) || !monthYearInput) {
+                alert("Inserisci valori validi per latitudine, longitudine e mese-anno.");
+                return;
+            }
+
+            const [month, year] = monthYearInput.split('-').map(Number);
+            if (isNaN(month) || isNaN(year) || month < 1 || month > 12) {
+                alert("Inserisci un mese e un anno validi nel formato MM-YYYY.");
+                return;
+            }
+
+            const resultsBody = document.getElementById('resultsBody');
+            resultsBody.innerHTML = '';
+
+            const daysInMonth = new Date(year, month, 0).getDate();
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(year, month - 1, day);
+                const mercuryTimes = await getMercuryEphemerides(date, latitude, longitude);
+
+                const sunriseLocal = formatTime(mercuryTimes.rise);
+                const solarNoonLocal = formatTime(mercuryTimes.transit);
+                const sunsetLocal = formatTime(mercuryTimes.set);
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${date.toLocaleDateString('it-IT')}</td>
+                    <td>${sunriseLocal}</td>
+                    <td>${solarNoonLocal}</td>
+                    <td>${sunsetLocal}</td>
+                `;
+                resultsBody.appendChild(row);
+            }
+        }
+
+        function formatTime(time) {
+            if (!time) return "N/A";
+            return new Date(time).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function downloadTableAsCSV() {
+            const table = document.getElementById('mercuryTimesTable');
+            const rows = table.querySelectorAll('tr');
+
+            const headers = Array.from(rows[0].cells).map(cell => cell.textContent);
+            const data = [];
+            for (let i = 1; i < rows.length; i++) {
+                const rowData = Array.from(rows[i].cells).map(cell => cell.textContent);
+                data.push(rowData.join(','));
+            }
+
+            const csvContent = [headers.join(','), ...data].join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.setAttribute('hidden', true);
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'mercury_times.csv');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        async function getMercuryEphemerides(date, latitude, longitude) {
+            return new Promise((resolve) => {
+                // Usa astrojs per calcolare le effemeridi di Mercurio
+                const mercury = Astronomy.Body('Mercury');
+                const observer = { latitude, longitude, height: 0 };
+
+                const rise = Astronomy.SearchRiseSet('rise', mercury, observer, date, true);
+                const transit = Astronomy.SearchRiseSet('transit', mercury, observer, date, true);
+                const set = Astronomy.SearchRiseSet('set', mercury, observer, date, true);
+
+                resolve({
+                    rise: rise ? rise.time : null,
+                    transit: transit ? transit.time : null,
+                    set: set ? set.time : null
+                });
+            });
+        }
+    </script>
+</body>
+</html>
