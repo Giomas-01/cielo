@@ -55,7 +55,7 @@
 
   <script>
     function calculateEphemeris() {
-      console.log("Funzione calculateEphemeris chiamata.");
+      console.log("=== INIZIO CALCOLO EFFEMERIDI ===");
 
       // Recupera i valori dal form
       const month = document.getElementById('month').valueAsNumber;
@@ -64,6 +64,12 @@
       const longitude = document.getElementById('longitude').valueAsNumber;
 
       console.log("Input:", { month, year, latitude, longitude });
+
+      // Verifica che i valori di input siano validi
+      if (isNaN(month) throw new Error("Mese non valido.");
+      if (isNaN(year)) throw new Error("Anno non valido.");
+      if (isNaN(latitude)) throw new Error("Latitudine non valida.");
+      if (isNaN(longitude)) throw new Error("Longitudine non valida.");
 
       // Calcola i giorni del mese
       const daysInMonth = new Date(year, month, 0).getDate();
@@ -75,13 +81,24 @@
       // Calcola per ogni giorno
       for (let day = 1; day <= daysInMonth; day++) {
         try {
-          const date = new Date(Date.UTC(year, month - 1, day, 12));
-          const jd = A.JulianDay.fromDate(date).jd;
-          const observer = A.GlobeCoord.fromWgs84(latitude, longitude, 0);
+          console.log(`\n=== CALCOLO PER IL GIORNO ${day} ===`);
 
-          console.log(`Calcolo per il giorno ${day}:`, { date, jd, observer });
+          const date = new Date(Date.UTC(year, month - 1, day, 12));
+          console.log("Data (UTC):", date);
+
+          const jd = A.JulianDay.fromDate(date).jd;
+          console.log("Julian Day:", jd);
+
+          const observer = A.GlobeCoord.fromWgs84(latitude, longitude, 0);
+          console.log("Coordinate osservatore:", observer);
+
+          // Verifica che le coordinate siano valide
+          if (!observer || typeof observer.latitude !== 'number' || typeof observer.longitude !== 'number') {
+            throw new Error("Coordinate osservatore non valide.");
+          }
 
           // Calcola la posizione di Mercurio
+          console.log("Calcolo posizione di Mercurio...");
           const mercuryPosition = A.Solar.mercury(jd);
           console.log("Posizione di Mercurio:", mercuryPosition);
 
@@ -91,11 +108,17 @@
           }
 
           // Calcola levata, culminazione e tramonto
+          console.log("Calcolo levata...");
           const rise = calculateRiseSet(jd, observer, mercuryPosition, 'rise');
-          const transit = calculateTransit(jd, observer, mercuryPosition);
-          const set = calculateRiseSet(jd, observer, mercuryPosition, 'set');
+          console.log("Levata (JD):", rise);
 
-          console.log(`Eventi per il giorno ${day}:`, { rise, transit, set });
+          console.log("Calcolo culminazione...");
+          const transit = calculateTransit(jd, observer, mercuryPosition);
+          console.log("Culminazione (JD):", transit);
+
+          console.log("Calcolo tramonto...");
+          const set = calculateRiseSet(jd, observer, mercuryPosition, 'set');
+          console.log("Tramonto (JD):", set);
 
           // Formatta la data
           const formattedDate = `${day.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${year}`;
@@ -126,6 +149,8 @@
           `;
         }
       }
+
+      console.log("=== FINE CALCOLO EFFEMERIDI ===");
     }
 
     /**
@@ -137,11 +162,18 @@
      * @returns {number} Julian Day dell'evento.
      */
     function calculateRiseSet(jd, observer, bodyPosition, type) {
+      console.log("Calcolo angolo orario...");
       const ha = A.Sidereal.hourAngle(jd, observer.longitude, bodyPosition.ra);
+      console.log("Angolo orario:", ha);
+
+      console.log("Calcolo altitudine...");
       const altitude = A.Coord.equatorialToHorizontal(ha, bodyPosition.dec, observer.latitude).alt;
+      console.log("Altitudine:", altitude);
 
       // Correzione per rifrazione atmosferica
+      console.log("Applicazione correzione rifrazione...");
       const correctedAltitude = altitude + A.Refraction.atmospheric(altitude);
+      console.log("Altitudine corretta:", correctedAltitude);
 
       // Calcola il tempo di levata/tramonto
       const deltaT = (type === 'rise') ? -correctedAltitude : correctedAltitude;
@@ -156,7 +188,10 @@
      * @returns {number} Julian Day della culminazione.
      */
     function calculateTransit(jd, observer, bodyPosition) {
+      console.log("Calcolo angolo orario per culminazione...");
       const ha = A.Sidereal.hourAngle(jd, observer.longitude, bodyPosition.ra);
+      console.log("Angolo orario:", ha);
+
       return jd + (ha / 360);
     }
   </script>
