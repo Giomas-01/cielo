@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Effemeridi di Mercurio</title>
+    <title>Effemeridi Mensili di Mercurio</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -52,7 +52,7 @@
     </style>
 </head>
 <body>
-    <h1>Effemeridi di Mercurio</h1>
+    <h1>Effemeridi Mensili di Mercurio</h1>
     <div class="container">
         <label for="latitude">Latitudine:</label>
         <input type="number" id="latitude" placeholder="Es. 45.28"><br>
@@ -63,12 +63,12 @@
         <label for="monthYear">Mese-Anno (MM-YYYY):</label>
         <input type="text" id="monthYear" placeholder="Es. 02-2025"><br>
 
-        <button onclick="calculateMonthlyMercuryTimes()">Calcola</button>
+        <button onclick="calculateMercuryEphemerides()">Calcola</button>
     </div>
 
     <button id="downloadButton" onclick="downloadTableAsCSV()">Scarica Tabella come CSV</button>
 
-    <table id="mercuryTimesTable">
+    <table id="ephemeridesTable">
         <thead>
             <tr>
                 <th>Data</th>
@@ -77,15 +77,12 @@
                 <th>Tramonto</th>
             </tr>
         </thead>
-        <tbody id="resultsBody">
-            <!-- I risultati verranno inseriti qui -->
-        </tbody>
+        <tbody id="resultsBody"></tbody>
     </table>
 
-    <!-- Includi la libreria astrojs.js dal tuo repository -->
-    <script src="lib/astrojs.js"></script>
+    <script src="lib/meeusjs.1.0.3.min.js"></script>
     <script>
-        async function calculateMonthlyMercuryTimes() {
+        function calculateMercuryEphemerides() {
             const latitude = parseFloat(document.getElementById('latitude').value);
             const longitude = parseFloat(document.getElementById('longitude').value);
             const monthYearInput = document.getElementById('monthYear').value;
@@ -105,32 +102,37 @@
             resultsBody.innerHTML = '';
 
             const daysInMonth = new Date(year, month, 0).getDate();
-            for (let day = 1; day <= daysInMonth; day++) {
-                const date = new Date(year, month - 1, day);
-                const mercuryTimes = await getMercuryEphemerides(date, latitude, longitude);
 
-                const sunriseLocal = formatTime(mercuryTimes.rise);
-                const solarNoonLocal = formatTime(mercuryTimes.transit);
-                const sunsetLocal = formatTime(mercuryTimes.set);
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(Date.UTC(year, month - 1, day));
+                const jd = Meeus.toJD(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(), 0);
+
+                const mercuryCoords = Meeus.mercury(jd);
+                const riseSetTransit = Meeus.riseSetTransit(jd, latitude, longitude, mercuryCoords.RA, mercuryCoords.DEC);
+
+                const riseLocal = formatTime(riseSetTransit.rise);
+                const transitLocal = formatTime(riseSetTransit.transit);
+                const setLocal = formatTime(riseSetTransit.set);
 
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${date.toLocaleDateString('it-IT')}</td>
-                    <td>${sunriseLocal}</td>
-                    <td>${solarNoonLocal}</td>
-                    <td>${sunsetLocal}</td>
+                    <td>${riseLocal}</td>
+                    <td>${transitLocal}</td>
+                    <td>${setLocal}</td>
                 `;
                 resultsBody.appendChild(row);
             }
         }
 
-        function formatTime(time) {
-            if (!time) return "N/A";
-            return new Date(time).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+        function formatTime(jd) {
+            if (isNaN(jd)) return "N/A";
+            const date = Meeus.fromJD(jd);
+            return date.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
         }
 
         function downloadTableAsCSV() {
-            const table = document.getElementById('mercuryTimesTable');
+            const table = document.getElementById('ephemeridesTable');
             const rows = table.querySelectorAll('tr');
 
             const headers = Array.from(rows[0].cells).map(cell => cell.textContent);
@@ -141,34 +143,17 @@
             }
 
             const csvContent = [headers.join(','), ...data].join('\n');
+
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
 
             const a = document.createElement('a');
             a.setAttribute('hidden', true);
             a.setAttribute('href', url);
-            a.setAttribute('download', 'mercury_times.csv');
+            a.setAttribute('download', 'mercury_ephemerides.csv');
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
-        }
-
-        async function getMercuryEphemerides(date, latitude, longitude) {
-            return new Promise((resolve) => {
-                // Usa astrojs per calcolare le effemeridi di Mercurio
-                const mercury = Astronomy.Body('Mercury');
-                const observer = { latitude, longitude, height: 0 };
-
-                const rise = Astronomy.SearchRiseSet('rise', mercury, observer, date, true);
-                const transit = Astronomy.SearchRiseSet('transit', mercury, observer, date, true);
-                const set = Astronomy.SearchRiseSet('set', mercury, observer, date, true);
-
-                resolve({
-                    rise: rise ? rise.time : null,
-                    transit: transit ? transit.time : null,
-                    set: set ? set.time : null
-                });
-            });
         }
     </script>
 </body>
