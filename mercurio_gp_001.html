@@ -84,22 +84,9 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             console.log("Script caricato correttamente");
-
-            if (typeof Astro === "undefined") {
-                console.error("Errore: Astro non è definito. Controlla che il file Astro.Rise.js sia caricato correttamente.");
-                return;
-            }
-
-            console.log("Modulo Astro trovato:", Astro);
-            console.log("Metodi disponibili in Astro:", Object.keys(Astro)); // Debug: vedere tutti i metodi
         });
 
         function calculateMercuryEphemerides() {
-            if (typeof Astro === "undefined") {
-                alert("Errore: Il modulo Astro non è disponibile.");
-                return;
-            }
-
             const latitude = parseFloat(document.getElementById('latitude').value);
             const longitude = parseFloat(document.getElementById('longitude').value);
             const monthYearInput = document.getElementById('monthYear').value;
@@ -123,26 +110,32 @@
             for (let day = 1; day <= daysInMonth; day++) {
                 const date = new Date(Date.UTC(year, month - 1, day));
                 const jd = calculateJulianDay(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate());
+                const mercuryCoords = getMercuryPosition(jd); // Funzione per ottenere le coordinate di Mercurio
 
-                console.log(`JD per ${date.toISOString()}:`, jd);
+                // Assicurati che le funzioni di A.Rise siano disponibili
+                const eclCoord = {
+                    lat: latitude * (Math.PI / 180), // Converti in radianti
+                    lng: longitude * (Math.PI / 180) // Converti in radianti
+                };
 
-                const mercuryCoords = Astro.Planets.mercury(jd); // Supponendo che Astro abbia una funzione per ottenere le coordinate di Mercurio
+                const h0 = A.Rise.stdh0Solar; // Usa l'altezza standard per il Sole
+                const Th0 = calculateSiderealTime(date); // Funzione per calcolare il tempo sidereo
 
-                const riseSetTransit = Astro.RiseSetTransit(jd, latitude, longitude, mercuryCoords.RA, mercuryCoords.DEC);
-                console.log("Orari Levata, Culminazione, Tramonto:", riseSetTransit);
+                const riseSetTransit = A.Rise.approxTimes(eclCoord, h0, Th0, mercuryCoords);
+                if (riseSetTransit) {
+                    const riseLocal = formatTime(riseSetTransit.rise);
+                    const transitLocal = formatTime(riseSetTransit.transit);
+                    const setLocal = formatTime(riseSetTransit.set);
 
-                const riseLocal = formatTime(riseSetTransit.rise);
-                const transitLocal = formatTime(riseSetTransit.transit);
-                const setLocal = formatTime(riseSetTransit.set);
-
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${date.toLocaleDateString('it-IT')}</td>
-                    <td>${riseLocal}</td>
-                    <td>${transitLocal}</td>
-                    <td>${setLocal}</td>
-                `;
-                resultsBody.appendChild(row);
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${date.toLocaleDateString('it-IT')}</td>
+                        <td>${riseLocal}</td>
+                        <td>${transitLocal}</td>
+                        <td>${setLocal}</td>
+                    `;
+                    resultsBody.appendChild(row);
+                }
             }
         }
 
@@ -157,10 +150,25 @@
             return julianDay;
         }
 
-        function formatTime(jd) {
-            if (isNaN(jd)) return "N/A";
-            const date = Astro.JulianDay.jdToDate(jd); // Usa jdToDate per convertire JD in data
+        function getMercuryPosition(jd) {
+            // Questa funzione deve restituire un oggetto contenente ra e dec di Mercurio per il giorno specificato
+            // Implementa qui la logica per ottenere le coordinate di Mercurio
+            return {
+                ra: /* Ascensione retta di Mercurio */,
+                dec: /* Declinazione di Mercurio */
+            };
+        }
+
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return "N/A";
+            const date = new Date(seconds * 1000); // Converti secondi in millisecondi
             return date.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function calculateSiderealTime(date) {
+            // Calcola il tempo sidereo apparente per la data specificata
+            // Implementa qui la logica per calcolare il tempo sidereo
+            return /* Tempo sidereo in secondi */;
         }
 
         function downloadTableAsCSV() {
