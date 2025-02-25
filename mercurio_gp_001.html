@@ -38,8 +38,7 @@
     </table>
 
     <script src="lib/Astro.js" defer></script>
-    <script src="lib/Astro.Rise.js" defer></script>
-    <script src="lib/astrojs.js" defer></script> <!-- Includi il file astrojs.js -->
+    <script src="lib/astrojs.js" defer></script> <!-- Rimosso Astro.Rise.js -->
     <script>
         var A = A || {}; // Assicura che A sia definito
 
@@ -71,7 +70,10 @@
                 const jd = calculateJulianDay(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate());
                 const mercuryCoords = getMercuryPosition(jd);
 
-                if (!mercuryCoords) continue;
+                if (!mercuryCoords) {
+                    console.log(`Nessuna posizione trovata per Mercurio in JD ${jd}`);
+                    continue;
+                }
 
                 console.log(`Mercurio JD ${jd}: ra = ${mercuryCoords.ra}, dec = ${mercuryCoords.dec}`);
 
@@ -80,7 +82,7 @@
                     lng: longitude * (Math.PI / 180) // Converti in radianti
                 };
 
-                const h0 = A.Rise.stdh0Solar || -0.833;
+                const h0 = -0.833; // Valore standard per il calcolo dell'ora di levata
                 const Th0 = calculateSiderealTime(date);
 
                 const riseSetTransit = A.Rise.approxTimes(eclCoord, h0, Th0, mercuryCoords);
@@ -97,7 +99,14 @@
                         <td>${setLocal}</td>
                     `;
                     resultsBody.appendChild(row);
+                } else {
+                    console.log(`Nessun risultato di levata, culminazione e tramonto per Mercurio in data ${date.toLocaleDateString('it-IT')}`);
                 }
+            }
+
+            // Controllo se la tabella è stata popolata
+            if (resultsBody.childNodes.length === 0) {
+                console.log("Nessun dato da mostrare nella tabella.");
             }
         }
 
@@ -117,7 +126,7 @@
                 return null;
             }
 
-            const mercuryPosition = A.Planet.position(jd, 'Mercury'); // Modifica qui per utilizzare il file astrojs.js
+            const mercuryPosition = A.Planet.position(jd, 'Mercury'); // Utilizza il file astrojs.js
             return {
                 ra: mercuryPosition.ra,
                 dec: mercuryPosition.dec
