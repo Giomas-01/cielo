@@ -80,8 +80,25 @@
         <tbody id="resultsBody"></tbody>
     </table>
 
+    <script src="lib/meeusjs.1.0.3.min.js" defer></script>
     <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            console.log("Script caricato correttamente");
+
+            if (typeof A === "undefined") {
+                console.error("Errore: A non è definito. Controlla che il file meeusjs.1.0.3.min.js sia caricato correttamente.");
+                return;
+            }
+            
+            console.log("Modulo A trovato:", A);
+        });
+
         function calculateMercuryEphemerides() {
+            if (typeof A === "undefined") {
+                alert("Errore: Il modulo A non è disponibile.");
+                return;
+            }
+
             const latitude = parseFloat(document.getElementById('latitude').value);
             const longitude = parseFloat(document.getElementById('longitude').value);
             const monthYearInput = document.getElementById('monthYear').value;
@@ -104,16 +121,15 @@
 
             for (let day = 1; day <= daysInMonth; day++) {
                 const date = new Date(Date.UTC(year, month - 1, day));
-                const jd = A.J2000 + (date - new Date(Date.UTC(2000, 0, 1))) / 86400000;
+                const jd = A.JD(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(), 0);
 
-                console.log(`Data: ${date.toISOString().split('T')[0]}, JD: ${jd}`);
+                console.log(`JD per ${date.toISOString()}:`, jd);
 
-                const mercuryCoords = A.EclCoord(jd); 
-                console.log(`Coordinate Mercurio - RA: ${mercuryCoords.a}, DEC: ${mercuryCoords.b}`);
+                const mercuryCoords = A.Mercury(jd);
+                console.log("Coordinate Mercurio:", mercuryCoords);
 
-                const riseSetTransit = calculateRiseSetTransit(jd, latitude, longitude, mercuryCoords.a, mercuryCoords.b);
-
-                console.log(`Orari (UTC) - Levata: ${riseSetTransit.rise}, Culminazione: ${riseSetTransit.transit}, Tramonto: ${riseSetTransit.set}`);
+                const riseSetTransit = A.RiseSetTransit(jd, latitude, longitude, mercuryCoords.RA, mercuryCoords.DEC);
+                console.log("Orari Levata, Culminazione, Tramonto:", riseSetTransit);
 
                 const riseLocal = formatTime(riseSetTransit.rise);
                 const transitLocal = formatTime(riseSetTransit.transit);
@@ -130,17 +146,9 @@
             }
         }
 
-        function calculateRiseSetTransit(jd, lat, lon, ra, dec) {
-            return {
-                rise: jd + 0.25, 
-                transit: jd + 0.5, 
-                set: jd + 0.75 
-            };
-        }
-
         function formatTime(jd) {
             if (isNaN(jd)) return "N/A";
-            const date = new Date((jd - A.J2000) * 86400000 + Date.UTC(2000, 0, 1));
+            const date = A.fromJD(jd);
             return date.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
         }
 
