@@ -38,7 +38,7 @@
     </table>
 
     <script src="lib/Astro.js" defer></script>
-    <script src="lib/astrojs.js" defer></script> <!-- Rimosso Astro.Rise.js -->
+    <script src="lib/astrojs.js" defer></script>
     <script>
         var A = A || {}; // Assicura che A sia definito
 
@@ -70,43 +70,39 @@
                 const jd = calculateJulianDay(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate());
                 const mercuryCoords = getMercuryPosition(jd);
 
-                if (!mercuryCoords) {
-                    console.log(`Nessuna posizione trovata per Mercurio in JD ${jd}`);
-                    continue;
-                }
+                if (!mercuryCoords) continue;
 
                 console.log(`Mercurio JD ${jd}: ra = ${mercuryCoords.ra}, dec = ${mercuryCoords.dec}`);
 
+                // Coordinate in gradi decimali
                 const eclCoord = {
-                    lat: latitude * (Math.PI / 180), // Converti in radianti
-                    lng: longitude * (Math.PI / 180) // Converti in radianti
+                    lat: latitude,
+                    lng: longitude
                 };
 
-                const h0 = -0.833; // Valore standard per il calcolo dell'ora di levata
-                const Th0 = calculateSiderealTime(date);
+                // Ottieni i dati dall'astro
+                const dati_ast = ST_ASTRO(mercuryCoords.ra, mercuryCoords.dec, longitude, latitude, 0, 0.25);
 
-                const riseSetTransit = A.Rise.approxTimes(eclCoord, h0, Th0, mercuryCoords);
-                if (riseSetTransit) {
-                    const riseLocal = formatTime(riseSetTransit.rise);
-                    const transitLocal = formatTime(riseSetTransit.transit);
-                    const setLocal = formatTime(riseSetTransit.set);
+                // Trasformazione degli Istanti, da T.U. a Tempo Locale
+                const t_locale = -fuso_loc(); // Calcola il fuso orario locale
 
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${date.toLocaleDateString('it-IT')}</td>
-                        <td>${riseLocal}</td>
-                        <td>${transitLocal}</td>
-                        <td>${setLocal}</td>
-                    `;
-                    resultsBody.appendChild(row);
-                } else {
-                    console.log(`Nessun risultato di levata, culminazione e tramonto per Mercurio in data ${date.toLocaleDateString('it-IT')}`);
-                }
-            }
+                const sorge = ore_24(dati_ast[2] + t_locale); // Sorgere
+                const transita = ore_24(dati_ast[3] + t_locale); // Transito
+                const tramonta = ore_24(dati_ast[4] + t_locale); // Tramonto
 
-            // Controllo se la tabella è stata popolata
-            if (resultsBody.childNodes.length === 0) {
-                console.log("Nessun dato da mostrare nella tabella.");
+                // Formattazione dei risultati
+                const riseLocal = formatTime(sorge);
+                const transitLocal = formatTime(transita);
+                const setLocal = formatTime(tramonta);
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${date.toLocaleDateString('it-IT')}</td>
+                    <td>${riseLocal}</td>
+                    <td>${transitLocal}</td>
+                    <td>${setLocal}</td>
+                `;
+                resultsBody.appendChild(row);
             }
         }
 
@@ -122,11 +118,11 @@
 
         function getMercuryPosition(jd) {
             if (typeof A.Planet === "undefined" || typeof A.Planet.position !== "function") {
-                console.error("Errore: A.Planet.position non è definita. Assicurati che Astro.js sia caricato.");
+                console.error("Errore: A.Planet.position non è definita. Assicurati che astrojs.js sia caricato.");
                 return null;
             }
 
-            const mercuryPosition = A.Planet.position(jd, 'Mercury'); // Utilizza il file astrojs.js
+            const mercuryPosition = A.Planet.position(jd, A.Planet.mercury);
             return {
                 ra: mercuryPosition.ra,
                 dec: mercuryPosition.dec
@@ -139,8 +135,11 @@
             return date.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
         }
 
-        function calculateSiderealTime(date) {
-            return 86400 * (date.getUTCHours() / 24);
+        function ore_24(time) {
+            // Assicurati che questo gestisca correttamente l'intervallo di tempo
+            while (time < 0) time += 24;
+            while (time >= 24) time -= 24;
+            return time;
         }
 
         function downloadTableAsCSV() {
