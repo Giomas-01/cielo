@@ -55,13 +55,13 @@
     <h1>Effemeridi Mensili di Mercurio</h1>
     <div class="container">
         <label for="latitude">Latitudine:</label>
-        <input type="number" id="latitude" placeholder="Es. 45.28"><br>
+        <input type="number" id="latitude" placeholder="Es. 45.28" required><br>
 
         <label for="longitude">Longitudine:</label>
-        <input type="number" id="longitude" placeholder="Es. 9.12"><br>
+        <input type="number" id="longitude" placeholder="Es. 9.12" required><br>
 
         <label for="monthYear">Mese-Anno (MM-YYYY):</label>
-        <input type="text" id="monthYear" placeholder="Es. 02-2025"><br>
+        <input type="text" id="monthYear" placeholder="Es. 02-2025" required><br>
 
         <button onclick="calculateMercuryEphemerides()">Calcola</button>
     </div>
@@ -80,13 +80,26 @@
         <tbody id="resultsBody"></tbody>
     </table>
 
-    <script src="lib/astronomy.js" defer></script>
+    <script src="lib/Astro.Rise.js" defer></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             console.log("Script caricato correttamente");
+
+            if (typeof Astro === "undefined") {
+                console.error("Errore: Astro non è definito. Controlla che il file Astro.Rise.js sia caricato correttamente.");
+                return;
+            }
+
+            console.log("Modulo Astro trovato:", Astro);
+            console.log("Metodi disponibili in Astro:", Object.keys(Astro)); // Debug: vedere tutti i metodi
         });
 
         function calculateMercuryEphemerides() {
+            if (typeof Astro === "undefined") {
+                alert("Errore: Il modulo Astro non è disponibile.");
+                return;
+            }
+
             const latitude = parseFloat(document.getElementById('latitude').value);
             const longitude = parseFloat(document.getElementById('longitude').value);
             const monthYearInput = document.getElementById('monthYear').value;
@@ -109,18 +122,13 @@
 
             for (let day = 1; day <= daysInMonth; day++) {
                 const date = new Date(Date.UTC(year, month - 1, day));
-
-                // Calcola il giorno giuliano
                 const jd = calculateJulianDay(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate());
 
                 console.log(`JD per ${date.toISOString()}:`, jd);
 
-                // Calcola le coordinate di Mercurio
-                const mercuryCoords = Astronomy.Mercury(jd);
-                console.log("Coordinate Mercurio:", mercuryCoords);
+                const mercuryCoords = Astro.Planets.mercury(jd); // Supponendo che Astro abbia una funzione per ottenere le coordinate di Mercurio
 
-                // Calcola i tempi di levata, culminazione e tramonto
-                const riseSetTransit = Astronomy.RiseSetTransit(jd, latitude, longitude, mercuryCoords.RA, mercuryCoords.Dec);
+                const riseSetTransit = Astro.RiseSetTransit(jd, latitude, longitude, mercuryCoords.RA, mercuryCoords.DEC);
                 console.log("Orari Levata, Culminazione, Tramonto:", riseSetTransit);
 
                 const riseLocal = formatTime(riseSetTransit.rise);
@@ -151,7 +159,7 @@
 
         function formatTime(jd) {
             if (isNaN(jd)) return "N/A";
-            const date = Astronomy.JDToDate(jd); // Usa JDToDate per convertire JD in data
+            const date = Astro.JulianDay.jdToDate(jd); // Usa jdToDate per convertire JD in data
             return date.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
         }
 
