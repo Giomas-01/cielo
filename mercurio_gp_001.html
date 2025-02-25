@@ -68,6 +68,7 @@
                 const date = new Date(Date.UTC(year, month - 1, day));
                 const jd = calculateJulianDay(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate());
                 const mercuryCoords = getMercuryPosition(jd); // Funzione per ottenere le coordinate di Mercurio
+                console.log(`Mercurio JD ${jd}: ra = ${mercuryCoords.ra}, dec = ${mercuryCoords.dec}`);
 
                 if (!mercuryCoords) continue;
 
