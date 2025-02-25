@@ -93,6 +93,14 @@
             console.log("Modulo A trovato:", A);
             console.log("Metodi disponibili in A:", Object.keys(A)); // Debug: vedere tutti i metodi
 
+            // Controllo specifico per Planets
+            if (A.Planets) {
+                console.log("Modulo Planets trovato:", A.Planets);
+                console.log("Metodi disponibili in Planets:", Object.keys(A.Planets));
+            } else {
+                console.error("Errore: A.Planets non è definito.");
+            }
+
             // Controllo specifico per JulianDay
             if (A.JulianDay) {
                 console.log("Metodi disponibili in JulianDay:", Object.keys(A.JulianDay));
@@ -135,6 +143,11 @@
 
                 console.log(`JD per ${date.toISOString()}:`, jd);
 
+                if (typeof A.Planets.mercury !== "function") {
+                    console.error("Errore: La funzione A.Planets.mercury non è disponibile.");
+                    return;
+                }
+                
                 const mercuryCoords = A.Planets.mercury(jd);
                 console.log("Coordinate Mercurio:", mercuryCoords);
 
