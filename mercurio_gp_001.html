@@ -68,12 +68,14 @@
                 const jd = calculateJulianDay(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate());
                 const mercuryCoords = getMercuryPosition(jd); // Funzione per ottenere le coordinate di Mercurio
 
+                if (!mercuryCoords) continue;
+
                 const eclCoord = {
                     lat: latitude * (Math.PI / 180), // Converti in radianti
                     lng: longitude * (Math.PI / 180) // Converti in radianti
                 };
 
-                const h0 = A.Rise.stdh0Solar; // Usa l'altezza standard per il Sole
+                const h0 = A.Rise.stdh0Solar || -0.833; // Usa l'altezza standard per il Sole
                 const Th0 = calculateSiderealTime(date); // Funzione per calcolare il tempo sidereo
 
                 const riseSetTransit = A.Rise.approxTimes(eclCoord, h0, Th0, mercuryCoords);
@@ -101,27 +103,25 @@
             }
             const A = Math.floor(year / 100);
             const B = 2 - A + Math.floor(A / 4);
-            const julianDay = Math.floor(365.25 * (year + 4716)) + Math.floor(30.6001 * (month + 1)) + day + B - 1524.5;
-            return julianDay;
+            return Math.floor(365.25 * (year + 4716)) + Math.floor(30.6001 * (month + 1)) + day + B - 1524.5;
         }
 
         function getMercuryPosition(jd) {
-            // Implementa qui la logica per ottenere ra e dec di Mercurio
+            // Sostituisci questi valori con una funzione di calcolo reale
             return {
-                ra: /* Ascensione retta di Mercurio */,
-                dec: /* Declinazione di Mercurio */
+                ra: 10.0, // Esempio di valore fittizio per ascensione retta
+                dec: -5.0  // Esempio di valore fittizio per declinazione
             };
         }
 
         function formatTime(seconds) {
             if (isNaN(seconds)) return "N/A";
-            const date = new Date(seconds * 1000); // Converti secondi in millisecondi
+            const date = new Date(seconds * 1000);
             return date.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
         }
 
         function calculateSiderealTime(date) {
-            // Implementa qui la logica per calcolare il tempo sidereo
-            return /* Tempo sidereo in secondi */;
+            return 86400 * (date.getUTCHours() / 24); // Semplice approssimazione per esempio
         }
 
         function downloadTableAsCSV() {
