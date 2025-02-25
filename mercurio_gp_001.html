@@ -129,6 +129,13 @@
 
             for (let day = 1; day <= daysInMonth; day++) {
                 const date = new Date(Date.UTC(year, month - 1, day));
+
+                // Validazione della data prima di ottenere il giorno giuliano
+                if (isNaN(date.getTime())) {
+                    console.error("Data non valida:", date);
+                    continue; // Salta se la data non è valida
+                }
+
                 // Usa il metodo jdFromGregorian per ottenere il giorno giuliano
                 const jd = A.JulianDay.jdFromGregorian(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate());
 
