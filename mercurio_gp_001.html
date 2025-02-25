@@ -129,8 +129,8 @@
 
             for (let day = 1; day <= daysInMonth; day++) {
                 const date = new Date(Date.UTC(year, month - 1, day));
-                // Usa il metodo appropriato per ottenere JD
-                const jd = A.JulianDay.fromDate(date); // Modifica in base al metodo corretto
+                // Usa il metodo jdFromGregorian per ottenere il giorno giuliano
+                const jd = A.JulianDay.jdFromGregorian(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate());
 
                 console.log(`JD per ${date.toISOString()}:`, jd);
 
@@ -157,7 +157,7 @@
 
         function formatTime(jd) {
             if (isNaN(jd)) return "N/A";
-            const date = A.JulianDay.fromJD(jd); // Usa un metodo appropriato per convertire JD
+            const date = A.JulianDay.jdToDate(jd); // Usa jdToDate per convertire JD in data
             return date.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
         }
 
