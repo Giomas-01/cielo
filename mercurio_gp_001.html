@@ -37,10 +37,10 @@
         <tbody id="resultsBody"></tbody>
     </table>
 
+    <script src="lib/Astro.js" defer></script>
     <script src="lib/Astro.Rise.js" defer></script>
     <script>
-        // Assicurati che l'oggetto A sia definito
-        var A = A || {}; // Definisci A se non esiste già
+        var A = A || {}; // Assicura che A sia definito
 
         function calculateMercuryEphemerides() {
             const latitude = parseFloat(document.getElementById('latitude').value);
@@ -53,11 +53,12 @@
             }
 
             const [month, year] = monthYearInput.split('-').map(Number);
-            console.log("Mese:", month, "Anno:", year);
             if (isNaN(month) || isNaN(year) || month < 1 || month > 12) {
                 alert("Inserisci un mese e un anno validi nel formato MM-YYYY.");
                 return;
             }
+
+            console.log("Mese:", month, "Anno:", year);
 
             const resultsBody = document.getElementById('resultsBody');
             resultsBody.innerHTML = '';
@@ -67,18 +68,19 @@
             for (let day = 1; day <= daysInMonth; day++) {
                 const date = new Date(Date.UTC(year, month - 1, day));
                 const jd = calculateJulianDay(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate());
-                const mercuryCoords = getMercuryPosition(jd); // Funzione per ottenere le coordinate di Mercurio
-                console.log(`Mercurio JD ${jd}: ra = ${mercuryCoords.ra}, dec = ${mercuryCoords.dec}`);
+                const mercuryCoords = getMercuryPosition(jd);
 
                 if (!mercuryCoords) continue;
+
+                console.log(`Mercurio JD ${jd}: ra = ${mercuryCoords.ra}, dec = ${mercuryCoords.dec}`);
 
                 const eclCoord = {
                     lat: latitude * (Math.PI / 180), // Converti in radianti
                     lng: longitude * (Math.PI / 180) // Converti in radianti
                 };
 
-                const h0 = A.Rise.stdh0Solar || -0.833; // Usa l'altezza standard per il Sole
-                const Th0 = calculateSiderealTime(date); // Funzione per calcolare il tempo sidereo
+                const h0 = A.Rise.stdh0Solar || -0.833;
+                const Th0 = calculateSiderealTime(date);
 
                 const riseSetTransit = A.Rise.approxTimes(eclCoord, h0, Th0, mercuryCoords);
                 if (riseSetTransit) {
@@ -109,10 +111,15 @@
         }
 
         function getMercuryPosition(jd) {
-            // Sostituisci questi valori con una funzione di calcolo reale
+            if (typeof A.Planet === "undefined" || typeof A.Planet.position !== "function") {
+                console.error("Errore: A.Planet.position non è definita. Assicurati che Astro.js sia caricato.");
+                return null;
+            }
+
+            const mercuryPosition = A.Planet.position(jd, A.Planet.mercury);
             return {
-                ra: 10.0, // Esempio di valore fittizio per ascensione retta
-                dec: -5.0  // Esempio di valore fittizio per declinazione
+                ra: mercuryPosition.ra,
+                dec: mercuryPosition.dec
             };
         }
 
@@ -123,7 +130,7 @@
         }
 
         function calculateSiderealTime(date) {
-            return 86400 * (date.getUTCHours() / 24); // Semplice approssimazione per esempio
+            return 86400 * (date.getUTCHours() / 24);
         }
 
         function downloadTableAsCSV() {
