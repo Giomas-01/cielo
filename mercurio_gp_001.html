@@ -72,6 +72,8 @@
                 // Calcola la levata, culminazione e tramonto usando ST_ASTRO_DATA
                 const riseSetTransit = calculateRiseSetTransit(jd, mercuryCoords, longitude, latitude);
 
+                console.log(`Data: ${date.toLocaleDateString('it-IT')}, Rise: ${riseSetTransit.rise}, Transit: ${riseSetTransit.transit}, Set: ${riseSetTransit.set}`); // Debug
+
                 if (riseSetTransit) {
                     const riseLocal = formatTime(riseSetTransit.rise);
                     const transitLocal = formatTime(riseSetTransit.transit);
@@ -105,6 +107,9 @@
             const altitude = 0; // Non necessario, puoi impostarlo a zero
             const datiAst = ST_ASTRO(np, jd, longitude, latitude, altitude, 0); // Raggio a zero per Mercurio
 
+            // Assicurati che i dati restituiti siano validi
+            console.log(`Posizione Mercurio (AR, DE): ${datiAst[0]}, ${datiAst[1]}`); // Debug
+
             return {
                 ar: datiAst[0], // Ascensione retta
                 de: datiAst[1] // Declinatione
@@ -114,6 +119,9 @@
         function calculateRiseSetTransit(jd, mercuryCoords, longitude, latitude) {
             const njd = Math.floor(jd); // Numero giuliano intero
             const riseData = ST_ASTRO_DATA(njd, mercuryCoords.ar, mercuryCoords.de, longitude, latitude, 0); // Altitudine a zero
+
+            console.log(`Dati di ST_ASTRO_DATA: ${riseData}`); // Debug
+
             return {
                 rise: riseData[2],    // Tempo di levata
                 transit: riseData[3], // Tempo di culminazione
