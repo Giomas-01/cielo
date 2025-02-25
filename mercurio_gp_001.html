@@ -130,14 +130,8 @@
             for (let day = 1; day <= daysInMonth; day++) {
                 const date = new Date(Date.UTC(year, month - 1, day));
 
-                // Validazione della data prima di ottenere il giorno giuliano
-                if (isNaN(date.getTime())) {
-                    console.error("Data non valida:", date);
-                    continue; // Salta se la data non è valida
-                }
-
-                // Usa il metodo jdFromGregorian per ottenere il giorno giuliano
-                const jd = A.JulianDay.jdFromGregorian(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate());
+                // Calcola il giorno giuliano
+                const jd = calculateJulianDay(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate());
 
                 console.log(`JD per ${date.toISOString()}:`, jd);
 
@@ -160,6 +154,17 @@
                 `;
                 resultsBody.appendChild(row);
             }
+        }
+
+        function calculateJulianDay(year, month, day) {
+            if (month <= 2) {
+                year--;
+                month += 12;
+            }
+            const A = Math.floor(year / 100);
+            const B = 2 - A + Math.floor(A / 4);
+            const julianDay = Math.floor(365.25 * (year + 4716)) + Math.floor(30.6001 * (month + 1)) + day + B - 1524.5;
+            return julianDay;
         }
 
         function formatTime(jd) {
