@@ -65,15 +65,12 @@
                 const date = new Date(Date.UTC(year, month - 1, day));
                 const jd = calculateJulianDay(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate());
 
-                // Calcola la posizione di Mercurio usando ST_ASTRO
-                const mercuryCoords = getMercuryPosition(jd, latitude, longitude);
+                const mercuryCoords = getMercuryPosition(jd);
 
                 if (!mercuryCoords) continue;
 
-                const riseSetTransit = A.Rise.approxTimes({
-                    lat: latitude * (Math.PI / 180),
-                    lng: longitude * (Math.PI / 180)
-                }, -0.833, calculateSiderealTime(date), mercuryCoords);
+                // Calcola la levata, culminazione e tramonto usando ST_ASTRO_DATA
+                const riseSetTransit = calculateRiseSetTransit(jd, mercuryCoords, longitude, latitude);
 
                 if (riseSetTransit) {
                     const riseLocal = formatTime(riseSetTransit.rise);
@@ -102,15 +99,25 @@
             return Math.floor(365.25 * (year + 4716)) + Math.floor(30.6001 * (month + 1)) + day + B - 1524.5;
         }
 
-        function getMercuryPosition(jd, latitude, longitude) {
+        function getMercuryPosition(jd) {
             // Usa ST_ASTRO per calcolare la posizione di Mercurio
             const np = 0; // Mercurio
             const altitude = 0; // Non necessario, puoi impostarlo a zero
-            const datiAst = ST_ASTRO(np, jd, longitude, latitude, altitude);
-            
+            const datiAst = ST_ASTRO(np, jd, longitude, latitude, altitude, 0); // Raggio a zero per Mercurio
+
             return {
-                azimut: datiAst[0], // Azimut
-                altitude: datiAst[1] // Altitudine
+                ar: datiAst[0], // Ascensione retta
+                de: datiAst[1] // Declinatione
+            };
+        }
+
+        function calculateRiseSetTransit(jd, mercuryCoords, longitude, latitude) {
+            const njd = Math.floor(jd); // Numero giuliano intero
+            const riseData = ST_ASTRO_DATA(njd, mercuryCoords.ar, mercuryCoords.de, longitude, latitude, 0); // Altitudine a zero
+            return {
+                rise: riseData[2],    // Tempo di levata
+                transit: riseData[3], // Tempo di culminazione
+                set: riseData[4]      // Tempo di tramonto
             };
         }
 
@@ -118,10 +125,6 @@
             if (isNaN(seconds)) return "N/A";
             const date = new Date(seconds * 1000);
             return date.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
-        }
-
-        function calculateSiderealTime(date) {
-            return 86400 * (date.getUTCHours() / 24);
         }
 
         function downloadTableAsCSV() {
