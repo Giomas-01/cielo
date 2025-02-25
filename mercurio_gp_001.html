@@ -84,30 +84,9 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             console.log("Script caricato correttamente");
-
-            if (typeof A === "undefined") {
-                console.error("Errore: A non è definito. Controlla che il file astronomy.js sia caricato correttamente.");
-                return;
-            }
-
-            console.log("Modulo A trovato:", A);
-            console.log("Metodi disponibili in A:", Object.keys(A)); // Debug: vedere tutti i metodi
-
-            // Controllo specifico per Planets
-            if (A.Planets) {
-                console.log("Modulo Planets trovato:", A.Planets);
-                console.log("Metodi disponibili in Planets:", Object.keys(A.Planets));
-            } else {
-                console.error("Errore: A.Planets non è definito.");
-            }
         });
 
         function calculateMercuryEphemerides() {
-            if (typeof A === "undefined") {
-                alert("Errore: Il modulo A non è disponibile.");
-                return;
-            }
-
             const latitude = parseFloat(document.getElementById('latitude').value);
             const longitude = parseFloat(document.getElementById('longitude').value);
             const monthYearInput = document.getElementById('monthYear').value;
@@ -136,15 +115,12 @@
 
                 console.log(`JD per ${date.toISOString()}:`, jd);
 
-                if (typeof A.Planets.mercury !== "function") {
-                    console.error("Errore: La funzione A.Planets.mercury non è disponibile.");
-                    return;
-                }
-                
-                const mercuryCoords = A.Planets.mercury(jd);
+                // Calcola le coordinate di Mercurio
+                const mercuryCoords = Astronomy.Mercury(jd);
                 console.log("Coordinate Mercurio:", mercuryCoords);
 
-                const riseSetTransit = A.RiseSetTransit(jd, latitude, longitude, mercuryCoords.RA, mercuryCoords.DEC);
+                // Calcola i tempi di levata, culminazione e tramonto
+                const riseSetTransit = Astronomy.RiseSetTransit(jd, latitude, longitude, mercuryCoords.RA, mercuryCoords.Dec);
                 console.log("Orari Levata, Culminazione, Tramonto:", riseSetTransit);
 
                 const riseLocal = formatTime(riseSetTransit.rise);
@@ -175,7 +151,7 @@
 
         function formatTime(jd) {
             if (isNaN(jd)) return "N/A";
-            const date = A.JulianDay.jdToDate(jd); // Usa jdToDate per convertire JD in data
+            const date = Astronomy.JDToDate(jd); // Usa JDToDate per convertire JD in data
             return date.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
         }
 
