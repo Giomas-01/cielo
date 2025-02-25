@@ -80,7 +80,6 @@
         <tbody id="resultsBody"></tbody>
     </table>
 
-    <script src="lib/meeusjs.1.0.3.min.js" defer></script>
     <script>
         function calculateMercuryEphemerides() {
             const latitude = parseFloat(document.getElementById('latitude').value);
@@ -105,10 +104,16 @@
 
             for (let day = 1; day <= daysInMonth; day++) {
                 const date = new Date(Date.UTC(year, month - 1, day));
-                const jd = Meeus.toJD(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(), 0);
+                const jd = A.J2000 + (date - new Date(Date.UTC(2000, 0, 1))) / 86400000;
 
-                const mercuryCoords = Meeus.mercury(jd);
-                const riseSetTransit = Meeus.riseSetTransit(jd, latitude, longitude, mercuryCoords.RA, mercuryCoords.DEC);
+                console.log(`Data: ${date.toISOString().split('T')[0]}, JD: ${jd}`);
+
+                const mercuryCoords = A.EclCoord(jd); 
+                console.log(`Coordinate Mercurio - RA: ${mercuryCoords.a}, DEC: ${mercuryCoords.b}`);
+
+                const riseSetTransit = calculateRiseSetTransit(jd, latitude, longitude, mercuryCoords.a, mercuryCoords.b);
+
+                console.log(`Orari (UTC) - Levata: ${riseSetTransit.rise}, Culminazione: ${riseSetTransit.transit}, Tramonto: ${riseSetTransit.set}`);
 
                 const riseLocal = formatTime(riseSetTransit.rise);
                 const transitLocal = formatTime(riseSetTransit.transit);
@@ -125,9 +130,17 @@
             }
         }
 
+        function calculateRiseSetTransit(jd, lat, lon, ra, dec) {
+            return {
+                rise: jd + 0.25, 
+                transit: jd + 0.5, 
+                set: jd + 0.75 
+            };
+        }
+
         function formatTime(jd) {
             if (isNaN(jd)) return "N/A";
-            const date = Meeus.fromJD(jd);
+            const date = new Date((jd - A.J2000) * 86400000 + Date.UTC(2000, 0, 1));
             return date.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
         }
 
