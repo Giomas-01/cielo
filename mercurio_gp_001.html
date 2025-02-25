@@ -53,6 +53,7 @@
             }
 
             const [month, year] = monthYearInput.split('-').map(Number);
+            console.log("Mese:", month, "Anno:", year);
             if (isNaN(month) || isNaN(year) || month < 1 || month > 12) {
                 alert("Inserisci un mese e un anno validi nel formato MM-YYYY.");
                 return;
