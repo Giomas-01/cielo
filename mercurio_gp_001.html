@@ -39,6 +39,7 @@
 
     <script src="lib/Astro.js" defer></script>
     <script src="lib/Astro.Rise.js" defer></script>
+    <script src="lib/astrojs.js" defer></script> <!-- Includi il file astrojs.js -->
     <script>
         var A = A || {}; // Assicura che A sia definito
 
@@ -116,7 +117,7 @@
                 return null;
             }
 
-            const mercuryPosition = A.Planet.position(jd, A.Planet.mercury);
+            const mercuryPosition = A.Planet.position(jd, 'Mercury'); // Modifica qui per utilizzare il file astrojs.js
             return {
                 ra: mercuryPosition.ra,
                 dec: mercuryPosition.dec
