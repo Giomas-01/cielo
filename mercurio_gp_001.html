@@ -80,13 +80,13 @@
         <tbody id="resultsBody"></tbody>
     </table>
 
-    <script src="lib/meeusjs.1.0.3.min.js" defer></script>
+    <script src="lib/astronomy.js" defer></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             console.log("Script caricato correttamente");
 
             if (typeof A === "undefined") {
-                console.error("Errore: A non è definito. Controlla che il file meeusjs.1.0.3.min.js sia caricato correttamente.");
+                console.error("Errore: A non è definito. Controlla che il file astronomy.js sia caricato correttamente.");
                 return;
             }
 
@@ -99,13 +99,6 @@
                 console.log("Metodi disponibili in Planets:", Object.keys(A.Planets));
             } else {
                 console.error("Errore: A.Planets non è definito.");
-            }
-
-            // Controllo specifico per JulianDay
-            if (A.JulianDay) {
-                console.log("Metodi disponibili in JulianDay:", Object.keys(A.JulianDay));
-            } else {
-                console.error("Errore: A.JulianDay non è definito.");
             }
         });
 
