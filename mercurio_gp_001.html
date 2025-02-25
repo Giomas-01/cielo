@@ -65,6 +65,9 @@
                 const date = new Date(Date.UTC(year, month - 1, day));
                 const jd = calculateJulianDay(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate());
 
+                // Debug: controlla il JD calcolato
+                console.log(`Data: ${date.toLocaleDateString('it-IT')}, JD: ${jd}`); 
+
                 const mercuryCoords = getMercuryPosition(jd);
 
                 if (!mercuryCoords) continue;
@@ -102,13 +105,21 @@
         }
 
         function getMercuryPosition(jd) {
-            // Usa ST_ASTRO per calcolare la posizione di Mercurio
             const np = 0; // Mercurio
             const altitude = 0; // Non necessario, puoi impostarlo a zero
+            
+            // Aggiungi stampe di debug per i parametri
+            console.log(`Chiamata a ST_ASTRO con JD: ${jd}, LON: ${longitude}, LAT: ${latitude}`);
+
             const datiAst = ST_ASTRO(np, jd, longitude, latitude, altitude, 0); // Raggio a zero per Mercurio
 
             // Assicurati che i dati restituiti siano validi
             console.log(`Posizione Mercurio (AR, DE): ${datiAst[0]}, ${datiAst[1]}`); // Debug
+
+            if (isNaN(datiAst[0]) || isNaN(datiAst[1])) {
+                console.error("Errore nel calcolo della posizione di Mercurio");
+                return null; // Se non è valido, ritorna null
+            }
 
             return {
                 ar: datiAst[0], // Ascensione retta
@@ -118,6 +129,10 @@
 
         function calculateRiseSetTransit(jd, mercuryCoords, longitude, latitude) {
             const njd = Math.floor(jd); // Numero giuliano intero
+            
+            // Aggiungi stampe di debug per i parametri
+            console.log(`Chiamata a ST_ASTRO_DATA con NJD: ${njd}, AR: ${mercuryCoords.ar}, DE: ${mercuryCoords.de}, LONG: ${longitude}, LAT: ${latitude}`);
+
             const riseData = ST_ASTRO_DATA(njd, mercuryCoords.ar, mercuryCoords.de, longitude, latitude, 0); // Altitudine a zero
 
             console.log(`Dati di ST_ASTRO_DATA: ${riseData}`); // Debug
