@@ -10,22 +10,82 @@
             font-family: Arial, sans-serif;
             text-align: center;
             margin: 20px;
+            background-color: #f5f5f5;
         }
+
         .container {
-            margin-bottom: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+            text-align: left;
+            width: 30%;  /* Ridotto a circa 1/3 della larghezza attuale */
+            min-width: 250px; /* Evita che diventi troppo stretto su schermi piccoli */
         }
-        table {
+
+        .container label {
+            font-weight: bold;
+        }
+
+        .container input, .container select {
             width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        th, td {
-            border: 1px solid black;
             padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
             text-align: center;
         }
+
         th {
-            background-color: #f2f2f2;
+            background-color: #007bff;
+            color: white;
+        }
+
+        td {
+            background-color: #f9f9f9;
+        }
+
+        #downloadButton {
+            margin-top: 10px;
+            background-color: #28a745;
+            width: 100px; /* Imposta la larghezza a 100px */
+            padding: 10px;
+        }
+
+        #downloadButton:hover {
+            background-color: #218838;
         }
     </style>
 </head>
@@ -33,17 +93,16 @@
     <h1>Effemeridi Mensili di Mercurio</h1>
     <div class="container">
         <label for="latitude">Latitudine:</label>
-        <input type="number" id="latitude" placeholder="Es. 45.28" required><br>
+        <input type="number" id="latitude" placeholder="Es. 45.28" required>
 
         <label for="longitude">Longitudine:</label>
-        <input type="number" id="longitude" placeholder="Es. 9.12" required><br>
+        <input type="number" id="longitude" placeholder="Es. 9.12" required>
 
         <label for="monthYear">Mese-Anno (MM-YYYY):</label>
-        <input type="text" id="monthYear" placeholder="Es. 02-2025" required><br>
+        <input type="text" id="monthYear" placeholder="Es. 02-2025" required>
 
         <label for="timezone">Ora locale (UTC):</label>
         <select id="timezone">
-            <!-- Generiamo le opzioni da -12 a +14 -->
             <script>
                 for (let i = -12; i <= 14; i++) {
                     let option = document.createElement("option");
@@ -52,12 +111,12 @@
                     document.write(option.outerHTML);
                 }
             </script>
-        </select><br>
+        </select>
 
         <button onclick="calculateMercuryEphemerides()">Calcola</button>
     </div>
 
-    <button id="downloadButton" onclick="downloadTableAsCSV()">Scarica Tabella come CSV</button>
+    <button id="downloadButton" onclick="downloadTableAsCSV()">CSV</button>
 
     <table id="ephemeridesTable">
         <thead>
@@ -92,8 +151,6 @@
                 return;
             }
 
-            console.log("Mese:", month, "Anno:", year, "Fuso orario:", timezoneOffset);
-
             const resultsBody = document.getElementById('resultsBody');
             resultsBody.innerHTML = '';
 
@@ -101,29 +158,13 @@
 
             for (let day = 1; day <= daysInMonth; day++) {
                 const date = new Date(Date.UTC(year, month - 1, day));
-                const jd = calculateJulianDay(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate());
-                console.log(`Data: ${date.toLocaleDateString('it-IT')}, JD: ${jd}`);
+                const jd = calculateJulianDay(year, month, day);
 
                 const mercuryCoords = getMercuryPosition(jd);
-                if (!mercuryCoords) {
-                    console.error("Errore nel calcolo della posizione di Mercurio");
-                    continue;
-                }
+                if (!mercuryCoords) continue;
 
-                console.log(`Posizione Mercurio (AR, DE): ${mercuryCoords.ra}, ${mercuryCoords.dec}`);
-
-                const eclCoord = {
-                    lat: latitude,
-                    lng: longitude
-                };
-
-                const alt = 0;
-                const raggio = 0;
-
-                const riseSetTransit = ST_ASTRO_DATA(jd, mercuryCoords.ra, mercuryCoords.dec, longitude, latitude, alt, raggio);
+                const riseSetTransit = ST_ASTRO_DATA(jd, mercuryCoords.ra, mercuryCoords.dec, longitude, latitude, 0, 0);
                 if (riseSetTransit) {
-                    console.log(`Dati di ST_ASTRO_DATA: ${riseSetTransit}`);
-
                     const riseLocal = adjustTime(riseSetTransit[2], timezoneOffset);
                     const transitLocal = adjustTime(riseSetTransit[3], timezoneOffset);
                     const setLocal = adjustTime(riseSetTransit[4], timezoneOffset);
@@ -151,21 +192,9 @@
         }
 
         function getMercuryPosition(jd) {
-            if (typeof pos_pianeti !== "function") {
-                console.error("Errore: pos_pianeti non è definita.");
-                return null;
-            }
-
+            if (typeof pos_pianeti !== "function") return null;
             const mercuryData = pos_pianeti(jd, 0);
-            if (!mercuryData || mercuryData.length < 2) {
-                console.error("Dati non validi da pos_pianeti");
-                return null;
-            }
-
-            return {
-                ra: mercuryData[0],
-                dec: mercuryData[1]
-            };
+            return mercuryData ? { ra: mercuryData[0], dec: mercuryData[1] } : null;
         }
 
         function adjustTime(hours, offset) {
@@ -173,36 +202,18 @@
             let adjustedHours = hours + offset;
             if (adjustedHours < 0) adjustedHours += 24;
             if (adjustedHours >= 24) adjustedHours -= 24;
-
-            const totalMinutes = Math.round(adjustedHours * 60);
-            const hh = Math.floor(totalMinutes / 60);
-            const mm = totalMinutes % 60;
-            return `${hh.toString().padStart(2, '0')}:${mm.toString().padStart(2, '0')}`;
+            return `${Math.floor(adjustedHours).toString().padStart(2, '0')}:${Math.round((adjustedHours % 1) * 60).toString().padStart(2, '0')}`;
         }
 
         function downloadTableAsCSV() {
-            const table = document.getElementById('ephemeridesTable');
-            const rows = table.querySelectorAll('tr');
-
-            const headers = Array.from(rows[0].cells).map(cell => cell.textContent);
-            const data = [];
-            for (let i = 1; i < rows.length; i++) {
-                const rowData = Array.from(rows[i].cells).map(cell => cell.textContent);
-                data.push(rowData.join(','));
-            }
-
-            const csvContent = [headers.join(','), ...data].join('\n');
-
+            const rows = [...document.querySelectorAll('#ephemeridesTable tr')];
+            const csvContent = rows.map(row => [...row.cells].map(cell => cell.textContent).join(',')).join('\n');
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
-
             const a = document.createElement('a');
-            a.setAttribute('hidden', true);
-            a.setAttribute('href', url);
-            a.setAttribute('download', 'mercury_ephemerides.csv');
-            document.body.appendChild(a);
+            a.href = url;
+            a.download = 'mercurio_effemeridi.csv';
             a.click();
-            document.body.removeChild(a);
         }
     </script>
 </body>
