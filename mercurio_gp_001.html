@@ -89,8 +89,9 @@
                 console.error("Errore: A non è definito. Controlla che il file meeusjs.1.0.3.min.js sia caricato correttamente.");
                 return;
             }
-            
+
             console.log("Modulo A trovato:", A);
+            console.log("Metodi disponibili in A:", Object.keys(A)); // Debug: vedere tutti i metodi
         });
 
         function calculateMercuryEphemerides() {
@@ -121,11 +122,11 @@
 
             for (let day = 1; day <= daysInMonth; day++) {
                 const date = new Date(Date.UTC(year, month - 1, day));
-                const jd = A.JD(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(), 0);
+                const jd = A.JulianDay.toJD(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(), 0);
 
                 console.log(`JD per ${date.toISOString()}:`, jd);
 
-                const mercuryCoords = A.Mercury(jd);
+                const mercuryCoords = A.Planets.mercury(jd);
                 console.log("Coordinate Mercurio:", mercuryCoords);
 
                 const riseSetTransit = A.RiseSetTransit(jd, latitude, longitude, mercuryCoords.RA, mercuryCoords.DEC);
@@ -148,7 +149,7 @@
 
         function formatTime(jd) {
             if (isNaN(jd)) return "N/A";
-            const date = A.fromJD(jd);
+            const date = A.JulianDay.fromJD(jd);
             return date.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
         }
 
