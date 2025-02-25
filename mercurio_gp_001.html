@@ -40,8 +40,6 @@
     <script src="lib/Astro.js" defer></script>
     <script src="lib/astrojs.js" defer></script>
     <script>
-        var A = A || {}; // Assicura che A sia definito
-
         function calculateMercuryEphemerides() {
             const latitude = parseFloat(document.getElementById('latitude').value);
             const longitude = parseFloat(document.getElementById('longitude').value);
@@ -58,8 +56,6 @@
                 return;
             }
 
-            console.log("Mese:", month, "Anno:", year);
-
             const resultsBody = document.getElementById('resultsBody');
             resultsBody.innerHTML = '';
 
@@ -68,41 +64,31 @@
             for (let day = 1; day <= daysInMonth; day++) {
                 const date = new Date(Date.UTC(year, month - 1, day));
                 const jd = calculateJulianDay(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate());
-                const mercuryCoords = getMercuryPosition(jd);
+
+                // Calcola la posizione di Mercurio usando ST_ASTRO
+                const mercuryCoords = getMercuryPosition(jd, latitude, longitude);
 
                 if (!mercuryCoords) continue;
 
-                console.log(`Mercurio JD ${jd}: ra = ${mercuryCoords.ra}, dec = ${mercuryCoords.dec}`);
+                const riseSetTransit = A.Rise.approxTimes({
+                    lat: latitude * (Math.PI / 180),
+                    lng: longitude * (Math.PI / 180)
+                }, -0.833, calculateSiderealTime(date), mercuryCoords);
 
-                // Coordinate in gradi decimali
-                const eclCoord = {
-                    lat: latitude,
-                    lng: longitude
-                };
+                if (riseSetTransit) {
+                    const riseLocal = formatTime(riseSetTransit.rise);
+                    const transitLocal = formatTime(riseSetTransit.transit);
+                    const setLocal = formatTime(riseSetTransit.set);
 
-                // Ottieni i dati dall'astro
-                const dati_ast = ST_ASTRO(mercuryCoords.ra, mercuryCoords.dec, longitude, latitude, 0, 0.25);
-
-                // Trasformazione degli Istanti, da T.U. a Tempo Locale
-                const t_locale = -fuso_loc(); // Calcola il fuso orario locale
-
-                const sorge = ore_24(dati_ast[2] + t_locale); // Sorgere
-                const transita = ore_24(dati_ast[3] + t_locale); // Transito
-                const tramonta = ore_24(dati_ast[4] + t_locale); // Tramonto
-
-                // Formattazione dei risultati
-                const riseLocal = formatTime(sorge);
-                const transitLocal = formatTime(transita);
-                const setLocal = formatTime(tramonta);
-
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${date.toLocaleDateString('it-IT')}</td>
-                    <td>${riseLocal}</td>
-                    <td>${transitLocal}</td>
-                    <td>${setLocal}</td>
-                `;
-                resultsBody.appendChild(row);
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${date.toLocaleDateString('it-IT')}</td>
+                        <td>${riseLocal}</td>
+                        <td>${transitLocal}</td>
+                        <td>${setLocal}</td>
+                    `;
+                    resultsBody.appendChild(row);
+                }
             }
         }
 
@@ -116,16 +102,15 @@
             return Math.floor(365.25 * (year + 4716)) + Math.floor(30.6001 * (month + 1)) + day + B - 1524.5;
         }
 
-        function getMercuryPosition(jd) {
-            if (typeof A.Planet === "undefined" || typeof A.Planet.position !== "function") {
-                console.error("Errore: A.Planet.position non è definita. Assicurati che astrojs.js sia caricato.");
-                return null;
-            }
-
-            const mercuryPosition = A.Planet.position(jd, A.Planet.mercury);
+        function getMercuryPosition(jd, latitude, longitude) {
+            // Usa ST_ASTRO per calcolare la posizione di Mercurio
+            const np = 0; // Mercurio
+            const altitude = 0; // Non necessario, puoi impostarlo a zero
+            const datiAst = ST_ASTRO(np, jd, longitude, latitude, altitude);
+            
             return {
-                ra: mercuryPosition.ra,
-                dec: mercuryPosition.dec
+                azimut: datiAst[0], // Azimut
+                altitude: datiAst[1] // Altitudine
             };
         }
 
@@ -135,11 +120,8 @@
             return date.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
         }
 
-        function ore_24(time) {
-            // Assicurati che questo gestisca correttamente l'intervallo di tempo
-            while (time < 0) time += 24;
-            while (time >= 24) time -= 24;
-            return time;
+        function calculateSiderealTime(date) {
+            return 86400 * (date.getUTCHours() / 24);
         }
 
         function downloadTableAsCSV() {
