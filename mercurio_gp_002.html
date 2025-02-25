@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Effemeridi Mensili di Mercurio</title>
+    <style>
+        /* Stili CSS */
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+        .container {
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Effemeridi Mensili di Mercurio</h1>
+    <div class="container">
+        <label for="latitude">Latitudine:</label>
+        <input type="number" id="latitude" placeholder="Es. 45.28" required><br>
+
+        <label for="longitude">Longitudine:</label>
+        <input type="number" id="longitude" placeholder="Es. 9.12" required><br>
+
+        <label for="monthYear">Mese-Anno (MM-YYYY):</label>
+        <input type="text" id="monthYear" placeholder="Es. 02-2025" required><br>
+
+        <label for="timezone">Ora locale (UTC):</label>
+        <select id="timezone">
+            <!-- Generiamo le opzioni da -12 a +14 -->
+            <script>
+                for (let i = -12; i <= 14; i++) {
+                    let option = document.createElement("option");
+                    option.value = i;
+                    option.textContent = `UTC ${i >= 0 ? '+' : ''}${i}`;
+                    document.write(option.outerHTML);
+                }
+            </script>
+        </select><br>
+
+        <button onclick="calculateMercuryEphemerides()">Calcola</button>
+    </div>
+
+    <button id="downloadButton" onclick="downloadTableAsCSV()">Scarica Tabella come CSV</button>
+
+    <table id="ephemeridesTable">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Levata</th>
+                <th>Culminazione</th>
+                <th>Tramonto</th>
+            </tr>
+        </thead>
+        <tbody id="resultsBody"></tbody>
+    </table>
+
+    <script src="lib/Astro.js" defer></script>
+    <script src="lib/astrojs.js" defer></script>
+
+    <script>
+        function calculateMercuryEphemerides() {
+            const latitude = parseFloat(document.getElementById('latitude').value);
+            const longitude = parseFloat(document.getElementById('longitude').value);
+            const timezoneOffset = parseInt(document.getElementById('timezone').value, 10);
+            const monthYearInput = document.getElementById('monthYear').value;
+
+            if (isNaN(latitude) || isNaN(longitude) || isNaN(timezoneOffset) || !monthYearInput) {
+                alert("Inserisci valori validi per latitudine, longitudine, ora locale e mese-anno.");
+                return;
+            }
+
+            const [month, year] = monthYearInput.split('-').map(Number);
+            if (isNaN(month) || isNaN(year) || month < 1 || month > 12) {
+                alert("Inserisci un mese e un anno validi nel formato MM-YYYY.");
+                return;
+            }
+
+            console.log("Mese:", month, "Anno:", year, "Fuso orario:", timezoneOffset);
+
+            const resultsBody = document.getElementById('resultsBody');
+            resultsBody.innerHTML = '';
+
+            const daysInMonth = new Date(year, month, 0).getDate();
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(Date.UTC(year, month - 1, day));
+                const jd = calculateJulianDay(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate());
+                console.log(`Data: ${date.toLocaleDateString('it-IT')}, JD: ${jd}`);
+
+                const mercuryCoords = getMercuryPosition(jd);
+                if (!mercuryCoords) {
+                    console.error("Errore nel calcolo della posizione di Mercurio");
+                    continue;
+                }
+
+                console.log(`Posizione Mercurio (AR, DE): ${mercuryCoords.ra}, ${mercuryCoords.dec}`);
+
+                const eclCoord = {
+                    lat: latitude,
+                    lng: longitude
+                };
+
+                const alt = 0;
+                const raggio = 0;
+
+                const riseSetTransit = ST_ASTRO_DATA(jd, mercuryCoords.ra, mercuryCoords.dec, longitude, latitude, alt, raggio);
+                if (riseSetTransit) {
+                    console.log(`Dati di ST_ASTRO_DATA: ${riseSetTransit}`);
+
+                    const riseLocal = adjustTime(riseSetTransit[2], timezoneOffset);
+                    const transitLocal = adjustTime(riseSetTransit[3], timezoneOffset);
+                    const setLocal = adjustTime(riseSetTransit[4], timezoneOffset);
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${date.toLocaleDateString('it-IT')}</td>
+                        <td>${riseLocal}</td>
+                        <td>${transitLocal}</td>
+                        <td>${setLocal}</td>
+                    `;
+                    resultsBody.appendChild(row);
+                }
+            }
+        }
+
+        function calculateJulianDay(year, month, day) {
+            if (month <= 2) {
+                year--;
+                month += 12;
+            }
+            const A = Math.floor(year / 100);
+            const B = 2 - A + Math.floor(A / 4);
+            return Math.floor(365.25 * (year + 4716)) + Math.floor(30.6001 * (month + 1)) + day + B - 1524.5;
+        }
+
+        function getMercuryPosition(jd) {
+            if (typeof pos_pianeti !== "function") {
+                console.error("Errore: pos_pianeti non è definita.");
+                return null;
+            }
+
+            const mercuryData = pos_pianeti(jd, 0);
+            if (!mercuryData || mercuryData.length < 2) {
+                console.error("Dati non validi da pos_pianeti");
+                return null;
+            }
+
+            return {
+                ra: mercuryData[0],
+                dec: mercuryData[1]
+            };
+        }
+
+        function adjustTime(hours, offset) {
+            if (isNaN(hours)) return "N/A";
+            let adjustedHours = hours + offset;
+            if (adjustedHours < 0) adjustedHours += 24;
+            if (adjustedHours >= 24) adjustedHours -= 24;
+
+            const totalMinutes = Math.round(adjustedHours * 60);
+            const hh = Math.floor(totalMinutes / 60);
+            const mm = totalMinutes % 60;
+            return `${hh.toString().padStart(2, '0')}:${mm.toString().padStart(2, '0')}`;
+        }
+
+        function downloadTableAsCSV() {
+            const table = document.getElementById('ephemeridesTable');
+            const rows = table.querySelectorAll('tr');
+
+            const headers = Array.from(rows[0].cells).map(cell => cell.textContent);
+            const data = [];
+            for (let i = 1; i < rows.length; i++) {
+                const rowData = Array.from(rows[i].cells).map(cell => cell.textContent);
+                data.push(rowData.join(','));
+            }
+
+            const csvContent = [headers.join(','), ...data].join('\n');
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.setAttribute('hidden', true);
+            a.setAttribute('href', url);
+            a.setAttribute('download', 'mercury_ephemerides.csv');
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    </script>
+</body>
+</html>
