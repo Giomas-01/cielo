@@ -36,11 +36,6 @@
             border-radius: 5px;
         }
 
-        .button-container {
-            display: flex;
-            justify-content: space-between;
-        }
-
         button {
             background-color: #007bff;
             color: white;
@@ -49,7 +44,7 @@
             font-size: 16px;
             border-radius: 5px;
             cursor: pointer;
-            width: 48%;
+            width: 100%;
         }
 
         button:hover {
@@ -58,6 +53,15 @@
 
         .csv-button {
             background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            display: block;
+            width: 100%;
         }
 
         .csv-button:hover {
@@ -114,10 +118,8 @@
             </script>
         </select>
 
-        <div class="button-container">
-            <button onclick="calculateVenusEphemerides()">Calcola</button>
-            <button class="csv-button" onclick="exportToCSV()">CSV</button>
-        </div>
+        <button onclick="calculateVenusEphemerides()">Calcola</button>
+        <button class="csv-button" onclick="exportToCSV()">CSV</button>
     </div>
 
     <table id="ephemeridesTable">
@@ -132,15 +134,18 @@
         <tbody id="resultsBody"></tbody>
     </table>
 
+    <script src="lib/Astro.js" defer></script>
+    <script src="lib/astrojs.js" defer></script>
     <script>
         function exportToCSV() {
             let table = document.getElementById("ephemeridesTable");
             let rows = table.querySelectorAll("tr");
             let csvContent = "";
             rows.forEach(row => {
-                let cells = row.querySelectorAll("th, td");
                 let rowData = [];
-                cells.forEach(cell => rowData.push(cell.innerText));
+                row.querySelectorAll("th, td").forEach(cell => {
+                    rowData.push(cell.textContent.trim());
+                });
                 csvContent += rowData.join(",") + "\n";
             });
             let blob = new Blob([csvContent], { type: "text/csv" });
