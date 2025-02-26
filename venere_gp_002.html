@@ -36,6 +36,11 @@
             border-radius: 5px;
         }
 
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+        }
+
         button {
             background-color: #007bff;
             color: white;
@@ -44,7 +49,7 @@
             font-size: 16px;
             border-radius: 5px;
             cursor: pointer;
-            width: 100%;
+            width: 48%;
         }
 
         button:hover {
@@ -53,13 +58,6 @@
 
         .csv-button {
             background-color: #28a745;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            font-size: 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            width: 100%;
         }
 
         .csv-button:hover {
@@ -116,10 +114,11 @@
             </script>
         </select>
 
-        <button onclick="calculateVenusEphemerides()">Calcola</button>
+        <div class="button-container">
+            <button onclick="calculateVenusEphemerides()">Calcola</button>
+            <button class="csv-button" onclick="exportToCSV()">CSV</button>
+        </div>
     </div>
-
-    <button class="csv-button" onclick="downloadTableAsCSV()">CSV</button>
 
     <table id="ephemeridesTable">
         <thead>
@@ -133,59 +132,24 @@
         <tbody id="resultsBody"></tbody>
     </table>
 
-    <script src="lib/Astro.js" defer></script>
-    <script src="lib/astrojs.js" defer></script>
     <script>
-        function calculateVenusEphemerides() {
-            const latitude = parseFloat(document.getElementById('latitude').value);
-            const longitude = parseFloat(document.getElementById('longitude').value);
-            const timezoneOffset = parseInt(document.getElementById('timezone').value, 10);
-            const monthYearInput = document.getElementById('monthYear').value;
-
-            if (isNaN(latitude) || isNaN(longitude) || isNaN(timezoneOffset) || !monthYearInput) {
-                alert("Inserisci valori validi per latitudine, longitudine, ora locale e mese-anno.");
-                return;
-            }
-
-            const [month, year] = monthYearInput.split('-').map(Number);
-            if (isNaN(month) || isNaN(year) || month < 1 || month > 12) {
-                alert("Inserisci un mese e un anno validi nel formato MM-YYYY.");
-                return;
-            }
-
-            const resultsBody = document.getElementById('resultsBody');
-            resultsBody.innerHTML = '';
-
-            const daysInMonth = new Date(year, month, 0).getDate();
-
-            for (let day = 1; day <= daysInMonth; day++) {
-                const jd = calculateJulianDay(year, month, day);
-                const venusCoords = getPlanetPosition(jd, 1);
-                if (!venusCoords) continue;
-
-                const riseSetTransit = ST_ASTRO_DATA(jd, venusCoords.ra, venusCoords.dec, longitude, latitude, 0, 0);
-                if (riseSetTransit) {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${day}-${month}-${year}</td>
-                        <td>${adjustTime(riseSetTransit[2], timezoneOffset)}</td>
-                        <td>${adjustTime(riseSetTransit[3], timezoneOffset)}</td>
-                        <td>${adjustTime(riseSetTransit[4], timezoneOffset)}</td>
-                    `;
-                    resultsBody.appendChild(row);
-                }
-            }
-        }
-
-        function downloadTableAsCSV() {
-            const rows = [...document.querySelectorAll('#ephemeridesTable tr')];
-            const csvContent = rows.map(row => [...row.cells].map(cell => cell.textContent).join(',')).join('\n');
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'venere_effemeridi.csv';
-            a.click();
+        function exportToCSV() {
+            let table = document.getElementById("ephemeridesTable");
+            let rows = table.querySelectorAll("tr");
+            let csvContent = "";
+            rows.forEach(row => {
+                let cells = row.querySelectorAll("th, td");
+                let rowData = [];
+                cells.forEach(cell => rowData.push(cell.innerText));
+                csvContent += rowData.join(",") + "\n";
+            });
+            let blob = new Blob([csvContent], { type: "text/csv" });
+            let link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "effemeridi_venere.csv";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
     </script>
 </body>
