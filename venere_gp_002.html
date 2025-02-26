@@ -44,11 +44,21 @@
             font-size: 16px;
             border-radius: 5px;
             cursor: pointer;
-            width: 100%;
         }
 
         button:hover {
             background-color: #0056b3;
+        }
+
+        #csvButton {
+            background-color: #28a745;
+            margin-left: 10px;
+            padding: 8px 12px;
+            font-size: 14px;
+        }
+
+        #csvButton:hover {
+            background-color: #218838;
         }
 
         table {
@@ -102,9 +112,8 @@
         </select>
 
         <button onclick="calculateVenusEphemerides()">Calcola</button>
+        <button id="csvButton" onclick="downloadTableAsCSV()">CSV</button>
     </div>
-
-    <button id="downloadButton" onclick="downloadTableAsCSV()">CSV</button>
 
     <table id="ephemeridesTable">
         <thead>
