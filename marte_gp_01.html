@@ -102,7 +102,7 @@
         </select>
 
         <button onclick="calculateMarsEphemerides()">Calcola</button>
-        <button onclick="exportToCSV()" style="margin-top: 10px;">Esporta CSV</button>
+        <button onclick="exportToCSV()" style="margin-top: 10px; background-color: #28a745;">Esporta CSV</button>
     </div>
 
     <table id="ephemeridesTable">
@@ -120,6 +120,16 @@
     <script src="lib/Astro.js" defer></script>
     <script src="lib/astrojs.js" defer></script>
     <script>
+        function calculateJulianDay(year, month, day) {
+            if (month <= 2) {
+                year--;
+                month += 12;
+            }
+            const A = Math.floor(year / 100);
+            const B = 2 - A + Math.floor(A / 4);
+            return Math.floor(365.25 * (year + 4716)) + Math.floor(30.6001 * (month + 1)) + day + B - 1524.5;
+        }
+
         function calculateMarsEphemerides() {
             const latitude = parseFloat(document.getElementById('latitude').value);
             const longitude = parseFloat(document.getElementById('longitude').value);
@@ -163,17 +173,15 @@
 
         function exportToCSV() {
             let csvContent = "Data,Levata,Culminazione,Tramonto\n";
-            document.querySelectorAll("#resultsBody tr").forEach(row => {
-                let rowData = [];
-                row.querySelectorAll("td").forEach(cell => rowData.push(cell.textContent));
-                csvContent += rowData.join(",") + "\n";
+            document.querySelectorAll('#resultsBody tr').forEach(row => {
+                let rowData = Array.from(row.children).map(cell => cell.textContent).join(",");
+                csvContent += rowData + "\n";
             });
-
-            const blob = new Blob([csvContent], { type: "text/csv" });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = "effemeridi_marte.csv";
-            link.click();
+            let blob = new Blob([csvContent], { type: 'text/csv' });
+            let a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = "effemeridi_marte.csv";
+            a.click();
         }
     </script>
 </body>
