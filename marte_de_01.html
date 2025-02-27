@@ -1,1 +1,142 @@
-// deep
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Effemeridi Mensili di Marte</title>
+    <style>
+        /* Stili rimangono invariati */
+    </style>
+</head>
+<body>
+    <h1>Effemeridi Mensili di Marte</h1>
+    <div class="container">
+        <label for="latitude">Latitudine:</label>
+        <input type="number" id="latitude" placeholder="Es. 45.28" required>
+
+        <label for="longitude">Longitudine:</label>
+        <input type="number" id="longitude" placeholder="Es. 9.12" required>
+
+        <label for="monthYear">Mese-Anno (MM-YYYY):</label>
+        <input type="text" id="monthYear" placeholder="Es. 02-2025" required>
+
+        <label for="timezone">Ora locale (UTC):</label>
+        <select id="timezone">
+            <script>
+                for (let i = -12; i <= 14; i++) {
+                    let option = document.createElement("option");
+                    option.value = i;
+                    option.textContent = `UTC ${i >= 0 ? '+' : ''}${i}`;
+                    document.write(option.outerHTML);
+                }
+            </script>
+        </select>
+
+        <div class="button-container">
+            <button onclick="calculateMarsEphemerides()">Calcola</button>
+            <button class="csv-button" onclick="exportToCSV()">CSV</button>
+        </div>
+    </div>
+
+    <table id="ephemeridesTable">
+        <thead>
+            <tr>
+                <th>Data</th>
+                <th>Levata</th>
+                <th>Culminazione</th>
+                <th>Tramonto</th>
+            </tr>
+        </thead>
+        <tbody id="resultsBody"></tbody>
+    </table>
+
+    <script src="lib/Astro.js" defer></script>
+    <script src="lib/astrojs.js" defer></script>
+    <script>
+        function calculateMarsEphemerides() {
+            const latitude = parseFloat(document.getElementById('latitude').value);
+            const longitude = parseFloat(document.getElementById('longitude').value);
+            const timezoneOffset = parseInt(document.getElementById('timezone').value, 10);
+            const monthYearInput = document.getElementById('monthYear').value;
+
+            if (isNaN(latitude) || isNaN(longitude) || isNaN(timezoneOffset) || !monthYearInput) {
+                alert("Inserisci valori validi per latitudine, longitudine, ora locale e mese-anno.");
+                return;
+            }
+
+            const [month, year] = monthYearInput.split('-').map(Number);
+            if (isNaN(month) || isNaN(year) || month < 1 || month > 12) {
+                alert("Inserisci un mese e un anno validi nel formato MM-YYYY.");
+                return;
+            }
+
+            const resultsBody = document.getElementById('resultsBody');
+            resultsBody.innerHTML = '';
+
+            const daysInMonth = new Date(year, month, 0).getDate();
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const jd = calculateJulianDay(year, month, day);
+                const marsCoords = getPlanetPosition(jd, 3); // np = 3 per Marte
+                if (!marsCoords) continue;
+
+                const riseSetTransit = ST_ASTRO_DATA(jd, marsCoords.ra, marsCoords.dec, longitude, latitude, 0, 0);
+                if (riseSetTransit) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${day}-${month}-${year}</td>
+                        <td>${adjustTime(riseSetTransit[2], timezoneOffset)}</td>
+                        <td>${adjustTime(riseSetTransit[3], timezoneOffset)}</td>
+                        <td>${adjustTime(riseSetTransit[4], timezoneOffset)}</td>
+                    `;
+                    resultsBody.appendChild(row);
+                }
+            }
+        }
+
+        function exportToCSV() {
+            let table = document.getElementById("ephemeridesTable");
+            let rows = table.querySelectorAll("tr");
+            let csvContent = "";
+
+            rows.forEach(row => {
+                let rowData = [];
+                row.querySelectorAll("th, td").forEach(cell => {
+                    rowData.push(cell.innerText);
+                });
+                csvContent += rowData.join(";") + "\n";
+            });
+
+            let blob = new Blob([csvContent], { type: "text/csv" });
+            let link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "effemeridi_marte.csv"; // Cambia il nome del file
+            link.click();
+        }
+
+        function calculateJulianDay(year, month, day) {
+            if (month <= 2) {
+                year--;
+                month += 12;
+            }
+            const A = Math.floor(year / 100);
+            const B = 2 - A + Math.floor(A / 4);
+            return Math.floor(365.25 * (year + 4716)) + Math.floor(30.6001 * (month + 1)) + day + B - 1524.5;
+        }
+
+        function getPlanetPosition(jd, np) {
+            if (typeof pos_pianeti !== "function") return null;
+            const planetData = pos_pianeti(jd, np);
+            return planetData ? { ra: planetData[0], dec: planetData[1] } : null;
+        }
+
+        function adjustTime(hours, offset) {
+            if (isNaN(hours)) return "N/A";
+            let adjustedHours = hours + offset;
+            if (adjustedHours < 0) adjustedHours += 24;
+            if (adjustedHours >= 24) adjustedHours -= 24;
+            return `${Math.floor(adjustedHours).toString().padStart(2, '0')}:${Math.round((adjustedHours % 1) * 60).toString().padStart(2, '0')}`;
+        }
+    </script>
+</body>
+</html>
