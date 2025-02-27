@@ -45,6 +45,7 @@
             border-radius: 5px;
             cursor: pointer;
             width: 100%;
+            margin-top: 5px;
         }
 
         button:hover {
@@ -102,7 +103,7 @@
         </select>
 
         <button onclick="calculateMarsEphemerides()">Calcola</button>
-        <button onclick="exportToCSV()" style="margin-top: 10px; background-color: #28a745;">Esporta CSV</button>
+        <button onclick="exportToCSV()">Esporta CSV</button>
     </div>
 
     <table id="ephemeridesTable">
@@ -130,6 +131,12 @@
             return Math.floor(365.25 * (year + 4716)) + Math.floor(30.6001 * (month + 1)) + day + B - 1524.5;
         }
 
+        function getPlanetPosition(jd, np) {
+            if (typeof pos_pianeti !== "function") return null;
+            const planetData = pos_pianeti(jd, np);
+            return planetData ? { ra: planetData[0], dec: planetData[1] } : null;
+        }
+
         function calculateMarsEphemerides() {
             const latitude = parseFloat(document.getElementById('latitude').value);
             const longitude = parseFloat(document.getElementById('longitude').value);
@@ -142,11 +149,6 @@
             }
 
             const [month, year] = monthYearInput.split('-').map(Number);
-            if (isNaN(month) || isNaN(year) || month < 1 || month > 12) {
-                alert("Inserisci un mese e un anno validi nel formato MM-YYYY.");
-                return;
-            }
-
             const resultsBody = document.getElementById('resultsBody');
             resultsBody.innerHTML = '';
 
@@ -173,15 +175,14 @@
 
         function exportToCSV() {
             let csvContent = "Data,Levata,Culminazione,Tramonto\n";
-            document.querySelectorAll('#resultsBody tr').forEach(row => {
-                let rowData = Array.from(row.children).map(cell => cell.textContent).join(",");
-                csvContent += rowData + "\n";
+            document.querySelectorAll("#ephemeridesTable tbody tr").forEach(row => {
+                csvContent += Array.from(row.children).map(cell => cell.textContent).join(",") + "\n";
             });
-            let blob = new Blob([csvContent], { type: 'text/csv' });
-            let a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = "effemeridi_marte.csv";
-            a.click();
+            const blob = new Blob([csvContent], { type: "text/csv" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "effemeridi_marte.csv";
+            link.click();
         }
     </script>
 </body>
