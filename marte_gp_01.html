@@ -36,11 +36,6 @@
             border-radius: 5px;
         }
 
-        .button-container {
-            display: flex;
-            justify-content: space-between;
-        }
-
         button {
             background-color: #007bff;
             color: white;
@@ -49,19 +44,11 @@
             font-size: 16px;
             border-radius: 5px;
             cursor: pointer;
-            width: 48%;
+            width: 100%;
         }
 
         button:hover {
             background-color: #0056b3;
-        }
-
-        .csv-button {
-            background-color: #28a745;
-        }
-
-        .csv-button:hover {
-            background-color: #218838;
         }
 
         table {
@@ -114,10 +101,7 @@
             </script>
         </select>
 
-        <div class="button-container">
-            <button onclick="calculateMarsEphemerides()">Calcola</button>
-            <button class="csv-button" onclick="exportToCSV()">CSV</button>
-        </div>
+        <button onclick="calculateMarsEphemerides()">Calcola</button>
     </div>
 
     <table id="ephemeridesTable">
@@ -176,48 +160,18 @@
             }
         }
 
-        function exportToCSV() {
-            let table = document.getElementById("ephemeridesTable");
-            let rows = table.querySelectorAll("tr");
-            let csvContent = "";
-
-            rows.forEach(row => {
-                let rowData = [];
-                row.querySelectorAll("th, td").forEach(cell => {
-                    rowData.push(cell.innerText);
-                });
-                csvContent += rowData.join(";") + "\n";
-            });
-
-            let blob = new Blob([csvContent], { type: "text/csv" });
-            let link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = "effemeridi_marte.csv";
-            link.click();
-        }
-
-        function calculateJulianDay(year, month, day) {
-            if (month <= 2) {
-                year--;
-                month += 12;
-            }
-            const A = Math.floor(year / 100);
-            const B = 2 - A + Math.floor(A / 4);
-            return Math.floor(365.25 * (year + 4716)) + Math.floor(30.6001 * (month + 1)) + day + B - 1524.5;
-        }
-
-        function getPlanetPosition(jd, np) {
-            if (typeof pos_pianeti !== "function") return null;
-            const planetData = pos_pianeti(jd, np);
-            return planetData ? { ra: planetData[0], dec: planetData[1] } : null;
-        }
-
         function adjustTime(hours, offset) {
             if (isNaN(hours)) return "N/A";
             let adjustedHours = hours + offset;
-            if (adjustedHours < 0) adjustedHours += 24;
-            if (adjustedHours >= 24) adjustedHours -= 24;
-            return `${Math.floor(adjustedHours).toString().padStart(2, '0')}:${Math.round((adjustedHours % 1) * 60).toString().padStart(2, '0')}`;
+            let minutes = Math.round((adjustedHours % 1) * 60);
+
+            if (minutes === 60) {
+                adjustedHours += 1;
+                minutes = 0;
+            }
+
+            adjustedHours = Math.floor(adjustedHours) % 24;
+            return `${adjustedHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
         }
     </script>
 </body>
