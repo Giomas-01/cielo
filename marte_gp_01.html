@@ -102,6 +102,7 @@
         </select>
 
         <button onclick="calculateMarsEphemerides()">Calcola</button>
+        <button onclick="exportToCSV()" style="margin-top: 10px;">Esporta CSV</button>
     </div>
 
     <table id="ephemeridesTable">
@@ -160,18 +161,19 @@
             }
         }
 
-        function adjustTime(hours, offset) {
-            if (isNaN(hours)) return "N/A";
-            let adjustedHours = hours + offset;
-            let minutes = Math.round((adjustedHours % 1) * 60);
+        function exportToCSV() {
+            let csvContent = "Data,Levata,Culminazione,Tramonto\n";
+            document.querySelectorAll("#resultsBody tr").forEach(row => {
+                let rowData = [];
+                row.querySelectorAll("td").forEach(cell => rowData.push(cell.textContent));
+                csvContent += rowData.join(",") + "\n";
+            });
 
-            if (minutes === 60) {
-                adjustedHours += 1;
-                minutes = 0;
-            }
-
-            adjustedHours = Math.floor(adjustedHours) % 24;
-            return `${adjustedHours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+            const blob = new Blob([csvContent], { type: "text/csv" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "effemeridi_marte.csv";
+            link.click();
         }
     </script>
 </body>
