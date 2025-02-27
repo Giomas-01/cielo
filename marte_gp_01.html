@@ -36,6 +36,11 @@
             border-radius: 5px;
         }
 
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+        }
+
         button {
             background-color: #007bff;
             color: white;
@@ -44,12 +49,19 @@
             font-size: 16px;
             border-radius: 5px;
             cursor: pointer;
-            width: 100%;
-            margin-top: 5px;
+            width: 48%;
         }
 
         button:hover {
             background-color: #0056b3;
+        }
+
+        .csv-button {
+            background-color: #28a745;
+        }
+
+        .csv-button:hover {
+            background-color: #218838;
         }
 
         table {
@@ -102,8 +114,10 @@
             </script>
         </select>
 
-        <button onclick="calculateMarsEphemerides()">Calcola</button>
-        <button onclick="exportToCSV()">Esporta CSV</button>
+        <div class="button-container">
+            <button onclick="calculateMarsEphemerides()">Calcola</button>
+            <button class="csv-button" onclick="exportToCSV()">CSV</button>
+        </div>
     </div>
 
     <table id="ephemeridesTable">
@@ -121,22 +135,6 @@
     <script src="lib/Astro.js" defer></script>
     <script src="lib/astrojs.js" defer></script>
     <script>
-        function calculateJulianDay(year, month, day) {
-            if (month <= 2) {
-                year--;
-                month += 12;
-            }
-            const A = Math.floor(year / 100);
-            const B = 2 - A + Math.floor(A / 4);
-            return Math.floor(365.25 * (year + 4716)) + Math.floor(30.6001 * (month + 1)) + day + B - 1524.5;
-        }
-
-        function getPlanetPosition(jd, np) {
-            if (typeof pos_pianeti !== "function") return null;
-            const planetData = pos_pianeti(jd, np);
-            return planetData ? { ra: planetData[0], dec: planetData[1] } : null;
-        }
-
         function calculateMarsEphemerides() {
             const latitude = parseFloat(document.getElementById('latitude').value);
             const longitude = parseFloat(document.getElementById('longitude').value);
@@ -149,6 +147,11 @@
             }
 
             const [month, year] = monthYearInput.split('-').map(Number);
+            if (isNaN(month) || isNaN(year) || month < 1 || month > 12) {
+                alert("Inserisci un mese e un anno validi nel formato MM-YYYY.");
+                return;
+            }
+
             const resultsBody = document.getElementById('resultsBody');
             resultsBody.innerHTML = '';
 
@@ -171,18 +174,6 @@
                     resultsBody.appendChild(row);
                 }
             }
-        }
-
-        function exportToCSV() {
-            let csvContent = "Data,Levata,Culminazione,Tramonto\n";
-            document.querySelectorAll("#ephemeridesTable tbody tr").forEach(row => {
-                csvContent += Array.from(row.children).map(cell => cell.textContent).join(",") + "\n";
-            });
-            const blob = new Blob([csvContent], { type: "text/csv" });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = "effemeridi_marte.csv";
-            link.click();
         }
     </script>
 </body>
