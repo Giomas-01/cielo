@@ -111,10 +111,10 @@
 
             // Calcola gli eventi astronomici per l'anno specificato
             const events = [
-                { name: "Equinozio di Primavera", event: SunCalc.getSpringEquinox(year) },
-                { name: "Solstizio d'Estate", event: SunCalc.getSummerSolstice(year) },
-                { name: "Equinozio d'Autunno", event: SunCalc.getAutumnEquinox(year) },
-                { name: "Solstizio d'Inverno", event: SunCalc.getWinterSolstice(year) }
+                { name: "Equinozio di Primavera", event: findEquinoxOrSolstice(year, 0) }, // Declinazione 0 (equinozio di primavera)
+                { name: "Solstizio d'Estate", event: findEquinoxOrSolstice(year, 23.44) }, // Declinazione +23.44° (solstizio d'estate)
+                { name: "Equinozio d'Autunno", event: findEquinoxOrSolstice(year, 0) }, // Declinazione 0 (equinozio d'autunno)
+                { name: "Solstizio d'Inverno", event: findEquinoxOrSolstice(year, -23.44) } // Declinazione -23.44° (solstizio d'inverno)
             ];
 
             // Mostra i risultati nella tabella
@@ -128,6 +128,27 @@
                 `;
                 resultsBody.appendChild(row);
             });
+        }
+
+        function findEquinoxOrSolstice(year, targetDeclination) {
+            // Cerca il momento in cui la declinazione del Sole è uguale a targetDeclination
+            let date = new Date(Date.UTC(year, 2, 20)); // Inizia a marzo (equinozio di primavera)
+            let step = 24 * 60 * 60 * 1000; // Passo di 1 giorno
+            let precision = 0.01; // Precisione della declinazione
+
+            while (step > 1000) { // Fermati quando il passo è inferiore a 1 secondo
+                const declination = SunCalc.getPosition(date).declination * (180 / Math.PI); // Converti radianti in gradi
+                if (Math.abs(declination - targetDeclination) < precision) {
+                    break;
+                }
+                if (declination < targetDeclination) {
+                    date.setTime(date.getTime() + step);
+                } else {
+                    date.setTime(date.getTime() - step);
+                }
+                step /= 2; // Riduci il passo a metà
+            }
+            return date;
         }
 
         function formatDate(date) {
