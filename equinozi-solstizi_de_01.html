@@ -1,1 +1,147 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calcolo Equinozi e Solstizi</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
 
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+            text-align: left;
+            width: 30%;
+            min-width: 250px;
+        }
+
+        .container label {
+            font-weight: bold;
+        }
+
+        .container input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        td {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <h1>Calcolo Equinozi e Solstizi</h1>
+    <div class="container">
+        <label for="year">Anno:</label>
+        <input type="number" id="year" placeholder="Es. 2024" required>
+        <button onclick="calculateEvents()">Calcola</button>
+    </div>
+
+    <table id="resultsTable">
+        <thead>
+            <tr>
+                <th>Evento</th>
+                <th>Data</th>
+                <th>Ora (UTC)</th>
+            </tr>
+        </thead>
+        <tbody id="resultsBody"></tbody>
+    </table>
+
+    <!-- Includi la libreria SunCalc.js -->
+    <script src="lib/suncalc.js"></script>
+    <script>
+        function calculateEvents() {
+            const year = parseInt(document.getElementById('year').value, 10);
+            if (isNaN(year) || year < 1) {
+                alert("Inserisci un anno valido.");
+                return;
+            }
+
+            const resultsBody = document.getElementById('resultsBody');
+            resultsBody.innerHTML = '';
+
+            // Calcola gli eventi astronomici per l'anno specificato
+            const events = [
+                { name: "Equinozio di Primavera", event: SunCalc.getSpringEquinox(year) },
+                { name: "Solstizio d'Estate", event: SunCalc.getSummerSolstice(year) },
+                { name: "Equinozio d'Autunno", event: SunCalc.getAutumnEquinox(year) },
+                { name: "Solstizio d'Inverno", event: SunCalc.getWinterSolstice(year) }
+            ];
+
+            // Mostra i risultati nella tabella
+            events.forEach(event => {
+                const date = new Date(event.event);
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${event.name}</td>
+                    <td>${formatDate(date)}</td>
+                    <td>${formatTime(date)}</td>
+                `;
+                resultsBody.appendChild(row);
+            });
+        }
+
+        function formatDate(date) {
+            const day = String(date.getUTCDate()).padStart(2, '0');
+            const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+            const year = date.getUTCFullYear();
+            return `${day}-${month}-${year}`;
+        }
+
+        function formatTime(date) {
+            const hours = String(date.getUTCHours()).padStart(2, '0');
+            const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+            return `${hours}:${minutes}`;
+        }
+    </script>
+</body>
+</html>
