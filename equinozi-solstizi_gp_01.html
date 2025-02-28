@@ -18,22 +18,15 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            gap: 20px;
         }
 
-        .input-box {
+        .box {
             background: white;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
             text-align: center;
-        }
-
-        .table-container {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
             width: fit-content;
         }
 
@@ -78,13 +71,13 @@
     <h1>Calcolo Equinozi e Solstizi</h1>
     
     <div class="container">
-        <div class="input-box">
+        <div class="box">
             <label for="year">Inserisci l'anno:</label>
             <input type="number" id="year" value="2025" min="1000" max="3000">
             <button onclick="calculate()">Calcola</button>
         </div>
 
-        <div class="table-container">
+        <div class="box">
             <h2 id="result-title"></h2>
             <table id="result-table">
                 <thead>
@@ -137,7 +130,6 @@
         }
 
         function calculateEquinoxSolstice(year) {
-            // Calcoli basati sulle formule di Jean Meeus (semplificati)
             const JDE0 = {
                 spring: 2451623.80984 + 365242.37404 * (year - 2000),
                 summer: 2451716.56767 + 365241.62603 * (year - 2000),
