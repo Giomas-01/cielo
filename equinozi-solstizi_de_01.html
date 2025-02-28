@@ -13,47 +13,23 @@
         }
 
         .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .box {
             background: white;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-            display: inline-block;
-            text-align: left;
-            width: 30%;
-            min-width: 250px;
-        }
-
-        .container label {
-            font-weight: bold;
-        }
-
-        .container input {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            font-size: 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            width: 100%;
-        }
-
-        button:hover {
-            background-color: #0056b3;
+            width: fit-content;
         }
 
         table {
-            width: 80%;
-            margin: 20px auto;
+            width: 100%;
             border-collapse: collapse;
             background: white;
             border-radius: 10px;
@@ -71,86 +47,187 @@
             background-color: #007bff;
             color: white;
         }
-
-        td {
-            background-color: #f9f9f9;
-        }
     </style>
 </head>
 <body>
     <h1>Calcolo Equinozi e Solstizi</h1>
+    
     <div class="container">
-        <label for="year">Anno:</label>
-        <input type="number" id="year" placeholder="Es. 2024" required>
-        <button onclick="calculateEvents()">Calcola</button>
+        <div class="box">
+            <label for="year">Inserisci l'anno:</label>
+            <input type="number" id="year" value="2025" min="-4000" max="4000">
+            <button onclick="calculateEquinoxesSolstices()">Calcola</button>
+        </div>
+
+        <div class="box">
+            <h2 id="result-title"></h2>
+            <table id="resultTable">
+                <thead>
+                    <tr>
+                        <th>Evento</th>
+                        <th>Data</th>
+                        <th>Ora (UTC)</th>
+                    </tr>
+                </thead>
+                <tbody id="resultsBody"></tbody>
+            </table>
+        </div>
     </div>
 
-    <table id="resultsTable">
-        <thead>
-            <tr>
-                <th>Evento</th>
-                <th>Data</th>
-                <th>Ora (UTC)</th>
-            </tr>
-        </thead>
-        <tbody id="resultsBody"></tbody>
-    </table>
-
-    <!-- Includi la libreria astrojs.js -->
-    <script src="lib/astrojs.js"></script>
     <script>
-        function calculateEvents() {
-            const year = parseInt(document.getElementById('year').value, 10);
-            if (isNaN(year) || year < 1) {
+        function calculateEquinoxesSolstices() {
+            const year = parseInt(document.getElementById('year').value);
+            if (isNaN(year)) {
                 alert("Inserisci un anno valido.");
                 return;
             }
 
+            const JDE0 = {
+                "March": [2451623.80984, 365242.37404, 0.05169, -0.00411, -0.00057],
+                "June": [2451716.56767, 365241.62603, 0.00325, 0.00888, -0.00030],
+                "September": [2451810.21715, 365242.01767, -0.11575, 0.00337, 0.00078],
+                "December": [2451900.05952, 365242.74049, -0.06223, -0.00823, 0.00032]
+            };
+
+            // Correzione per perturbazioni planetarie (Meeus, Capitolo 27)
+            function planetaryCorrections(Y) {
+                const A = 485 * Math.cos((324.96 + 1934.136 * Y) * Math.PI / 180);
+                const B = 203 * Math.cos((337.23 + 32964.467 * Y) * Math.PI / 180);
+                const C = 199 * Math.cos((342.08 + 20.186 * Y) * Math.PI / 180);
+                const D = 182 * Math.cos((27.85 + 445267.112 * Y) * Math.PI / 180);
+                const E = 156 * Math.cos((73.14 + 45036.886 * Y) * Math.PI / 180);
+                const F = 136 * Math.cos((171.52 + 22518.443 * Y) * Math.PI / 180);
+                const G = 77 * Math.cos((222.54 + 65928.934 * Y) * Math.PI / 180);
+                const H = 74 * Math.cos((296.72 + 3034.906 * Y) * Math.PI / 180);
+                const I = 70 * Math.cos((243.58 + 9037.513 * Y) * Math.PI / 180);
+                const J = 58 * Math.cos((119.81 + 33718.147 * Y) * Math.PI / 180);
+                const K = 52 * Math.cos((297.17 + 150.678 * Y) * Math.PI / 180);
+                const L = 50 * Math.cos((21.02 + 2281.226 * Y) * Math.PI / 180);
+                const M = 45 * Math.cos((247.54 + 29929.562 * Y) * Math.PI / 180);
+                const N = 44 * Math.cos((325.15 + 31555.956 * Y) * Math.PI / 180);
+                const O = 29 * Math.cos((60.93 + 4443.417 * Y) * Math.PI / 180);
+                const P = 18 * Math.cos((155.12 + 67555.328 * Y) * Math.PI / 180);
+                const Q = 17 * Math.cos((288.79 + 4562.452 * Y) * Math.PI / 180);
+                const R = 16 * Math.cos((198.04 + 62894.029 * Y) * Math.PI / 180);
+                const S = 14 * Math.cos((199.76 + 31436.921 * Y) * Math.PI / 180);
+                const T = 12 * Math.cos((95.39 + 14577.848 * Y) * Math.PI / 180);
+                const U = 12 * Math.cos((287.11 + 31931.756 * Y) * Math.PI / 180);
+                const V = 12 * Math.cos((320.81 + 34777.259 * Y) * Math.PI / 180);
+                const W = 9 * Math.cos((227.73 + 1222.114 * Y) * Math.PI / 180);
+                const X = 8 * Math.cos((15.45 + 16859.074 * Y) * Math.PI / 180);
+
+                return (A + B + C + D + E + F + G + H + I + J + K + L + M + N + O + P + Q + R + S + T + U + V + W + X) / 1000000;
+            }
+
+            // Calcolo di ΔT (differenza tra Tempo Dinamico e Tempo Universale)
+            function calculateDeltaT(year) {
+                const y = year + (new Date().getMonth() + 1 - 0.5) / 12;
+                if (year < -500) {
+                    const u = (year - 1820) / 100;
+                    return -20 + 32 * u * u;
+                } else if (year < 500) {
+                    const u = y / 100;
+                    return 10583.6 - 1014.41 * u + 33.78311 * Math.pow(u, 2) - 5.952053 * Math.pow(u, 3) - 0.1798452 * Math.pow(u, 4) + 0.022174192 * Math.pow(u, 5) + 0.0090316521 * Math.pow(u, 6);
+                } else if (year < 1600) {
+                    const u = (y - 1000) / 100;
+                    return 1574.2 - 556.01 * u + 71.23472 * Math.pow(u, 2) + 0.319781 * Math.pow(u, 3) - 0.8503463 * Math.pow(u, 4) - 0.005050998 * Math.pow(u, 5) + 0.0083572073 * Math.pow(u, 6);
+                } else if (year < 1700) {
+                    const u = y - 1600;
+                    return 120 - 0.9808 * u - 0.01532 * Math.pow(u, 2) + Math.pow(u, 3) / 7129;
+                } else if (year < 1800) {
+                    const u = y - 1700;
+                    return 8.83 + 0.1603 * u - 0.0059285 * Math.pow(u, 2) + 0.00013336 * Math.pow(u, 3) - Math.pow(u, 4) / 1174000;
+                } else if (year < 1860) {
+                    const u = y - 1800;
+                    return 13.72 - 0.332447 * u + 0.0068612 * Math.pow(u, 2) + 0.0041116 * Math.pow(u, 3) - 0.00037436 * Math.pow(u, 4) + 0.0000121272 * Math.pow(u, 5) - 0.0000001699 * Math.pow(u, 6) + 0.000000000875 * Math.pow(u, 7);
+                } else if (year < 1900) {
+                    const u = y - 1860;
+                    return 7.62 + 0.5737 * u - 0.251754 * Math.pow(u, 2) + 0.01680668 * Math.pow(u, 3) - 0.0004473624 * Math.pow(u, 4) + Math.pow(u, 5) / 233174;
+                } else if (year < 1920) {
+                    const u = y - 1900;
+                    return -2.79 + 1.494119 * u - 0.0598939 * Math.pow(u, 2) + 0.0061966 * Math.pow(u, 3) - 0.000197 * Math.pow(u, 4);
+                } else if (year < 1941) {
+                    const u = y - 1920;
+                    return 21.20 + 0.84493 * u - 0.076100 * Math.pow(u, 2) + 0.0020936 * Math.pow(u, 3);
+                } else if (year < 1961) {
+                    const u = y - 1950;
+                    return 29.07 + 0.407 * u - Math.pow(u, 2) / 233 + Math.pow(u, 3) / 2547;
+                } else if (year < 1986) {
+                    const u = y - 1975;
+                    return 45.45 + 1.067 * u - Math.pow(u, 2) / 260 - Math.pow(u, 3) / 718;
+                } else if (year < 2005) {
+                    const u = y - 2000;
+                    return 63.86 + 0.3345 * u - 0.060374 * Math.pow(u, 2) + 0.0017275 * Math.pow(u, 3) + 0.000651814 * Math.pow(u, 4) + 0.00002373599 * Math.pow(u, 5);
+                } else if (year < 2050) {
+                    const u = y - 2000;
+                    return 62.92 + 0.32217 * u + 0.005589 * Math.pow(u, 2);
+                } else if (year < 2150) {
+                    const u = (year - 1820) / 100;
+                    return -20 + 32 * Math.pow(u, 2) - 0.5628 * (2150 - year);
+                } else {
+                    const u = (year - 1820) / 100;
+                    return -20 + 32 * Math.pow(u, 2);
+                }
+            }
+
+            function getJDE(base, Y) {
+                return base[0] + base[1] * Y + base[2] * Math.pow(Y, 2) + base[3] * Math.pow(Y, 3) + base[4] * Math.pow(Y, 4);
+            }
+
+            function JDEtoDate(JDE) {
+                const deltaT = calculateDeltaT(year) / 86400; // Converti ΔT da secondi a giorni
+                const JD = JDE - deltaT; // Converti da Tempo Dinamico (TD) a Tempo Universale (UT)
+                let Z = Math.floor(JD + 0.5);
+                let F = (JD + 0.5) - Z;
+                let A = Z;
+
+                if (Z >= 2299161) {
+                    let alpha = Math.floor((Z - 1867216.25) / 36524.25);
+                    A = Z + 1 + alpha - Math.floor(alpha / 4);
+                }
+
+                let B = A + 1524;
+                let C = Math.floor((B - 122.1) / 365.25);
+                let D = Math.floor(365.25 * C);
+                let E = Math.floor((B - D) / 30.6001);
+
+                let day = B - D - Math.floor(30.6001 * E) + F;
+                let month = (E < 14) ? E - 1 : E - 13;
+                let year = (month > 2) ? C - 4716 : C - 4715;
+
+                let hours = Math.floor((day - Math.floor(day)) * 24);
+                let minutes = Math.round(((day - Math.floor(day)) * 24 - hours) * 60);
+
+                let months = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"];
+
+                return {
+                    date: `${Math.floor(day)} ${months[month - 1]} ${year}`,
+                    time: `${hours}:${minutes.toString().padStart(2, '0')}`
+                };
+            }
+
+            let Y = (year - 2000) / 1000;
+
+            let events = {
+                "🌸 Equinozio di Primavera": JDEtoDate(getJDE(JDE0["March"], Y) + planetaryCorrections(Y)),
+                "☀️ Solstizio d'Estate": JDEtoDate(getJDE(JDE0["June"], Y) + planetaryCorrections(Y)),
+                "🍂 Equinozio d'Autunno": JDEtoDate(getJDE(JDE0["September"], Y) + planetaryCorrections(Y)),
+                "❄️ Solstizio d'Inverno": JDEtoDate(getJDE(JDE0["December"], Y) + planetaryCorrections(Y))
+            };
+
+            document.getElementById('result-title').innerText = `Equinozi e Solstizi per l'anno ${year}`;
             const resultsBody = document.getElementById('resultsBody');
-            resultsBody.innerHTML = '';
+            resultsBody.innerHTML = "";
 
-            // Calcola i giorni giuliani degli equinozi e solstizi
-            const date_eqsol = eqsol(year);
-
-            // Definisci i nomi degli eventi
-            const events = [
-                { name: "Equinozio di Primavera", jd: date_eqsol[0] },
-                { name: "Solstizio d'Estate", jd: date_eqsol[1] },
-                { name: "Equinozio d'Autunno", jd: date_eqsol[2] },
-                { name: "Solstizio d'Inverno", jd: date_eqsol[3] }
-            ];
-
-            // Mostra i risultati nella tabella
-            events.forEach(event => {
-                const formattedDate = formatDate(event.jd); // Formatta la data come DD-MM-YYYY
-                const formattedTime = formatTime(event.jd); // Formatta l'ora come HH:MM
-
+            for (let event in events) {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${event.name}</td>
-                    <td>${formattedDate}</td>
-                    <td>${formattedTime}</td>
+                    <td>${event}</td>
+                    <td>${events[event].date}</td>
+                    <td>${events[event].time}</td>
                 `;
                 resultsBody.appendChild(row);
-            });
-        }
-
-        function formatDate(jd) {
-            // Converti il giorno giuliano in una data del calendario
-            const date = new Date((jd - 2440587.5) * 86400000); // Converti JD in timestamp
-            const day = String(date.getUTCDate()).padStart(2, '0'); // Giorno
-            const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Mese
-            const year = date.getUTCFullYear(); // Anno
-            return `${day}-${month}-${year}`;
-        }
-
-        function formatTime(jd) {
-            // Calcola l'ora in formato HH:MM dal giorno giuliano
-            const fractionalDay = jd - Math.floor(jd); // Parte frazionaria del giorno giuliano
-            const totalSeconds = Math.floor(fractionalDay * 86400); // Secondi totali nel giorno
-            const hours = Math.floor(totalSeconds / 3600); // Ore
-            const minutes = Math.floor((totalSeconds % 3600) / 60); // Minuti
-            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+            }
         }
     </script>
 </body>
