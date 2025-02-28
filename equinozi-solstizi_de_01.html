@@ -174,8 +174,8 @@
                 return base[0] + base[1] * Y + base[2] * Math.pow(Y, 2) + base[3] * Math.pow(Y, 3) + base[4] * Math.pow(Y, 4);
             }
 
-            function JDEtoDate(JDE) {
-                const deltaT = calculateDeltaT(year) / 86400; // Converti ΔT da secondi a giorni
+            function JDEtoDate(JDE, inputYear) {
+                const deltaT = calculateDeltaT(inputYear) / 86400; // Converti ΔT da secondi a giorni
                 const JD = JDE - deltaT; // Converti da Tempo Dinamico (TD) a Tempo Universale (UT)
                 let Z = Math.floor(JD + 0.5);
                 let F = (JD + 0.5) - Z;
@@ -209,10 +209,10 @@
             let Y = (year - 2000) / 1000;
 
             let events = {
-                "🌸 Equinozio di Primavera": JDEtoDate(getJDE(JDE0["March"], Y) + planetaryCorrections(Y)),
-                "☀️ Solstizio d'Estate": JDEtoDate(getJDE(JDE0["June"], Y) + planetaryCorrections(Y)),
-                "🍂 Equinozio d'Autunno": JDEtoDate(getJDE(JDE0["September"], Y) + planetaryCorrections(Y)),
-                "❄️ Solstizio d'Inverno": JDEtoDate(getJDE(JDE0["December"], Y) + planetaryCorrections(Y))
+                "🌸 Equinozio di Primavera": JDEtoDate(getJDE(JDE0["March"], Y) + planetaryCorrections(Y), year),
+                "☀️ Solstizio d'Estate": JDEtoDate(getJDE(JDE0["June"], Y) + planetaryCorrections(Y), year),
+                "🍂 Equinozio d'Autunno": JDEtoDate(getJDE(JDE0["September"], Y) + planetaryCorrections(Y), year),
+                "❄️ Solstizio d'Inverno": JDEtoDate(getJDE(JDE0["December"], Y) + planetaryCorrections(Y), year)
             };
 
             document.getElementById('result-title').innerText = `Equinozi e Solstizi per l'anno ${year}`;
