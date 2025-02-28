@@ -122,8 +122,7 @@
 
             // Mostra i risultati nella tabella
             events.forEach(event => {
-                const data = jd_data(event.jd); // Converti il giorno giuliano in data del calendario
-                const formattedDate = formatDate(data); // Formatta la data come DD-MM-YYYY
+                const formattedDate = formatDate(event.jd); // Formatta la data come DD-MM-YYYY
                 const formattedTime = formatTime(event.jd); // Formatta l'ora come HH:MM
 
                 const row = document.createElement('tr');
@@ -136,11 +135,12 @@
             });
         }
 
-        function formatDate(data) {
-            // Formatta la data come DD-MM-YYYY
-            const day = String(data[2]).padStart(2, '0'); // Giorno
-            const month = String(data[1]).padStart(2, '0'); // Mese
-            const year = data[0]; // Anno
+        function formatDate(jd) {
+            // Converti il giorno giuliano in una data del calendario
+            const date = new Date((jd - 2440587.5) * 86400000); // Converti JD in timestamp
+            const day = String(date.getUTCDate()).padStart(2, '0'); // Giorno
+            const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Mese
+            const year = date.getUTCFullYear(); // Anno
             return `${day}-${month}-${year}`;
         }
 
