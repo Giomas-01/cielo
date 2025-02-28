@@ -123,15 +123,32 @@
             // Mostra i risultati nella tabella
             events.forEach(event => {
                 const data = jd_data(event.jd); // Converti il giorno giuliano in data del calendario
-                const dataf = sc_day_hm(data[0]) + " : " + data[1] + " : " + data[2]; // Formatta la data
+                const formattedDate = formatDate(data); // Formatta la data come DD-MM-YYYY
+                const formattedTime = formatTime(data); // Formatta l'ora come HH:MM
+
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${event.name}</td>
-                    <td>${data[2]}-${data[1]}-${data[0]}</td>
-                    <td>${sc_day_hm(data[0])}</td>
+                    <td>${formattedDate}</td>
+                    <td>${formattedTime}</td>
                 `;
                 resultsBody.appendChild(row);
             });
+        }
+
+        function formatDate(data) {
+            // Formatta la data come DD-MM-YYYY
+            const day = String(data[2]).padStart(2, '0'); // Giorno
+            const month = String(data[1]).padStart(2, '0'); // Mese
+            const year = data[0]; // Anno
+            return `${day}-${month}-${year}`;
+        }
+
+        function formatTime(data) {
+            // Formatta l'ora come HH:MM
+            const time = sc_day_hm(data[0]); // Ottieni l'ora in formato HH:MM:SS
+            const [hours, minutes] = time.split(':'); // Separa ore e minuti
+            return `${hours}:${minutes}`; // Restituisce solo HH:MM
         }
     </script>
 </body>
