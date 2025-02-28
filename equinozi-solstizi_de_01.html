@@ -109,38 +109,29 @@
             const resultsBody = document.getElementById('resultsBody');
             resultsBody.innerHTML = '';
 
-            // Calcola gli eventi astronomici per l'anno specificato
+            // Calcola i giorni giuliani degli equinozi e solstizi
+            const date_eqsol = eqsol(year);
+
+            // Definisci i nomi degli eventi
             const events = [
-                { name: "Equinozio di Primavera", event: ST_EQUI_SOLST(year, 0) }, // 0 = Equinozio di primavera
-                { name: "Solstizio d'Estate", event: ST_EQUI_SOLST(year, 1) }, // 1 = Solstizio d'estate
-                { name: "Equinozio d'Autunno", event: ST_EQUI_SOLST(year, 2) }, // 2 = Equinozio d'autunno
-                { name: "Solstizio d'Inverno", event: ST_EQUI_SOLST(year, 3) } // 3 = Solstizio d'inverno
+                { name: "Equinozio di Primavera", jd: date_eqsol[0] },
+                { name: "Solstizio d'Estate", jd: date_eqsol[1] },
+                { name: "Equinozio d'Autunno", jd: date_eqsol[2] },
+                { name: "Solstizio d'Inverno", jd: date_eqsol[3] }
             ];
 
             // Mostra i risultati nella tabella
             events.forEach(event => {
-                const date = new Date(event.event);
+                const data = jd_data(event.jd); // Converti il giorno giuliano in data del calendario
+                const dataf = sc_day_hm(data[0]) + " : " + data[1] + " : " + data[2]; // Formatta la data
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${event.name}</td>
-                    <td>${formatDate(date)}</td>
-                    <td>${formatTime(date)}</td>
+                    <td>${data[2]}-${data[1]}-${data[0]}</td>
+                    <td>${sc_day_hm(data[0])}</td>
                 `;
                 resultsBody.appendChild(row);
             });
-        }
-
-        function formatDate(date) {
-            const day = String(date.getUTCDate()).padStart(2, '0');
-            const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-            const year = date.getUTCFullYear();
-            return `${day}-${month}-${year}`;
-        }
-
-        function formatTime(date) {
-            const hours = String(date.getUTCHours()).padStart(2, '0');
-            const minutes = String(date.getUTCMinutes()).padStart(2, '0');
-            return `${hours}:${minutes}`;
         }
     </script>
 </body>
