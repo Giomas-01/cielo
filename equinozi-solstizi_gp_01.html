@@ -8,8 +8,8 @@
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            margin: 20px;
             background-color: #f5f5f5;
+            margin: 20px;
         }
         .container {
             background: white;
@@ -19,61 +19,119 @@
             display: inline-block;
             text-align: left;
         }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
         button {
             background-color: #007bff;
             color: white;
             border: none;
-            padding: 10px;
+            padding: 10px 15px;
             font-size: 16px;
             border-radius: 5px;
             cursor: pointer;
+            width: 100%;
         }
         button:hover {
             background-color: #0056b3;
         }
+        #output {
+            margin-top: 20px;
+            padding: 10px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: left;
+        }
     </style>
 </head>
 <body>
+
     <h1>Calcolo Equinozi e Solstizi</h1>
     <div class="container">
-        <label for="year">Anno:</label>
+        <label for="year">Inserisci l'anno:</label>
         <input type="number" id="year" placeholder="Es. 2025" required>
-        <button onclick="calculateSeasons()">Calcola</button>
+        <button onclick="calculateEvents()">Calcola</button>
     </div>
-    <h2>Risultati:</h2>
-    <p id="spring"></p>
-    <p id="summer"></p>
-    <p id="autumn"></p>
-    <p id="winter"></p>
+
+    <div id="output"></div>
+
     <script>
-        function calculateSeasons() {
-            const year = parseInt(document.getElementById("year").value);
-            if (isNaN(year) || year < 0) {
+        function calculateEvents() {
+            const year = parseInt(document.getElementById('year').value);
+            if (isNaN(year)) {
                 alert("Inserisci un anno valido.");
                 return;
             }
-            
-            const data = {
-                2025: {
-                    spring: "20 Marzo 2025, 09:01 UTC",
-                    summer: "21 Giugno 2025, 02:41 UTC",
-                    autumn: "22 Settembre 2025, 18:19 UTC",
-                    winter: "21 Dicembre 2025, 15:02 UTC"
-                }
-            };
-            
-            if (data[year]) {
-                document.getElementById("spring").innerText = "Equinozio di Primavera: " + data[year].spring;
-                document.getElementById("summer").innerText = "Solstizio d'Estate: " + data[year].summer;
-                document.getElementById("autumn").innerText = "Equinozio d'Autunno: " + data[year].autumn;
-                document.getElementById("winter").innerText = "Solstizio d'Inverno: " + data[year].winter;
-            } else {
-                document.getElementById("spring").innerText = "Dati non disponibili per l'anno " + year;
-                document.getElementById("summer").innerText = "";
-                document.getElementById("autumn").innerText = "";
-                document.getElementById("winter").innerText = "";
+
+            const equinoxesSolstices = getEquinoxesSolstices(year);
+            let outputHTML = `<h2>Equinozi e Solstizi per l'anno ${year}</h2>`;
+            outputHTML += `<p>🌸 Equinozio di Primavera: ${formatDate(equinoxesSolstices.spring)}</p>`;
+            outputHTML += `<p>☀️ Solstizio d'Estate: ${formatDate(equinoxesSolstices.summer)}</p>`;
+            outputHTML += `<p>🍂 Equinozio d'Autunno: ${formatDate(equinoxesSolstices.autumn)}</p>`;
+            outputHTML += `<p>❄️ Solstizio d'Inverno: ${formatDate(equinoxesSolstices.winter)}</p>`;
+
+            document.getElementById('output').innerHTML = outputHTML;
+        }
+
+        function getEquinoxesSolstices(year) {
+            // Formule di Jean Meeus per il calcolo degli equinozi e solstizi
+            const Y = (year - 2000) / 1000;
+
+            function meeusTime(JDE0, coefficients) {
+                return JDE0 +
+                    coefficients[0] * Y +
+                    coefficients[1] * Y**2 +
+                    coefficients[2] * Y**3 +
+                    coefficients[3] * Y**4;
             }
+
+            return {
+                spring: meeusTime(2451623.80984, [365242.37404, 0.05169, -0.00411, -0.00057]),
+                summer: meeusTime(2451716.56767, [365241.62603, 0.00325,  0.00888, -0.00030]),
+                autumn: meeusTime(2451810.21715, [365242.01767, -0.11575, 0.00337, 0.00078]),
+                winter: meeusTime(2451900.05952, [365242.74049, -0.06223, -0.00823, 0.00032])
+            };
+        }
+
+        function formatDate(jde) {
+            // Conversione JDE in data e ora UTC
+            const JD = jde + 0.5;
+            const Z = Math.floor(JD);
+            const F = JD - Z;
+            let A = Z;
+
+            if (Z >= 2299161) {
+                const alpha = Math.floor((Z - 1867216.25) / 36524.25);
+                A = Z + 1 + alpha - Math.floor(alpha / 4);
+            }
+
+            const B = A + 1524;
+            const C = Math.floor((B - 122.1) / 365.25);
+            const D = Math.floor(365.25 * C);
+            const E = Math.floor((B - D) / 30.6001);
+
+            const day = B - D - Math.floor(30.6001 * E) + F;
+            const month = E < 14 ? E - 1 : E - 13;
+            const year = month > 2 ? C - 4716 : C - 4715;
+
+            const fractionalDay = day - Math.floor(day);
+            const hours = Math.floor(fractionalDay * 24);
+            const minutes = Math.floor((fractionalDay * 24 - hours) * 60);
+
+            const monthNames = [
+                "Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno",
+                "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"
+            ];
+
+            return `${Math.floor(day)} ${monthNames[month - 1]} ${year}, ${hours}:${minutes.toString().padStart(2, '0')} UTC`;
         }
     </script>
+
 </body>
 </html>
