@@ -126,17 +126,40 @@
 
             // Funzione per calcolare le correzioni delle perturbazioni planetarie
             function planetaryCorrections(Y) {
-                const A = 485 * Math.cos((324.96 + 1934.136 * Y) * Math.PI / 180);
-                const B = 203 * Math.cos((337.23 + 8129.091 * Y) * Math.PI / 180);
-                const C = 199 * Math.cos((342.08 + 1324.785 * Y) * Math.PI / 180);
-                const D = 182 * Math.cos((270.43 +  1600.371 * Y) * Math.PI / 180);
-                const E = 156 * Math.cos((311.71 +  5416.755 * Y) * Math.PI / 180);
-                const F = 136 * Math.cos((316.56 +  5431.084 * Y) * Math.PI / 180);
-                const G = 77 * Math.cos((297.17 +  4871.288 * Y) * Math.PI / 180);
-                const H = 74 * Math.cos((  73.62 +  2509.244 * Y) * Math.PI / 180);
+                const terms = [
+                    [485, 324.96, 1934.136],
+                    [203, 337.23, 8129.091],
+                    [199, 342.08, 1324.785],
+                    [182, 270.43, 1600.371],
+                    [156, 311.71, 5416.755],
+                    [136, 316.56, 5431.084],
+                    [77, 297.17, 4871.288],
+                    [74, 73.62, 2509.244],
+                    [70, 23.27, 7771.377],
+                    [63, 88.57, 16172.135],
+                    [59, 142.60, 20323.877],
+                    [56, 41.83, 26.71],
+                    [50, 183.73, 11929.042],
+                    [45, 232.42, 1582.429],
+                    [44, 121.75, 6578.142],
+                    [29, 266.61, 3216.907],
+                    [21, 333.33, 11856.218],
+                    [17, 311.62, 879.165],
+                    [16, 10.32, 15936.142],
+                    [14, 63.10, 9147.993],
+                    [12, 124.58, 11856.218],
+                    [10, 132.12, 15936.142],
+                    [8, 192.43, 12792.663]
+                ];
 
-                // Somma totale delle correzioni
-                return (A + B + C + D + E + F + G + H) / 86400;  // Dividiamo per 86400 per ottenere il valore in giorni
+                let correction = 0;
+
+                for (let i = 0; i < terms.length; i++) {
+                    const [A, B, C] = terms[i];
+                    correction += A * Math.cos((B + C * Y) * Math.PI / 180);
+                }
+
+                return correction / 86400;  // Dividiamo per 86400 per ottenere il valore in giorni
             }
 
             // Funzione per applicare la correzione delle perturbazioni planetarie a JDE
