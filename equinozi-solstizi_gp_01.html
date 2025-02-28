@@ -81,32 +81,70 @@
                 alert("Inserisci un anno valido.");
                 return;
             }
-            
-            const data = {
-                2025: [
-                    { event: "🌸 Equinozio di Primavera", date: "20 Marzo 2025", time: "09:01" },
-                    { event: "☀️ Solstizio d'Estate", date: "21 Giugno 2025", time: "02:41" },
-                    { event: "🍂 Equinozio d'Autunno", date: "22 Settembre 2025", time: "18:19" },
-                    { event: "❄️ Solstizio d'Inverno", date: "21 Dicembre 2025", time: "15:02" }
-                ]
+
+            const JDE0 = {
+                "March": [2451623.80984, 365242.37404, 0.05169, -0.00411, -0.00057],
+                "June": [2451716.56767, 365241.62603, 0.00325, 0.00888, -0.00030],
+                "September": [2451810.21715, 365242.01767, -0.11575, 0.00337, 0.00078],
+                "December": [2451900.05952, 365242.74049, -0.06223, -0.00823, 0.00032]
             };
-            
+
+            function getJDE(base, Y) {
+                return base[0] + base[1] * Y + base[2] * Math.pow(Y, 2) + base[3] * Math.pow(Y, 3) + base[4] * Math.pow(Y, 4);
+            }
+
+            function JDEtoDate(JDE) {
+                let JD = JDE + 0.5;
+                let Z = Math.floor(JD);
+                let F = JD - Z;
+                let A = Z;
+
+                if (Z >= 2299161) {
+                    let alpha = Math.floor((Z - 1867216.25) / 36524.25);
+                    A = Z + 1 + alpha - Math.floor(alpha / 4);
+                }
+
+                let B = A + 1524;
+                let C = Math.floor((B - 122.1) / 365.25);
+                let D = Math.floor(365.25 * C);
+                let E = Math.floor((B - D) / 30.6001);
+
+                let day = B - D - Math.floor(30.6001 * E) + F;
+                let month = (E < 14) ? E - 1 : E - 13;
+                let year = (month > 2) ? C - 4716 : C - 4715;
+
+                let hours = Math.floor((day - Math.floor(day)) * 24);
+                let minutes = Math.round(((day - Math.floor(day)) * 24 - hours) * 60);
+
+                let months = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"];
+
+                return {
+                    date: `${Math.floor(day)} ${months[month - 1]} ${year}`,
+                    time: `${hours}:${minutes.toString().padStart(2, '0')}`
+                };
+            }
+
+            let Y = (year - 2000) / 1000;
+
+            let events = {
+                "🌸 Equinozio di Primavera": JDEtoDate(getJDE(JDE0["March"], Y)),
+                "☀️ Solstizio d'Estate": JDEtoDate(getJDE(JDE0["June"], Y)),
+                "🍂 Equinozio d'Autunno": JDEtoDate(getJDE(JDE0["September"], Y)),
+                "❄️ Solstizio d'Inverno": JDEtoDate(getJDE(JDE0["December"], Y))
+            };
+
             document.getElementById('result-title').innerText = `Equinozi e Solstizi per l'anno ${year}`;
             const resultsBody = document.getElementById('resultsBody');
             resultsBody.innerHTML = "";
-            
-            if (data[year]) {
-                data[year].forEach(event => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${event.event}</td>
-                        <td>${event.date}</td>
-                        <td>${event.time}</td>
-                    `;
-                    resultsBody.appendChild(row);
-                });
-            } else {
-                resultsBody.innerHTML = "<tr><td colspan='3'>Dati non disponibili</td></tr>";
+
+            for (let event in events) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${event}</td>
+                    <td>${events[event].date}</td>
+                    <td>${events[event].time}</td>
+                `;
+                resultsBody.appendChild(row);
             }
         }
     </script>
