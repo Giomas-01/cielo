@@ -126,24 +126,22 @@
 
             // Funzione per calcolare le correzioni delle perturbazioni planetarie
             function planetaryCorrections(Y) {
-                const T = Y;  // Anno in secoli (Y)
-                const A = 485 * Math.cos((324.96 + 1934.136 * T) * Math.PI / 180);
-                const B = 203 * Math.cos((337.23 + 8129.091 * T) * Math.PI / 180);
-                const C = 199 * Math.cos((342.08 + 1324.785 * T) * Math.PI / 180);
-                const D = 182 * Math.cos((270.43 +  1600.371 * T) * Math.PI / 180);
-                const E = 156 * Math.cos((311.71 +  5416.755 * T) * Math.PI / 180);
-                const F = 136 * Math.cos((316.56 +  5431.084 * T) * Math.PI / 180);
-                const G = 77 * Math.cos((297.17 +  4871.288 * T) * Math.PI / 180);
-                const H = 74 * Math.cos((  73.62 +  2509.244 * T) * Math.PI / 180);
+                const A = 485 * Math.cos((324.96 + 1934.136 * Y) * Math.PI / 180);
+                const B = 203 * Math.cos((337.23 + 8129.091 * Y) * Math.PI / 180);
+                const C = 199 * Math.cos((342.08 + 1324.785 * Y) * Math.PI / 180);
+                const D = 182 * Math.cos((270.43 +  1600.371 * Y) * Math.PI / 180);
+                const E = 156 * Math.cos((311.71 +  5416.755 * Y) * Math.PI / 180);
+                const F = 136 * Math.cos((316.56 +  5431.084 * Y) * Math.PI / 180);
+                const G = 77 * Math.cos((297.17 +  4871.288 * Y) * Math.PI / 180);
+                const H = 74 * Math.cos((  73.62 +  2509.244 * Y) * Math.PI / 180);
 
                 // Somma totale delle correzioni
-                return A + B + C + D + E + F + G + H;
+                return (A + B + C + D + E + F + G + H) / 86400;  // Dividiamo per 86400 per ottenere il valore in giorni
             }
 
             // Funzione per applicare la correzione delle perturbazioni planetarie a JDE
             function applyPlanetaryPerturbations(JDE, Y) {
-                let correction = planetaryCorrections(Y) / 86400;  // Dividiamo per 86400 per ottenere il valore in giorni
-                return JDE + correction;
+                return JDE + planetaryCorrections(Y);  // Aggiungiamo la correzione
             }
 
             // Funzione per applicare la precessione (approssimazione)
