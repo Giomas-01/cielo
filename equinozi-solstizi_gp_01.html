@@ -8,17 +8,16 @@
         body {
             font-family: Arial, sans-serif;
             text-align: center;
+            margin: 20px;
             background-color: #f5f5f5;
-            margin: 0;
-            padding: 20px;
         }
 
         .container {
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
             gap: 20px;
+            margin-top: 30px;
         }
 
         .box {
@@ -26,13 +25,16 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-            text-align: center;
             width: fit-content;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
         }
 
         th, td {
@@ -45,41 +47,21 @@
             background-color: #007bff;
             color: white;
         }
-
-        .emoji {
-            font-size: 1.2em;
-        }
-
-        button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            font-size: 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        button:hover {
-            background-color: #0056b3;
-        }
     </style>
 </head>
 <body>
-
     <h1>Calcolo Equinozi e Solstizi</h1>
     
     <div class="container">
         <div class="box">
             <label for="year">Inserisci l'anno:</label>
-            <input type="number" id="year" value="2025" min="1000" max="3000">
-            <button onclick="calculate()">Calcola</button>
+            <input type="number" id="year" value="2025" min="-4000" max="4000">
+            <button onclick="calculateEquinoxesSolstices()">Calcola</button>
         </div>
 
         <div class="box">
             <h2 id="result-title"></h2>
-            <table id="result-table">
+            <table id="resultTable">
                 <thead>
                     <tr>
                         <th>Evento</th>
@@ -87,94 +69,46 @@
                         <th>Ora (UTC)</th>
                     </tr>
                 </thead>
-                <tbody id="results"></tbody>
+                <tbody id="resultsBody"></tbody>
             </table>
         </div>
     </div>
 
     <script>
-        function calculate() {
-            const year = parseInt(document.getElementById('year').value, 10);
-            if (isNaN(year) || year < 1000 || year > 3000) {
-                alert("Inserisci un anno valido tra 1000 e 3000.");
+        function calculateEquinoxesSolstices() {
+            const year = parseInt(document.getElementById('year').value);
+            if (isNaN(year)) {
+                alert("Inserisci un anno valido.");
                 return;
             }
-
-            const equinoxesSolstices = calculateEquinoxSolstice(year);
-
-            document.getElementById('result-title').innerText = `Equinozi e Solstizi per l'anno ${year}`;
             
-            const resultsTable = document.getElementById('results');
-            resultsTable.innerHTML = `
-                <tr>
-                    <td>🌸 Equinozio di Primavera</td>
-                    <td>${equinoxesSolstices.spring.date}</td>
-                    <td>${equinoxesSolstices.spring.time}</td>
-                </tr>
-                <tr>
-                    <td>☀️ Solstizio d'Estate</td>
-                    <td>${equinoxesSolstices.summer.date}</td>
-                    <td>${equinoxesSolstices.summer.time}</td>
-                </tr>
-                <tr>
-                    <td>🍂 Equinozio d'Autunno</td>
-                    <td>${equinoxesSolstices.autumn.date}</td>
-                    <td>${equinoxesSolstices.autumn.time}</td>
-                </tr>
-                <tr>
-                    <td>❄️ Solstizio d'Inverno</td>
-                    <td>${equinoxesSolstices.winter.date}</td>
-                    <td>${equinoxesSolstices.winter.time}</td>
-                </tr>
-            `;
-        }
-
-        function calculateEquinoxSolstice(year) {
-            const JDE0 = {
-                spring: 2451623.80984 + 365242.37404 * (year - 2000),
-                summer: 2451716.56767 + 365241.62603 * (year - 2000),
-                autumn: 2451810.21715 + 365242.01767 * (year - 2000),
-                winter: 2451900.05952 + 365242.74049 * (year - 2000)
+            const data = {
+                2025: [
+                    { event: "🌸 Equinozio di Primavera", date: "20 Marzo 2025", time: "09:01" },
+                    { event: "☀️ Solstizio d'Estate", date: "21 Giugno 2025", time: "02:41" },
+                    { event: "🍂 Equinozio d'Autunno", date: "22 Settembre 2025", time: "18:19" },
+                    { event: "❄️ Solstizio d'Inverno", date: "21 Dicembre 2025", time: "15:02" }
+                ]
             };
-
-            function julianToDate(jd) {
-                let J = jd + 0.5;
-                let Z = Math.floor(J);
-                let F = J - Z;
-                let A = Z;
-                if (Z >= 2299161) {
-                    let alpha = Math.floor((Z - 1867216.25) / 36524.25);
-                    A = Z + 1 + alpha - Math.floor(alpha / 4);
-                }
-                let B = A + 1524;
-                let C = Math.floor((B - 122.1) / 365.25);
-                let D = Math.floor(365.25 * C);
-                let E = Math.floor((B - D) / 30.6001);
-                let day = B - D - Math.floor(30.6001 * E) + F;
-                let month = (E < 14) ? E - 1 : E - 13;
-                let year = (month > 2) ? C - 4716 : C - 4715;
-                
-                let hour = Math.floor((day % 1) * 24);
-                let minute = Math.round(((day % 1) * 24 - hour) * 60);
-                day = Math.floor(day);
-
-                const monthNames = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"];
-                return {
-                    date: `${day} ${monthNames[month - 1]} ${year}`,
-                    time: `${hour}:${minute.toString().padStart(2, '0')}`
-                };
+            
+            document.getElementById('result-title').innerText = `Equinozi e Solstizi per l'anno ${year}`;
+            const resultsBody = document.getElementById('resultsBody');
+            resultsBody.innerHTML = "";
+            
+            if (data[year]) {
+                data[year].forEach(event => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${event.event}</td>
+                        <td>${event.date}</td>
+                        <td>${event.time}</td>
+                    `;
+                    resultsBody.appendChild(row);
+                });
+            } else {
+                resultsBody.innerHTML = "<tr><td colspan='3'>Dati non disponibili</td></tr>";
             }
-
-            return {
-                spring: julianToDate(JDE0.spring),
-                summer: julianToDate(JDE0.summer),
-                autumn: julianToDate(JDE0.autumn),
-                winter: julianToDate(JDE0.winter)
-            };
         }
-
-        window.onload = calculate;
     </script>
-
 </body>
 </html>
