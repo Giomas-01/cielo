@@ -111,10 +111,10 @@
 
             // Calcola gli eventi astronomici per l'anno specificato
             const events = [
-                { name: "Equinozio di Primavera", event: Astro.calcEquinoxSolstice(year, 'spring') },
-                { name: "Solstizio d'Estate", event: Astro.calcEquinoxSolstice(year, 'summer') },
-                { name: "Equinozio d'Autunno", event: Astro.calcEquinoxSolstice(year, 'autumn') },
-                { name: "Solstizio d'Inverno", event: Astro.calcEquinoxSolstice(year, 'winter') }
+                { name: "Equinozio di Primavera", event: calcEquinoxSolstice(year, 'spring') },
+                { name: "Solstizio d'Estate", event: calcEquinoxSolstice(year, 'summer') },
+                { name: "Equinozio d'Autunno", event: calcEquinoxSolstice(year, 'autumn') },
+                { name: "Solstizio d'Inverno", event: calcEquinoxSolstice(year, 'winter') }
             ];
 
             // Mostra i risultati nella tabella
