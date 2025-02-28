@@ -17,10 +17,10 @@
             border-radius: 10px;
             box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
             display: inline-block;
-            text-align: left;
+            text-align: center;
         }
         input {
-            width: 100%;
+            width: 80%;
             padding: 8px;
             margin-top: 5px;
             margin-bottom: 15px;
@@ -46,7 +46,22 @@
             background: white;
             border-radius: 10px;
             box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-            text-align: left;
+            display: inline-block;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
         }
     </style>
 </head>
@@ -71,16 +86,38 @@
 
             const equinoxesSolstices = getEquinoxesSolstices(year);
             let outputHTML = `<h2>Equinozi e Solstizi per l'anno ${year}</h2>`;
-            outputHTML += `<p>🌸 Equinozio di Primavera: ${formatDate(equinoxesSolstices.spring)}</p>`;
-            outputHTML += `<p>☀️ Solstizio d'Estate: ${formatDate(equinoxesSolstices.summer)}</p>`;
-            outputHTML += `<p>🍂 Equinozio d'Autunno: ${formatDate(equinoxesSolstices.autumn)}</p>`;
-            outputHTML += `<p>❄️ Solstizio d'Inverno: ${formatDate(equinoxesSolstices.winter)}</p>`;
+            outputHTML += `<table>
+                            <tr>
+                                <th>Evento</th>
+                                <th>Data</th>
+                                <th>Ora (UTC)</th>
+                            </tr>
+                            <tr>
+                                <td>🌸 Equinozio di Primavera</td>
+                                <td>${formatDate(equinoxesSolstices.spring).date}</td>
+                                <td>${formatDate(equinoxesSolstices.spring).time}</td>
+                            </tr>
+                            <tr>
+                                <td>☀️ Solstizio d'Estate</td>
+                                <td>${formatDate(equinoxesSolstices.summer).date}</td>
+                                <td>${formatDate(equinoxesSolstices.summer).time}</td>
+                            </tr>
+                            <tr>
+                                <td>🍂 Equinozio d'Autunno</td>
+                                <td>${formatDate(equinoxesSolstices.autumn).date}</td>
+                                <td>${formatDate(equinoxesSolstices.autumn).time}</td>
+                            </tr>
+                            <tr>
+                                <td>❄️ Solstizio d'Inverno</td>
+                                <td>${formatDate(equinoxesSolstices.winter).date}</td>
+                                <td>${formatDate(equinoxesSolstices.winter).time}</td>
+                            </tr>
+                        </table>`;
 
             document.getElementById('output').innerHTML = outputHTML;
         }
 
         function getEquinoxesSolstices(year) {
-            // Formule di Jean Meeus per il calcolo degli equinozi e solstizi
             const Y = (year - 2000) / 1000;
 
             function meeusTime(JDE0, coefficients) {
@@ -100,7 +137,6 @@
         }
 
         function formatDate(jde) {
-            // Conversione JDE in data e ora UTC
             const JD = jde + 0.5;
             const Z = Math.floor(JD);
             const F = JD - Z;
@@ -129,7 +165,10 @@
                 "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"
             ];
 
-            return `${Math.floor(day)} ${monthNames[month - 1]} ${year}, ${hours}:${minutes.toString().padStart(2, '0')} UTC`;
+            return {
+                date: `${Math.floor(day)} ${monthNames[month - 1]} ${year}`,
+                time: `${hours}:${minutes.toString().padStart(2, '0')}`
+            };
         }
     </script>
 
