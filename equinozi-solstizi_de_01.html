@@ -138,18 +138,17 @@
 
         function formatDate(data) {
             // Formatta la data come DD-MM-YYYY
-            const date = new Date(data[0], data[1] - 1, data[2]); // Anno, Mese (0-based), Giorno
-            const day = String(date.getUTCDate()).padStart(2, '0'); // Giorno
-            const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Mese
-            const year = date.getUTCFullYear(); // Anno
+            const day = String(data[2]).padStart(2, '0'); // Giorno
+            const month = String(data[1]).padStart(2, '0'); // Mese
+            const year = data[0]; // Anno
             return `${day}-${month}-${year}`;
         }
 
         function formatTime(jd) {
             // Calcola l'ora in formato HH:MM dal giorno giuliano
-            const time = (jd - Math.floor(jd)) * 24; // Parte frazionaria del giorno giuliano
-            const hours = Math.floor(time);
-            const minutes = Math.floor((time - hours) * 60);
+            const fractionalDay = jd - Math.floor(jd); // Parte frazionaria del giorno giuliano
+            const hours = Math.floor(fractionalDay * 24);
+            const minutes = Math.floor((fractionalDay * 24 - hours) * 60);
             return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
         }
     </script>
