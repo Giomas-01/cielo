@@ -124,13 +124,23 @@
                 };
             }
 
+            // Funzione per calcolare ΔT (Differenza tra Tempo Dinamico e Tempo Universale)
+            function calculateDeltaT(year) {
+                // Usando una formula semplificata per calcolare ΔT
+                // La formula completa dipenderebbe da più variabili, ma questa è una buona approssimazione
+                const T = (year - 2000) / 100;
+                const deltaT = 62.92 + 0.32217 * T + 0.005589 * Math.pow(T, 2);
+                return deltaT;
+            }
+
             let Y = (year - 2000) / 1000;
+            let deltaT = calculateDeltaT(year);
 
             let events = {
-                "🌸 Equinozio di Primavera": JDEtoDate(getJDE(JDE0["March"], Y)),
-                "☀️ Solstizio d'Estate": JDEtoDate(getJDE(JDE0["June"], Y)),
-                "🍂 Equinozio d'Autunno": JDEtoDate(getJDE(JDE0["September"], Y)),
-                "❄️ Solstizio d'Inverno": JDEtoDate(getJDE(JDE0["December"], Y))
+                "🌸 Equinozio di Primavera": JDEtoDate(getJDE(JDE0["March"], Y) + deltaT / 86400),
+                "☀️ Solstizio d'Estate": JDEtoDate(getJDE(JDE0["June"], Y) + deltaT / 86400),
+                "🍂 Equinozio d'Autunno": JDEtoDate(getJDE(JDE0["September"], Y) + deltaT / 86400),
+                "❄️ Solstizio d'Inverno": JDEtoDate(getJDE(JDE0["December"], Y) + deltaT / 86400)
             };
 
             document.getElementById('result-title').innerText = `Equinozi e Solstizi per l'anno ${year}`;
