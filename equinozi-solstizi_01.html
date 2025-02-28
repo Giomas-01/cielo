@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calcolo Equinozi e Solstizi</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+            text-align: left;
+            width: 40%;
+            min-width: 300px;
+        }
+        label {
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .results {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Calcolo Equinozi e Solstizi</h1>
+    <div class="container">
+        <label for="year">Inserisci l'anno:</label>
+        <input type="number" id="year" placeholder="Es. 2025" required>
+        <button onclick="calculateSolsticesEquinoxes()">Calcola</button>
+        <div class="results" id="results"></div>
+    </div>
+
+    <script>
+        function calculateSolsticesEquinoxes() {
+            const year = parseInt(document.getElementById("year").value);
+            if (isNaN(year) || year < -1000 || year > 3000) {
+                alert("Inserisci un anno valido tra -1000 e 3000.");
+                return;
+            }
+
+            const resultsDiv = document.getElementById("results");
+            resultsDiv.innerHTML = "<strong>Calcolando...</strong>";
+
+            // Calcolo degli equinozi e solstizi usando la formula di Meeus
+            const events = ["Equinozio di Primavera", "Solstizio d'Estate", "Equinozio d'Autunno", "Solstizio d'Inverno"];
+            const JDEs = calculateMeeus(year);
+
+            let output = "<h2>Risultati per l'anno " + year + "</h2><ul>";
+            for (let i = 0; i < 4; i++) {
+                const date = convertJulianToGregorian(JDEs[i]);
+                output += `<li><strong>${events[i]}:</strong> ${date}</li>`;
+            }
+            output += "</ul>";
+            resultsDiv.innerHTML = output;
+        }
+
+        function calculateMeeus(year) {
+            // Coefficienti per gli equinozi e solstizi (Jean Meeus, "Astronomical Algorithms")
+            const coefficients = [
+                [2451623.80984, 365242.37404, 0.05169, -0.00411, -0.00057], // Primavera
+                [2451716.56767, 365241.62603, 0.00325,  0.00888, -0.00030], // Estate
+                [2451810.21715, 365242.01767, -0.11575, 0.00337, 0.00078],  // Autunno
+                [2451900.05952, 365242.74049, -0.06223, -0.00823, 0.00032]  // Inverno
+            ];
+
+            const Y = (year - 2000) / 1000; // Secolo juliano rispetto all'anno 2000
+            return coefficients.map(c =>
+                c[0] + c[1] * Y + c[2] * Math.pow(Y, 2) + c[3] * Math.pow(Y, 3) + c[4] * Math.pow(Y, 4)
+            );
+        }
+
+        function convertJulianToGregorian(JD) {
+            let Z = Math.floor(JD + 0.5);
+            let F = JD + 0.5 - Z;
+            let A = Z;
+
+            if (Z >= 2299161) { // Passaggio al calendario gregoriano
+                let alpha = Math.floor((Z - 1867216.25) / 36524.25);
+                A = Z + 1 + alpha - Math.floor(alpha / 4);
+            }
+
+            let B = A + 1524;
+            let C = Math.floor((B - 122.1) / 365.25);
+            let D = Math.floor(365.25 * C);
+            let E = Math.floor((B - D) / 30.6001);
+
+            let day = B - D - Math.floor(30.6001 * E) + F;
+            let month = (E < 14) ? E - 1 : E - 13;
+            let year = (month > 2) ? C - 4716 : C - 4715;
+
+            // Estrazione dell'orario
+            let hour = (day % 1) * 24;
+            let minute = (hour % 1) * 60;
+            let second = (minute % 1) * 60;
+
+            return `${Math.floor(day)} ${getMonthName(month)} ${year}, ${Math.floor(hour)}:${Math.floor(minute)} UTC`;
+        }
+
+        function getMonthName(month) {
+            const months = [
+                "Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno",
+                "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"
+            ];
+            return months[month - 1];
+        }
+    </script>
+</body>
+</html>
