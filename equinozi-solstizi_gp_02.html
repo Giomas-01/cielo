@@ -3,197 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calcolo Equinozi e Solstizi</title>
+    <title>Equinozi e Solstizi</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            text-align: center;
             margin: 20px;
-            background-color: #f5f5f5;
+            background-color: #f4f4f4;
+            text-align: center;
         }
-
-        .container {
+        h1 {
+            color: #333;
+        }
+        .subtitle {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 10px;
+        }
+        .table-container {
             display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-            margin-top: 30px;
+            justify-content: center;
+            margin-top: 20px;
+            overflow: auto;
+            max-height: 500px;
         }
-
-        .box {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-            width: fit-content;
-        }
-
-        table {
-            width: 100%;
+        table.styled-table {
+            width: 90%;
             border-collapse: collapse;
             background: white;
             border-radius: 10px;
             box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
             overflow: hidden;
+            position: relative;
         }
-
         th, td {
             border: 1px solid #ddd;
-            padding: 12px;
+            padding: 10px;
             text-align: center;
         }
-
         th {
             background-color: #007bff;
             color: white;
         }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #ddd;
+        }
+        .sticky-header th {
+            position: sticky;
+            top: 0;
+            background-color: #007bff;
+            z-index: 2;
+        }
+        .sticky-header:nth-child(2) th {
+            background-color: #c8e6c9;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #555;
+        }
     </style>
 </head>
 <body>
-    <h1>Calcolo Equinozi e Solstizi</h1>
-    
-    <div class="container">
-        <div class="box">
-            <label for="year">Inserisci l'anno:</label>
-            <input type="number" id="year" value="2025" min="-4000" max="4000">
-            <button onclick="calculateEquinoxesSolstices()">Calcola</button>
-        </div>
-
-        <div class="box">
-            <h2 id="result-title"></h2>
-            <table id="resultTable">
-                <thead>
-                    <tr>
-                        <th>Evento</th>
-                        <th>Data</th>
-                        <th>Ora (UTC)</th>
-                    </tr>
-                </thead>
-                <tbody id="resultsBody"></tbody>
-            </table>
-        </div>
+    <h1>Equinozi e Solstizi</h1>
+    <p class="subtitle">Orari UTC - per l'Italia aggiungere +1 ora per l'ora solare e +2 ore durante l'ora legale</p>
+    <div class="table-container">
+        <table class="styled-table" id="data-table">
+            <thead>
+                <tr class="sticky-header" id="table-header"></tr>
+                <tr class="sticky-header" id="table-subheader"></tr>
+            </thead>
+            <tbody id="table-body"></tbody>
+        </table>
     </div>
-
+    <p class="footer">Fonte: <a href="https://data.giss.nasa.gov/modelE/ar5plots/srvernal.html" target="_blank">NASA GISS</a></p>
+    
     <script>
-        function calculateEquinoxesSolstices() {
-            const year = parseInt(document.getElementById('year').value);
-            if (isNaN(year)) {
-                alert("Inserisci un anno valido.");
-                return;
-            }
-
-            const JDE0 = {
-                "March": [2451623.80984, 365242.37404, 0.05169, -0.00411, -0.00057],
-                "June": [2451716.56767, 365241.62603, 0.00325, 0.00888, -0.00030],
-                "September": [2451810.21715, 365242.01767, -0.11575, 0.00337, 0.00078],
-                "December": [2451900.05952, 365242.74049, -0.06223, -0.00823, 0.00032]
-            };
-
-            function getJDE(base, Y) {
-                return base[0] + base[1] * Y + base[2] * Math.pow(Y, 2) + base[3] * Math.pow(Y, 3) + base[4] * Math.pow(Y, 4);
-            }
-
-            function JDEtoDate(JDE) {
-                let JD = JDE + 0.5;
-                let Z = Math.floor(JD);
-                let F = JD - Z;
-                let A = Z;
-
-                if (Z >= 2299161) {
-                    let alpha = Math.floor((Z - 1867216.25) / 36524.25);
-                    A = Z + 1 + alpha - Math.floor(alpha / 4);
+        async function loadCSV() {
+            const response = await fetch('equi-sol_02.csv'); // Assicurati che il CSV sia nella stessa cartella
+            const data = await response.text();
+            const rows = data.split('\n').map(row => row.split(';'));
+            
+            const tableHeader = document.getElementById('table-header');
+            const tableSubheader = document.getElementById('table-subheader');
+            const tableBody = document.getElementById('table-body');
+            
+            tableHeader.innerHTML = rows[0].map((header, index) => index % 2 === 0 ? `<th colspan="2">${header}</th>` : '').join('');
+            tableSubheader.innerHTML = rows[1].map(header => `<th>${header}</th>`).join('');
+            
+            for (let i = 2; i < rows.length; i++) {
+                if (rows[i].length > 1) {
+                    let rowHTML = rows[i].map(cell => `<td>${cell}</td>`).join('');
+                    tableBody.innerHTML += `<tr>${rowHTML}</tr>`;
                 }
-
-                let B = A + 1524;
-                let C = Math.floor((B - 122.1) / 365.25);
-                let D = Math.floor(365.25 * C);
-                let E = Math.floor((B - D) / 30.6001);
-
-                let day = B - D - Math.floor(30.6001 * E) + F;
-                let month = (E < 14) ? E - 1 : E - 13;
-                let year = (month > 2) ? C - 4716 : C - 4715;
-
-                let hours = Math.floor((day - Math.floor(day)) * 24);
-                let minutes = Math.round(((day - Math.floor(day)) * 24 - hours) * 60);
-
-                let months = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"];
-
-                return {
-                    date: `${Math.floor(day)} ${months[month - 1]} ${year}`,
-                    time: `${hours}:${minutes.toString().padStart(2, '0')}`
-                };
-            }
-
-            // Funzione per calcolare le correzioni delle perturbazioni planetarie
-            function planetaryCorrections(Y) {
-                const terms = [
-                    [485, 324.96, 1934.136],
-                    [203, 337.23, 8129.091],
-                    [199, 342.08, 1324.785],
-                    [182, 270.43, 1600.371],
-                    [156, 311.71, 5416.755],
-                    [136, 316.56, 5431.084],
-                    [77, 297.17, 4871.288],
-                    [74, 73.62, 2509.244],
-                    [70, 23.27, 7771.377],
-                    [63, 88.57, 16172.135],
-                    [59, 142.60, 20323.877],
-                    [56, 41.83, 26.71],
-                    [50, 183.73, 11929.042],
-                    [45, 232.42, 1582.429],
-                    [44, 121.75, 6578.142],
-                    [29, 266.61, 3216.907],
-                    [21, 333.33, 11856.218],
-                    [17, 311.62, 879.165],
-                    [16, 10.32, 15936.142],
-                    [14, 63.10, 9147.993],
-                    [12, 124.58, 11856.218],
-                    [10, 132.12, 15936.142],
-                    [8, 192.43, 12792.663]
-                ];
-
-                let correction = 0;
-
-                for (let i = 0; i < terms.length; i++) {
-                    const [A, B, C] = terms[i];
-                    correction += A * Math.cos((B + C * Y) * Math.PI / 180);
-                }
-
-                return correction / 86400;  // Dividiamo per 86400 per ottenere il valore in giorni
-            }
-
-            // Funzione per applicare la correzione delle perturbazioni planetarie a JDE
-            function applyPlanetaryPerturbations(JDE, Y) {
-                return JDE + planetaryCorrections(Y);  // Aggiungiamo la correzione
-            }
-
-            // Funzione per applicare la precessione (approssimazione)
-            function applyPrecession(JDE) {
-                return JDE + 0.000015 * (JDE - 2451545);  // Correzione della precessione
-            }
-
-            let Y = (year - 2000) / 1000;  // Anno in secoli rispetto al 2000
-            let events = {
-                "🌸 Equinozio di Primavera": JDEtoDate(applyPrecession(applyPlanetaryPerturbations(getJDE(JDE0["March"], Y), Y))),
-                "☀️ Solstizio d'Estate": JDEtoDate(applyPrecession(applyPlanetaryPerturbations(getJDE(JDE0["June"], Y), Y))),
-                "🍂 Equinozio d'Autunno": JDEtoDate(applyPrecession(applyPlanetaryPerturbations(getJDE(JDE0["September"], Y), Y))),
-                "❄️ Solstizio d'Inverno": JDEtoDate(applyPrecession(applyPlanetaryPerturbations(getJDE(JDE0["December"], Y), Y)))
-            };
-
-            document.getElementById('result-title').innerText = `Equinozi e Solstizi per l'anno ${year}`;
-            const resultsBody = document.getElementById('resultsBody');
-            resultsBody.innerHTML = "";
-
-            for (let event in events) {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${event}</td>
-                    <td>${events[event].date}</td>
-                    <td>${events[event].time}</td>
-                `;
-                resultsBody.appendChild(row);
             }
         }
+        
+        loadCSV();
     </script>
 </body>
 </html>
