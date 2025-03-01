@@ -25,6 +25,7 @@
             margin-top: 20px;
             overflow: auto;
             max-height: 500px;
+            position: relative;
         }
         table.styled-table {
             width: 90%;
@@ -50,20 +51,15 @@
         tr:hover {
             background-color: #ddd;
         }
-        .sticky-header th {
+        thead th {
             position: sticky;
             top: 0;
             background-color: #007bff;
             z-index: 2;
         }
-        .sticky-header:nth-child(2) th {
+        thead tr:nth-child(2) th {
             background-color: #c8e6c9;
             color: black;
-        }
-        .footer {
-            margin-top: 20px;
-            font-size: 14px;
-            color: #555;
         }
     </style>
 </head>
@@ -73,7 +69,7 @@
     <div class="table-container">
         <table class="styled-table" id="data-table">
             <thead>
-                <tr class="sticky-header">
+                <tr>
                     <th>Anno</th>
                     <th colspan="3">Equinozio di Primavera</th>
                     <th colspan="3">Solstizio d'Estate</th>
@@ -82,7 +78,27 @@
                     <th colspan="3">Perielio</th>
                     <th colspan="3">Afelio</th>
                 </tr>
-                <tr class="sticky-header" id="table-subheader"></tr>
+                <tr>
+                    <th>Anno</th>
+                    <th>Mese</th>
+                    <th>Giorno</th>
+                    <th>Ora</th>
+                    <th>Mese</th>
+                    <th>Giorno</th>
+                    <th>Ora</th>
+                    <th>Mese</th>
+                    <th>Giorno</th>
+                    <th>Ora</th>
+                    <th>Mese</th>
+                    <th>Giorno</th>
+                    <th>Ora</th>
+                    <th>Mese</th>
+                    <th>Giorno</th>
+                    <th>Ora</th>
+                    <th>Mese</th>
+                    <th>Giorno</th>
+                    <th>Ora</th>
+                </tr>
             </thead>
             <tbody id="table-body"></tbody>
         </table>
@@ -95,10 +111,7 @@
             const data = await response.text();
             const rows = data.split('\n').map(row => row.split(';'));
             
-            const tableSubheader = document.getElementById('table-subheader');
             const tableBody = document.getElementById('table-body');
-            
-            tableSubheader.innerHTML = rows[1].map(header => `<th>${header}</th>`).join('');
             
             for (let i = 2; i < rows.length; i++) {
                 if (rows[i].length > 1) {
