@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calcolatore Astrologico</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .results {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e9f7ef;
+            border-radius: 4px;
+            display: none;
+        }
+        .horizontal-line {
+            border-top: 1px solid #ccc;
+            margin: 15px 0;
+        }
+        .error-message {
+            color: red;
+            margin-top: 5px;
+            display: none;
+        }
+        .csv-input {
+            margin-top: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            font-family: monospace;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Calcolatore Astrologico</h1>
+        
+        <div class="form-group">
+            <label for="nomeCognome">Nome e Cognome:</label>
+            <input type="text" id="nomeCognome" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="dataNascita">Data di Nascita (GG-MM-AAAA):</label>
+            <input type="text" id="dataNascita" placeholder="GG-MM-AAAA" required>
+            <div id="dataError" class="error-message">Inserisci una data valida nel formato GG-MM-AAAA</div>
+        </div>
+        
+        <div class="form-group">
+            <label for="anticipoRitardo">Anticipo parto (gg) o ritardo (-):</label>
+            <input type="number" id="anticipoRitardo" value="0">
+        </div>
+        
+        <!-- Aggiunti campi per inserire manualmente i dati CSV -->
+        <div class="csv-input">
+            <label for="csvNormale">Dati CSV per anno normale (inserisci qui i dati):</label>
+            <textarea id="csvNormale" placeholder="Inserisci qui i tuoi dati CSV per l'anno normale"></textarea>
+            
+            <label for="csvBisestile">Dati CSV per anno bisestile (inserisci qui i dati):</label>
+            <textarea id="csvBisestile" placeholder="Inserisci qui i tuoi dati CSV per l'anno bisestile"></textarea>
+            
+            <button onclick="caricaDatiDaInput()">Carica Dati CSV</button>
+        </div>
+        
+        <div class="form-group" style="margin-top: 20px;">
+            <button onclick="calcola()">Calcola</button>
+        </div>
+        
+        <div id="risultati" class="results">
+            <h2>Risultati per <span id="nomeOutput"></span></h2>
+            
+            <p><strong>Data di nascita:</strong> <span id="dataNascitaOutput"></span></p>
+            <p><strong>Data concepimento:</strong> <span id="dataConcepimentoOutput"></span></p>
+            <p><strong>Giorno dell'anno di nascita:</strong> <span id="giornoAnnoNascitaOutput"></span></p>
+            <p><strong>Giorno dell'anno del concepimento:</strong> <span id="giornoAnnoConcepimentoOutput"></span></p>
+            
+            <div class="horizontal-line"></div>
+            
+            <h3>Informazioni alla nascita:</h3>
+            <p><strong>Signore alla nascita:</strong> <span id="signoreNascitaOutput"></span></p>
+            <p><strong>Decano alla nascita:</strong> <span id="decanoNascitaOutput"></span></p>
+            
+            <div class="horizontal-line"></div>
+            
+            <h3>Informazioni al concepimento:</h3>
+            <p><strong>Signore al concepimento:</strong> <span id="signoreConcepimentoOutput"></span></p>
+            <p><strong>Decano al concepimento:</strong> <span id="decanoConcepimentoOutput"></span></p>
+        </div>
+    </div>
+
+    <script>
+        // Dati CSV per gli anni normali e bisestili
+        let datiAnnoNormale = [];
+        let datiAnnoBisestile = [];
+        let datiCaricati = false;
+
+        // Funzione per caricare i dati CSV da input
+        function caricaDatiDaInput() {
+            const csvNormale = document.getElementById('csvNormale').value;
+            const csvBisestile = document.getElementById('csvBisestile').value;
+            
+            if (csvNormale.trim() === '' || csvBisestile.trim() === '') {
+                alert('Inserisci entrambi i dati CSV prima di procedere.');
+                return;
+            }
+            
+            datiAnnoNormale = parseCSV(csvNormale);
+            datiAnnoBisestile = parseCSV(csvBisestile);
+            
+            datiCaricati = true;
+            alert('Dati CSV caricati con successo!');
+            
+            console.log("Dati anno normale:", datiAnnoNormale);
+            console.log("Dati anno bisestile:", datiAnnoBisestile);
+        }
+
+        // Funzione per parsificare i dati CSV
+        function parseCSV(testo) {
+            const righe = testo.split('\n');
+            const dati = [];
+            
+            // Elabora tutte le righe (ora consideriamo tutte le righe)
+            for (let i = 0; i < righe.length; i++) {
+                const valori = righe[i].split(';');
+                // Verifica che ci siano almeno 5 colonne
+                if (valori.length >= 5) {
+                    const giorno = parseInt(valori[0]);
+                    // Verifica che il giorno sia un numero valido
+                    if (!isNaN(giorno)) {
+                        dati.push({
+                            giorno: giorno,
+                            segnoZodiacale: valori[1] ? valori[1].trim() : "",
+                            pianetaDomicilio: valori[2] ? valori[2].trim() : "",
+                            gg: valori[3] ? parseInt(valori[3]) : 0,
+                            decano: valori[4] ? valori[4].trim() : ""
+                        });
+                    }
+                }
+            }
+            return dati;
+        }
+
+        // Funzione per verificare se un anno è bisestile
+        function isBisestile(anno) {
+            return (anno % 4 === 0 && anno % 100 !== 0) || (anno % 400 === 0);
+        }
+
+        // Funzione per calcolare il giorno dell'anno (1-366)
+        function calcolaGiornoAnno(data) {
+            const anno = data.getFullYear();
+            const giorniMese = isBisestile(anno) ? 
+                [0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31] : 
+                [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+            
+            const mese = data.getMonth() + 1; // getMonth() restituisce 0-11
+            const giorno = data.getDate();
+            
+            let giornoAnno = giorno;
+            for (let i = 1; i < mese; i++) {
+                giornoAnno += giorniMese[i];
+            }
+            
+            return giornoAnno;
+        }
+
+        // Funzione per formattare la data come GG-MM-AAAA
+        function formattaData(data) {
+            const giorno = String(data.getDate()).padStart(2, '0');
+            const mese = String(data.getMonth() + 1).padStart(2, '0');
+            const anno = data.getFullYear();
+            return `${giorno}-${mese}-${anno}`;
+        }
+
+        // Funzione per calcolare la data del concepimento
+        function calcolaDataConcepimento(dataNascita, anticipoRitardo) {
+            const data = new Date(dataNascita);
+            data.setDate(data.getDate() - 265 + anticipoRitardo);
+            return data;
+        }
+
+        // Funzione per trovare le informazioni astrologiche in base al giorno dell'anno
+        function trovaInfoAstrologiche(giornoAnno, isBisestileAnno) {
+            // Scegli il set di dati corretto in base all'anno
+            const dati = isBisestileAnno ? datiAnnoBisestile : datiAnnoNormale;
+            
+            // Cerca il giorno nell'array di dati
+            const trovato = dati.find(riga => riga.giorno === giornoAnno);
+            
+            if (trovato) {
+                return {
+                    signore: trovato.pianetaDomicilio,
+                    decano: trovato.decano
+                };
+            }
+            
+            console.log(`Non trovate informazioni per il giorno ${giornoAnno} in anno ${isBisestileAnno ? 'bisestile' : 'normale'}`);
+            console.log("Dati disponibili:", dati);
+            
+            return {
+                signore: "Non trovato",
+                decano: "Non trovato"
+            };
+        }
+
+        // Funzione principale per effettuare i calcoli
+        function calcola() {
+            if (!datiCaricati) {
+                alert('Devi prima caricare i dati CSV. Compila i campi dei dati CSV e clicca su "Carica Dati CSV".');
+                return;
+            }
+            
+            const nomeCognome = document.getElementById('nomeCognome').value.trim();
+            const dataNascitaStr = document.getElementById('dataNascita').value.trim();
+            const anticipoRitardo = parseInt(document.getElementById('anticipoRitardo').value) || 0;
+            
+            // Valida la data di nascita
+            const datePattern = /^(\d{2})-(\d{2})-(\d{4})$/;
+            const match = dataNascitaStr.match(datePattern);
+            
+            if (!match) {
+                document.getElementById('dataError').style.display = 'block';
+                return;
+            } else {
+                document.getElementById('dataError').style.display = 'none';
+            }
+            
+            const giorno = parseInt(match[1]);
+            const mese = parseInt(match[2]) - 1; // I mesi in JavaScript vanno da 0 a 11
+            const anno = parseInt(match[3]);
+            
+            const dataNascita = new Date(anno, mese, giorno);
+            
+            // Calcola la data del concepimento
+            const dataConcepimento = calcolaDataConcepimento(dataNascita, anticipoRitardo);
+            
+            // Calcola i giorni dell'anno
+            const giornoAnnoNascita = calcolaGiornoAnno(dataNascita);
+            const giornoAnnoConcepimento = calcolaGiornoAnno(dataConcepimento);
+            
+            // Determina se gli anni sono bisestili
+            const isBisestileNascita = isBisestile(dataNascita.getFullYear());
+            const isBisestileConcepimento = isBisestile(dataConcepimento.getFullYear());
+            
+            console.log(`Giorno nascita: ${giornoAnnoNascita}, bisestile: ${isBisestileNascita}`);
+            console.log(`Giorno concepimento: ${giornoAnnoConcepimento}, bisestile: ${isBisestileConcepimento}`);
+            
+            // Trova le informazioni astrologiche
+            const infoNascita = trovaInfoAstrologiche(giornoAnnoNascita, isBisestileNascita);
+            const infoConcepimento = trovaInfoAstrologiche(giornoAnnoConcepimento, isBisestileConcepimento);
+            
+            console.log("Info nascita:", infoNascita);
+            console.log("Info concepimento:", infoConcepimento);
+            
+            // Mostra i risultati
+            document.getElementById('nomeOutput').textContent = nomeCognome;
+            document.getElementById('dataNascitaOutput').textContent = formattaData(dataNascita);
+            document.getElementById('dataConcepimentoOutput').textContent = formattaData(dataConcepimento);
+            document.getElementById('giornoAnnoNascitaOutput').textContent = giornoAnnoNascita;
+            document.getElementById('giornoAnnoConcepimentoOutput').textContent = giornoAnnoConcepimento;
+            
+            document.getElementById('signoreNascitaOutput').textContent = infoNascita.signore;
+            document.getElementById('decanoNascitaOutput').textContent = infoNascita.decano;
+            document.getElementById('signoreConcepimentoOutput').textContent = infoConcepimento.signore;
+            document.getElementById('decanoConcepimentoOutput').textContent = infoConcepimento.decano;
+            
+            // Mostra i risultati
+            document.getElementById('risultati').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
