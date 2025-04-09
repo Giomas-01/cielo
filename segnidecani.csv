@@ -1,0 +1,366 @@
+data;giorno;segno;domicilio;elemento;Esaltazione;triste;caduta;nota;gg;decano
+01 gennaio;1;Capricorno;Saturno;Terra;Marte;Luna;Giove;-;2;Marte
+02 gennaio;2;Capricorno;Saturno;Terra;Marte;Luna;Giove;-;3;Marte
+03 gennaio;3;Capricorno;Saturno;Terra;Marte;Luna;Giove;-;4;Marte
+04 gennaio;4;Capricorno;Saturno;Terra;Marte;Luna;Giove;-;5;Marte
+05 gennaio;5;Capricorno;Saturno;Terra;Marte;Luna;Giove;-;6;Marte
+06 gennaio;6;Capricorno;Saturno;Terra;Marte;Luna;Giove;-;7;Marte
+07 gennaio;7;Capricorno;Saturno;Terra;Marte;Luna;Giove;-;8;Marte
+08 gennaio;8;Capricorno;Saturno;Terra;Marte;Luna;Giove;-;9;Marte
+09 gennaio;9;Capricorno;Saturno;Terra;Marte;Luna;Giove;-;10;Marte
+10 gennaio;10;Capricorno;Saturno;Terra;Marte;Luna;Giove;-;1;Sole
+11 gennaio;11;Capricorno;Saturno;Terra;Marte;Luna;Giove;-;2;Sole
+12 gennaio;12;Capricorno;Saturno;Terra;Marte;Luna;Giove;-;3;Sole
+13 gennaio;13;Capricorno;Saturno;Terra;Marte;Luna;Giove;-;4;Sole
+14 gennaio;14;Capricorno;Saturno;Terra;Marte;Luna;Giove;-;5;Sole
+15 gennaio;15;Capricorno;Saturno;Terra;Marte;Luna;Giove;-;6;Sole
+16 gennaio;16;Capricorno;Saturno;Terra;Marte;Luna;Giove;-;7;Sole
+17 gennaio;17;Capricorno;Saturno;Terra;Marte;Luna;Giove;-;8;Sole
+18 gennaio;18;Capricorno;Saturno;Terra;Marte;Luna;Giove;-;9;Sole
+19 gennaio;19;Capricorno;Saturno;Terra;Marte;Luna;Giove;-;10;Sole
+20 gennaio;20;Capricorno;Saturno;Terra;Marte;Luna;Giove;-;11;Sole
+21 gennaio;21;Acquario;Saturno;Aria;-;Sole;-;Giove divide il potere con Saturno;1;Venere
+22 gennaio;22;Acquario;Saturno;Aria;-;Sole;-;Giove divide il potere con Saturno;2;Venere
+23 gennaio;23;Acquario;Saturno;Aria;-;Sole;-;Giove divide il potere con Saturno;3;Venere
+24 gennaio;24;Acquario;Saturno;Aria;-;Sole;-;Giove divide il potere con Saturno;4;Venere
+25 gennaio;25;Acquario;Saturno;Aria;-;Sole;-;Giove divide il potere con Saturno;5;Venere
+26 gennaio;26;Acquario;Saturno;Aria;-;Sole;-;Giove divide il potere con Saturno;6;Venere
+27 gennaio;27;Acquario;Saturno;Aria;-;Sole;-;Giove divide il potere con Saturno;7;Venere
+28 gennaio;28;Acquario;Saturno;Aria;-;Sole;-;Giove divide il potere con Saturno;8;Venere
+29 gennaio;29;Acquario;Saturno;Aria;-;Sole;-;Giove divide il potere con Saturno;9;Venere
+30 gennaio;30;Acquario;Saturno;Aria;-;Sole;-;Giove divide il potere con Saturno;10;Venere
+31 gennaio;31;Acquario;Saturno;Aria;-;Sole;-;Giove divide il potere con Saturno;1;Mercurio
+01 febbraio;32;Acquario;Saturno;Aria;-;Sole;-;Giove divide il potere con Saturno;2;Mercurio
+02 febbraio;33;Acquario;Saturno;Aria;-;Sole;-;Giove divide il potere con Saturno;3;Mercurio
+03 febbraio;34;Acquario;Saturno;Aria;-;Sole;-;Giove divide il potere con Saturno;4;Mercurio
+04 febbraio;35;Acquario;Saturno;Aria;-;Sole;-;Giove divide il potere con Saturno;5;Mercurio
+05 febbraio;36;Acquario;Saturno;Aria;-;Sole;-;Giove divide il potere con Saturno;6;Mercurio
+06 febbraio;37;Acquario;Saturno;Aria;-;Sole;-;Giove divide il potere con Saturno;7;Mercurio
+07 febbraio;38;Acquario;Saturno;Aria;-;Sole;-;Giove divide il potere con Saturno;8;Mercurio
+08 febbraio;39;Acquario;Saturno;Aria;-;Sole;-;Giove divide il potere con Saturno;9;Mercurio
+09 febbraio;40;Acquario;Saturno;Aria;-;Sole;-;Giove divide il potere con Saturno;10;Mercurio
+10 febbraio;41;Acquario;Saturno;Aria;-;Sole;-;Giove divide il potere con Saturno;1;Luna
+11 febbraio;42;Acquario;Saturno;Aria;-;Sole;-;Giove divide il potere con Saturno;2;Luna
+12 febbraio;43;Acquario;Saturno;Aria;-;Sole;-;Giove divide il potere con Saturno;3;Luna
+13 febbraio;44;Acquario;Saturno;Aria;-;Sole;-;Giove divide il potere con Saturno;4;Luna
+14 febbraio;45;Acquario;Saturno;Aria;-;Sole;-;Giove divide il potere con Saturno;5;Luna
+15 febbraio;46;Acquario;Saturno;Aria;-;Sole;-;Giove divide il potere con Saturno;6;Luna
+16 febbraio;47;Acquario;Saturno;Aria;-;Sole;-;Giove divide il potere con Saturno;7;Luna
+17 febbraio;48;Acquario;Saturno;Aria;-;Sole;-;Giove divide il potere con Saturno;8;Luna
+18 febbraio;49;Acquario;Saturno;Aria;-;Sole;-;Giove divide il potere con Saturno;9;Luna
+19 febbraio;50;Acquario;Saturno;Aria;-;Sole;-;Giove divide il potere con Saturno;10;Luna
+20 febbraio;51;Pesci;Giove;Acqua;Venere;Mercurio;Mercurio;Saturno un po? triste, appena amico di Giove;1;Saturno
+21 febbraio;52;Pesci;Giove;Acqua;Venere;Mercurio;Mercurio;Saturno un po? triste, appena amico di Giove;2;Saturno
+22 febbraio;53;Pesci;Giove;Acqua;Venere;Mercurio;Mercurio;Saturno un po? triste, appena amico di Giove;3;Saturno
+23 febbraio;54;Pesci;Giove;Acqua;Venere;Mercurio;Mercurio;Saturno un po? triste, appena amico di Giove;4;Saturno
+24 febbraio;55;Pesci;Giove;Acqua;Venere;Mercurio;Mercurio;Saturno un po? triste, appena amico di Giove;5;Saturno
+25 febbraio;56;Pesci;Giove;Acqua;Venere;Mercurio;Mercurio;Saturno un po? triste, appena amico di Giove;6;Saturno
+26 febbraio;57;Pesci;Giove;Acqua;Venere;Mercurio;Mercurio;Saturno un po? triste, appena amico di Giove;7;Saturno
+27 febbraio;58;Pesci;Giove;Acqua;Venere;Mercurio;Mercurio;Saturno un po? triste, appena amico di Giove;8;Saturno
+28 febbraio;59;Pesci;Giove;Acqua;Venere;Mercurio;Mercurio;Saturno un po? triste, appena amico di Giove;9;Saturno
+01 marzo;60;Pesci;Giove;Acqua;Venere;Mercurio;Mercurio;Saturno un po? triste, appena amico di Giove;10;Saturno
+02 marzo;61;Pesci;Giove;Acqua;Venere;Mercurio;Mercurio;Saturno un po? triste, appena amico di Giove;1;Giove
+03 marzo;62;Pesci;Giove;Acqua;Venere;Mercurio;Mercurio;Saturno un po? triste, appena amico di Giove;2;Giove
+04 marzo;63;Pesci;Giove;Acqua;Venere;Mercurio;Mercurio;Saturno un po? triste, appena amico di Giove;3;Giove
+05 marzo;64;Pesci;Giove;Acqua;Venere;Mercurio;Mercurio;Saturno un po? triste, appena amico di Giove;4;Giove
+06 marzo;65;Pesci;Giove;Acqua;Venere;Mercurio;Mercurio;Saturno un po? triste, appena amico di Giove;5;Giove
+07 marzo;66;Pesci;Giove;Acqua;Venere;Mercurio;Mercurio;Saturno un po? triste, appena amico di Giove;6;Giove
+08 marzo;67;Pesci;Giove;Acqua;Venere;Mercurio;Mercurio;Saturno un po? triste, appena amico di Giove;7;Giove
+09 marzo;68;Pesci;Giove;Acqua;Venere;Mercurio;Mercurio;Saturno un po? triste, appena amico di Giove;8;Giove
+10 marzo;69;Pesci;Giove;Acqua;Venere;Mercurio;Mercurio;Saturno un po? triste, appena amico di Giove;9;Giove
+11 marzo;70;Pesci;Giove;Acqua;Venere;Mercurio;Mercurio;Saturno un po? triste, appena amico di Giove;10;Giove
+12 marzo;71;Pesci;Giove;Acqua;Venere;Mercurio;Mercurio;Saturno un po? triste, appena amico di Giove;1;Marte
+13 marzo;72;Pesci;Giove;Acqua;Venere;Mercurio;Mercurio;Saturno un po? triste, appena amico di Giove;2;Marte
+14 marzo;73;Pesci;Giove;Acqua;Venere;Mercurio;Mercurio;Saturno un po? triste, appena amico di Giove;3;Marte
+15 marzo;74;Pesci;Giove;Acqua;Venere;Mercurio;Mercurio;Saturno un po? triste, appena amico di Giove;4;Marte
+16 marzo;75;Pesci;Giove;Acqua;Venere;Mercurio;Mercurio;Saturno un po? triste, appena amico di Giove;5;Marte
+17 marzo;76;Pesci;Giove;Acqua;Venere;Mercurio;Mercurio;Saturno un po? triste, appena amico di Giove;6;Marte
+18 marzo;77;Pesci;Giove;Acqua;Venere;Mercurio;Mercurio;Saturno un po? triste, appena amico di Giove;7;Marte
+19 marzo;78;Pesci;Giove;Acqua;Venere;Mercurio;Mercurio;Saturno un po? triste, appena amico di Giove;8;Marte
+20 marzo;79;Pesci;Giove;Acqua;Venere;Mercurio;Mercurio;Saturno un po? triste, appena amico di Giove;9;Marte
+21 marzo;80;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;1;Marte
+22 marzo;81;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;2;Marte
+23 marzo;82;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;3;Marte
+24 marzo;83;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;4;Marte
+25 marzo;84;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;5;Marte
+26 marzo;85;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;6;Marte
+27 marzo;86;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;7;Marte
+28 marzo;87;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;8;Marte
+29 marzo;88;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;9;Marte
+30 marzo;89;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;10;Marte
+31 marzo;90;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;1;Sole
+01 aprile;91;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;2;Sole
+02 aprile;92;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;3;Sole
+03 aprile;93;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;4;Sole
+04 aprile;94;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;5;Sole
+05 aprile;95;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;6;Sole
+06 aprile;96;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;7;Sole
+07 aprile;97;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;8;Sole
+08 aprile;98;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;9;Sole
+09 aprile;99;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;10;Sole
+10 aprile;100;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;1;Venere
+11 aprile;101;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;2;Venere
+12 aprile;102;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;3;Venere
+13 aprile;103;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;4;Venere
+14 aprile;104;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;5;Venere
+15 aprile;105;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;6;Venere
+16 aprile;106;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;7;Venere
+17 aprile;107;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;8;Venere
+18 aprile;108;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;9;Venere
+19 aprile;109;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;10;Venere
+20 aprile;110;Toro;Venere;Terra;Luna;Marte;-;-;1;Mercurio
+21 aprile;111;Toro;Venere;Terra;Luna;Marte;-;-;2;Mercurio
+22 aprile;112;Toro;Venere;Terra;Luna;Marte;-;-;3;Mercurio
+23 aprile;113;Toro;Venere;Terra;Luna;Marte;-;-;4;Mercurio
+24 aprile;114;Toro;Venere;Terra;Luna;Marte;-;-;5;Mercurio
+25 aprile;115;Toro;Venere;Terra;Luna;Marte;-;-;6;Mercurio
+26 aprile;116;Toro;Venere;Terra;Luna;Marte;-;-;7;Mercurio
+27 aprile;117;Toro;Venere;Terra;Luna;Marte;-;-;8;Mercurio
+28 aprile;118;Toro;Venere;Terra;Luna;Marte;-;-;9;Mercurio
+29 aprile;119;Toro;Venere;Terra;Luna;Marte;-;-;10;Mercurio
+30 aprile;120;Toro;Venere;Terra;Luna;Marte;-;-;1;Luna
+01 maggio;121;Toro;Venere;Terra;Luna;Marte;-;-;2;Luna
+02 maggio;122;Toro;Venere;Terra;Luna;Marte;-;-;3;Luna
+03 maggio;123;Toro;Venere;Terra;Luna;Marte;-;-;4;Luna
+04 maggio;124;Toro;Venere;Terra;Luna;Marte;-;-;5;Luna
+05 maggio;125;Toro;Venere;Terra;Luna;Marte;-;-;6;Luna
+06 maggio;126;Toro;Venere;Terra;Luna;Marte;-;-;7;Luna
+07 maggio;127;Toro;Venere;Terra;Luna;Marte;-;-;8;Luna
+08 maggio;128;Toro;Venere;Terra;Luna;Marte;-;-;9;Luna
+09 maggio;129;Toro;Venere;Terra;Luna;Marte;-;-;10;Luna
+10 maggio;130;Toro;Venere;Terra;Luna;Marte;-;-;1;Saturno
+11 maggio;131;Toro;Venere;Terra;Luna;Marte;-;-;2;Saturno
+12 maggio;132;Toro;Venere;Terra;Luna;Marte;-;-;3;Saturno
+13 maggio;133;Toro;Venere;Terra;Luna;Marte;-;-;4;Saturno
+14 maggio;134;Toro;Venere;Terra;Luna;Marte;-;-;5;Saturno
+15 maggio;135;Toro;Venere;Terra;Luna;Marte;-;-;6;Saturno
+16 maggio;136;Toro;Venere;Terra;Luna;Marte;-;-;7;Saturno
+17 maggio;137;Toro;Venere;Terra;Luna;Marte;-;-;8;Saturno
+18 maggio;138;Toro;Venere;Terra;Luna;Marte;-;-;9;Saturno
+19 maggio;139;Toro;Venere;Terra;Luna;Marte;-;-;10;Saturno
+20 maggio;140;Toro;Venere;Terra;Luna;Marte;-;-;;Saturno
+21 maggio;141;Gemelli;Mercurio;Aria;-;Giove;-;Venere: forza e potenza;1;Giove
+22 maggio;142;Gemelli;Mercurio;Aria;-;Giove;-;Venere: forza e potenza;2;Giove
+23 maggio;143;Gemelli;Mercurio;Aria;-;Giove;-;Venere: forza e potenza;3;Giove
+24 maggio;144;Gemelli;Mercurio;Aria;-;Giove;-;Venere: forza e potenza;4;Giove
+25 maggio;145;Gemelli;Mercurio;Aria;-;Giove;-;Venere: forza e potenza;5;Giove
+26 maggio;146;Gemelli;Mercurio;Aria;-;Giove;-;Venere: forza e potenza;6;Giove
+27 maggio;147;Gemelli;Mercurio;Aria;-;Giove;-;Venere: forza e potenza;7;Giove
+28 maggio;148;Gemelli;Mercurio;Aria;-;Giove;-;Venere: forza e potenza;8;Giove
+29 maggio;149;Gemelli;Mercurio;Aria;-;Giove;-;Venere: forza e potenza;9;Giove
+30 maggio;150;Gemelli;Mercurio;Aria;-;Giove;-;Venere: forza e potenza;10;Giove
+31 maggio;151;Gemelli;Mercurio;Aria;-;Giove;-;Venere: forza e potenza;1;Marte
+01 giugno;152;Gemelli;Mercurio;Aria;-;Giove;-;Venere: forza e potenza;2;Marte
+02 giugno;153;Gemelli;Mercurio;Aria;-;Giove;-;Venere: forza e potenza;3;Marte
+03 giugno;154;Gemelli;Mercurio;Aria;-;Giove;-;Venere: forza e potenza;4;Marte
+04 giugno;155;Gemelli;Mercurio;Aria;-;Giove;-;Venere: forza e potenza;5;Marte
+05 giugno;156;Gemelli;Mercurio;Aria;-;Giove;-;Venere: forza e potenza;6;Marte
+06 giugno;157;Gemelli;Mercurio;Aria;-;Giove;-;Venere: forza e potenza;7;Marte
+07 giugno;158;Gemelli;Mercurio;Aria;-;Giove;-;Venere: forza e potenza;8;Marte
+08 giugno;159;Gemelli;Mercurio;Aria;-;Giove;-;Venere: forza e potenza;9;Marte
+09 giugno;160;Gemelli;Mercurio;Aria;-;Giove;-;Venere: forza e potenza;10;Marte
+10 giugno;161;Gemelli;Mercurio;Aria;-;Giove;-;Venere: forza e potenza;1;Sole
+11 giugno;162;Gemelli;Mercurio;Aria;-;Giove;-;Venere: forza e potenza;2;Sole
+12 giugno;163;Gemelli;Mercurio;Aria;-;Giove;-;Venere: forza e potenza;3;Sole
+13 giugno;164;Gemelli;Mercurio;Aria;-;Giove;-;Venere: forza e potenza;4;Sole
+14 giugno;165;Gemelli;Mercurio;Aria;-;Giove;-;Venere: forza e potenza;5;Sole
+15 giugno;166;Gemelli;Mercurio;Aria;-;Giove;-;Venere: forza e potenza;6;Sole
+16 giugno;167;Gemelli;Mercurio;Aria;-;Giove;-;Venere: forza e potenza;7;Sole
+17 giugno;168;Gemelli;Mercurio;Aria;-;Giove;-;Venere: forza e potenza;8;Sole
+18 giugno;169;Gemelli;Mercurio;Aria;-;Giove;-;Venere: forza e potenza;9;Sole
+19 giugno;170;Gemelli;Mercurio;Aria;-;Giove;-;Venere: forza e potenza;10;Sole
+20 giugno;171;Gemelli;Mercurio;Aria;-;Giove;-;Venere: forza e potenza;11;Sole
+21 giugno;172;Gemelli;Mercurio;Aria;-;Giove;-;Venere: forza e potenza;12;Sole
+22 giugno;173;Cancro;Luna;Acqua;Giove;Saturno;Marte;-;1;Venere
+23 giugno;174;Cancro;Luna;Acqua;Giove;Saturno;Marte;-;2;Venere
+24 giugno;175;Cancro;Luna;Acqua;Giove;Saturno;Marte;-;3;Venere
+25 giugno;176;Cancro;Luna;Acqua;Giove;Saturno;Marte;-;4;Venere
+26 giugno;177;Cancro;Luna;Acqua;Giove;Saturno;Marte;-;5;Venere
+27 giugno;178;Cancro;Luna;Acqua;Giove;Saturno;Marte;-;6;Venere
+28 giugno;179;Cancro;Luna;Acqua;Giove;Saturno;Marte;-;7;Venere
+29 giugno;180;Cancro;Luna;Acqua;Giove;Saturno;Marte;-;8;Venere
+30 giugno;181;Cancro;Luna;Acqua;Giove;Saturno;Marte;-;9;Venere
+01 luglio;182;Cancro;Luna;Acqua;Giove;Saturno;Marte;-;10;Venere
+02 luglio;183;Cancro;Luna;Acqua;Giove;Saturno;Marte;-;1;Mercurio
+03 luglio;184;Cancro;Luna;Acqua;Giove;Saturno;Marte;-;2;Mercurio
+04 luglio;185;Cancro;Luna;Acqua;Giove;Saturno;Marte;-;3;Mercurio
+05 luglio;186;Cancro;Luna;Acqua;Giove;Saturno;Marte;-;4;Mercurio
+06 luglio;187;Cancro;Luna;Acqua;Giove;Saturno;Marte;-;5;Mercurio
+07 luglio;188;Cancro;Luna;Acqua;Giove;Saturno;Marte;-;6;Mercurio
+08 luglio;189;Cancro;Luna;Acqua;Giove;Saturno;Marte;-;7;Mercurio
+09 luglio;190;Cancro;Luna;Acqua;Giove;Saturno;Marte;-;8;Mercurio
+10 luglio;191;Cancro;Luna;Acqua;Giove;Saturno;Marte;-;9;Mercurio
+11 luglio;192;Cancro;Luna;Acqua;Giove;Saturno;Marte;-;10;Mercurio
+12 luglio;193;Cancro;Luna;Acqua;Giove;Saturno;Marte;-;1;Luna
+13 luglio;194;Cancro;Luna;Acqua;Giove;Saturno;Marte;-;2;Luna
+14 luglio;195;Cancro;Luna;Acqua;Giove;Saturno;Marte;-;3;Luna
+15 luglio;196;Cancro;Luna;Acqua;Giove;Saturno;Marte;-;4;Luna
+16 luglio;197;Cancro;Luna;Acqua;Giove;Saturno;Marte;-;5;Luna
+17 luglio;198;Cancro;Luna;Acqua;Giove;Saturno;Marte;-;6;Luna
+18 luglio;199;Cancro;Luna;Acqua;Giove;Saturno;Marte;-;7;Luna
+19 luglio;200;Cancro;Luna;Acqua;Giove;Saturno;Marte;-;8;Luna
+20 luglio;201;Cancro;Luna;Acqua;Giove;Saturno;Marte;-;9;Luna
+21 luglio;202;Cancro;Luna;Acqua;Giove;Saturno;Marte;-;10;Luna
+22 luglio;203;Leone;Sole;Fuoco;-;Saturno;-;Venere divide il potere con Sole;1;Saturno
+23 luglio;204;Leone;Sole;Fuoco;-;Saturno;-;Venere divide il potere con Sole;2;Saturno
+24 luglio;205;Leone;Sole;Fuoco;-;Saturno;-;Venere divide il potere con Sole;3;Saturno
+25 luglio;206;Leone;Sole;Fuoco;-;Saturno;-;Venere divide il potere con Sole;4;Saturno
+26 luglio;207;Leone;Sole;Fuoco;-;Saturno;-;Venere divide il potere con Sole;5;Saturno
+27 luglio;208;Leone;Sole;Fuoco;-;Saturno;-;Venere divide il potere con Sole;6;Saturno
+28 luglio;209;Leone;Sole;Fuoco;-;Saturno;-;Venere divide il potere con Sole;7;Saturno
+29 luglio;210;Leone;Sole;Fuoco;-;Saturno;-;Venere divide il potere con Sole;8;Saturno
+30 luglio;211;Leone;Sole;Fuoco;-;Saturno;-;Venere divide il potere con Sole;9;Saturno
+31 luglio;212;Leone;Sole;Fuoco;-;Saturno;-;Venere divide il potere con Sole;10;Saturno
+01 agosto;213;Leone;Sole;Fuoco;-;Saturno;-;Venere divide il potere con Sole;11;Saturno
+02 agosto;214;Leone;Sole;Fuoco;-;Saturno;-;Venere divide il potere con Sole;1;Giove
+03 agosto;215;Leone;Sole;Fuoco;-;Saturno;-;Venere divide il potere con Sole;2;Giove
+04 agosto;216;Leone;Sole;Fuoco;-;Saturno;-;Venere divide il potere con Sole;3;Giove
+05 agosto;217;Leone;Sole;Fuoco;-;Saturno;-;Venere divide il potere con Sole;4;Giove
+06 agosto;218;Leone;Sole;Fuoco;-;Saturno;-;Venere divide il potere con Sole;5;Giove
+07 agosto;219;Leone;Sole;Fuoco;-;Saturno;-;Venere divide il potere con Sole;6;Giove
+08 agosto;220;Leone;Sole;Fuoco;-;Saturno;-;Venere divide il potere con Sole;7;Giove
+09 agosto;221;Leone;Sole;Fuoco;-;Saturno;-;Venere divide il potere con Sole;8;Giove
+10 agosto;222;Leone;Sole;Fuoco;-;Saturno;-;Venere divide il potere con Sole;9;Giove
+11 agosto;223;Leone;Sole;Fuoco;-;Saturno;-;Venere divide il potere con Sole;10;Giove
+12 agosto;224;Leone;Sole;Fuoco;-;Saturno;-;Venere divide il potere con Sole;11;Giove
+13 agosto;225;Leone;Sole;Fuoco;-;Saturno;-;Venere divide il potere con Sole;1;Marte
+14 agosto;226;Leone;Sole;Fuoco;-;Saturno;-;Venere divide il potere con Sole;2;Marte
+15 agosto;227;Leone;Sole;Fuoco;-;Saturno;-;Venere divide il potere con Sole;3;Marte
+16 agosto;228;Leone;Sole;Fuoco;-;Saturno;-;Venere divide il potere con Sole;4;Marte
+17 agosto;229;Leone;Sole;Fuoco;-;Saturno;-;Venere divide il potere con Sole;5;Marte
+18 agosto;230;Leone;Sole;Fuoco;-;Saturno;-;Venere divide il potere con Sole;6;Marte
+19 agosto;231;Leone;Sole;Fuoco;-;Saturno;-;Venere divide il potere con Sole;7;Marte
+20 agosto;232;Leone;Sole;Fuoco;-;Saturno;-;Venere divide il potere con Sole;8;Marte
+21 agosto;233;Leone;Sole;Fuoco;-;Saturno;-;Venere divide il potere con Sole;9;Marte
+22 agosto;234;Leone;Sole;Fuoco;-;Saturno;-;Venere divide il potere con Sole;10;Marte
+23 agosto;235;Leone;Sole;Fuoco;-;Saturno;-;Venere divide il potere con Sole;11;Marte
+24 agosto;236;Vergine;Mercurio;Terra;Mercurio;Giove;Venere;Marte divide il potere con Saturno;1;Sole
+25 agosto;237;Vergine;Mercurio;Terra;Mercurio;Giove;Venere;Marte divide il potere con Saturno;2;Sole
+26 agosto;238;Vergine;Mercurio;Terra;Mercurio;Giove;Venere;Marte divide il potere con Saturno;3;Sole
+27 agosto;239;Vergine;Mercurio;Terra;Mercurio;Giove;Venere;Marte divide il potere con Saturno;4;Sole
+28 agosto;240;Vergine;Mercurio;Terra;Mercurio;Giove;Venere;Marte divide il potere con Saturno;5;Sole
+29 agosto;241;Vergine;Mercurio;Terra;Mercurio;Giove;Venere;Marte divide il potere con Saturno;6;Sole
+30 agosto;242;Vergine;Mercurio;Terra;Mercurio;Giove;Venere;Marte divide il potere con Saturno;7;Sole
+31 agosto;243;Vergine;Mercurio;Terra;Mercurio;Giove;Venere;Marte divide il potere con Saturno;8;Sole
+01 settembre;244;Vergine;Mercurio;Terra;Mercurio;Giove;Venere;Marte divide il potere con Saturno;9;Sole
+02 settembre;245;Vergine;Mercurio;Terra;Mercurio;Giove;Venere;Marte divide il potere con Saturno;10;Sole
+03 settembre;246;Vergine;Mercurio;Terra;Mercurio;Giove;Venere;Marte divide il potere con Saturno;1;Venere
+04 settembre;247;Vergine;Mercurio;Terra;Mercurio;Giove;Venere;Marte divide il potere con Saturno;2;Venere
+05 settembre;248;Vergine;Mercurio;Terra;Mercurio;Giove;Venere;Marte divide il potere con Saturno;3;Venere
+06 settembre;249;Vergine;Mercurio;Terra;Mercurio;Giove;Venere;Marte divide il potere con Saturno;4;Venere
+07 settembre;250;Vergine;Mercurio;Terra;Mercurio;Giove;Venere;Marte divide il potere con Saturno;5;Venere
+08 settembre;251;Vergine;Mercurio;Terra;Mercurio;Giove;Venere;Marte divide il potere con Saturno;6;Venere
+09 settembre;252;Vergine;Mercurio;Terra;Mercurio;Giove;Venere;Marte divide il potere con Saturno;7;Venere
+10 settembre;253;Vergine;Mercurio;Terra;Mercurio;Giove;Venere;Marte divide il potere con Saturno;8;Venere
+11 settembre;254;Vergine;Mercurio;Terra;Mercurio;Giove;Venere;Marte divide il potere con Saturno;9;Venere
+12 settembre;255;Vergine;Mercurio;Terra;Mercurio;Giove;Venere;Marte divide il potere con Saturno;10;Venere
+13 settembre;256;Vergine;Mercurio;Terra;Mercurio;Giove;Venere;Marte divide il potere con Saturno;1;Mercurio
+14 settembre;257;Vergine;Mercurio;Terra;Mercurio;Giove;Venere;Marte divide il potere con Saturno;2;Mercurio
+15 settembre;258;Vergine;Mercurio;Terra;Mercurio;Giove;Venere;Marte divide il potere con Saturno;3;Mercurio
+16 settembre;259;Vergine;Mercurio;Terra;Mercurio;Giove;Venere;Marte divide il potere con Saturno;4;Mercurio
+17 settembre;260;Vergine;Mercurio;Terra;Mercurio;Giove;Venere;Marte divide il potere con Saturno;5;Mercurio
+18 settembre;261;Vergine;Mercurio;Terra;Mercurio;Giove;Venere;Marte divide il potere con Saturno;6;Mercurio
+19 settembre;262;Vergine;Mercurio;Terra;Mercurio;Giove;Venere;Marte divide il potere con Saturno;7;Mercurio
+20 settembre;263;Vergine;Mercurio;Terra;Mercurio;Giove;Venere;Marte divide il potere con Saturno;8;Mercurio
+21 settembre;264;Vergine;Mercurio;Terra;Mercurio;Giove;Venere;Marte divide il potere con Saturno;9;Mercurio
+22 settembre;265;Vergine;Mercurio;Terra;Mercurio;Giove;Venere;Marte divide il potere con Saturno;10;Mercurio
+23 settembre;266;Bilancia;Venere;Aria;Saturno;Marte;Sole;-;1;Luna
+24 settembre;267;Bilancia;Venere;Aria;Saturno;Marte;Sole;-;2;Luna
+25 settembre;268;Bilancia;Venere;Aria;Saturno;Marte;Sole;-;3;Luna
+26 settembre;269;Bilancia;Venere;Aria;Saturno;Marte;Sole;-;4;Luna
+27 settembre;270;Bilancia;Venere;Aria;Saturno;Marte;Sole;-;5;Luna
+28 settembre;271;Bilancia;Venere;Aria;Saturno;Marte;Sole;-;6;Luna
+29 settembre;272;Bilancia;Venere;Aria;Saturno;Marte;Sole;-;7;Luna
+30 settembre;273;Bilancia;Venere;Aria;Saturno;Marte;Sole;-;8;Luna
+01 ottobre;274;Bilancia;Venere;Aria;Saturno;Marte;Sole;-;9;Luna
+02 ottobre;275;Bilancia;Venere;Aria;Saturno;Marte;Sole;-;10;Luna
+03 ottobre;276;Bilancia;Venere;Aria;Saturno;Marte;Sole;-;1;Saturno
+04 ottobre;277;Bilancia;Venere;Aria;Saturno;Marte;Sole;-;2;Saturno
+05 ottobre;278;Bilancia;Venere;Aria;Saturno;Marte;Sole;-;3;Saturno
+06 ottobre;279;Bilancia;Venere;Aria;Saturno;Marte;Sole;-;4;Saturno
+07 ottobre;280;Bilancia;Venere;Aria;Saturno;Marte;Sole;-;5;Saturno
+08 ottobre;281;Bilancia;Venere;Aria;Saturno;Marte;Sole;-;6;Saturno
+09 ottobre;282;Bilancia;Venere;Aria;Saturno;Marte;Sole;-;7;Saturno
+10 ottobre;283;Bilancia;Venere;Aria;Saturno;Marte;Sole;-;8;Saturno
+11 ottobre;284;Bilancia;Venere;Aria;Saturno;Marte;Sole;-;9;Saturno
+12 ottobre;285;Bilancia;Venere;Aria;Saturno;Marte;Sole;-;10;Saturno
+13 ottobre;286;Bilancia;Venere;Aria;Saturno;Marte;Sole;-;1;Giove
+14 ottobre;287;Bilancia;Venere;Aria;Saturno;Marte;Sole;-;2;Giove
+15 ottobre;288;Bilancia;Venere;Aria;Saturno;Marte;Sole;-;3;Giove
+16 ottobre;289;Bilancia;Venere;Aria;Saturno;Marte;Sole;-;4;Giove
+17 ottobre;290;Bilancia;Venere;Aria;Saturno;Marte;Sole;-;5;Giove
+18 ottobre;291;Bilancia;Venere;Aria;Saturno;Marte;Sole;-;6;Giove
+19 ottobre;292;Bilancia;Venere;Aria;Saturno;Marte;Sole;-;7;Giove
+20 ottobre;293;Bilancia;Venere;Aria;Saturno;Marte;Sole;-;8;Giove
+21 ottobre;294;Bilancia;Venere;Aria;Saturno;Marte;Sole;-;9;Giove
+22 ottobre;295;Bilancia;Venere;Aria;Saturno;Marte;Sole;-;10;Giove
+23 ottobre;296;Scorpione;Marte;Acqua;-;Venere;Luna;-;1;Marte
+24 ottobre;297;Scorpione;Marte;Acqua;-;Venere;Luna;-;2;Marte
+25 ottobre;298;Scorpione;Marte;Acqua;-;Venere;Luna;-;3;Marte
+26 ottobre;299;Scorpione;Marte;Acqua;-;Venere;Luna;-;4;Marte
+27 ottobre;300;Scorpione;Marte;Acqua;-;Venere;Luna;-;5;Marte
+28 ottobre;301;Scorpione;Marte;Acqua;-;Venere;Luna;-;6;Marte
+29 ottobre;302;Scorpione;Marte;Acqua;-;Venere;Luna;-;7;Marte
+30 ottobre;303;Scorpione;Marte;Acqua;-;Venere;Luna;-;8;Marte
+31 ottobre;304;Scorpione;Marte;Acqua;-;Venere;Luna;-;9;Marte
+01 novembre;305;Scorpione;Marte;Acqua;-;Venere;Luna;-;10;Marte
+02 novembre;306;Scorpione;Marte;Acqua;-;Venere;Luna;-;1;Sole
+03 novembre;307;Scorpione;Marte;Acqua;-;Venere;Luna;-;2;Sole
+04 novembre;308;Scorpione;Marte;Acqua;-;Venere;Luna;-;3;Sole
+05 novembre;309;Scorpione;Marte;Acqua;-;Venere;Luna;-;4;Sole
+06 novembre;310;Scorpione;Marte;Acqua;-;Venere;Luna;-;5;Sole
+07 novembre;311;Scorpione;Marte;Acqua;-;Venere;Luna;-;6;Sole
+08 novembre;312;Scorpione;Marte;Acqua;-;Venere;Luna;-;7;Sole
+09 novembre;313;Scorpione;Marte;Acqua;-;Venere;Luna;-;8;Sole
+10 novembre;314;Scorpione;Marte;Acqua;-;Venere;Luna;-;9;Sole
+11 novembre;315;Scorpione;Marte;Acqua;-;Venere;Luna;-;10;Sole
+12 novembre;316;Scorpione;Marte;Acqua;-;Venere;Luna;-;1;Venere
+13 novembre;317;Scorpione;Marte;Acqua;-;Venere;Luna;-;2;Venere
+14 novembre;318;Scorpione;Marte;Acqua;-;Venere;Luna;-;3;Venere
+15 novembre;319;Scorpione;Marte;Acqua;-;Venere;Luna;-;4;Venere
+16 novembre;320;Scorpione;Marte;Acqua;-;Venere;Luna;-;5;Venere
+17 novembre;321;Scorpione;Marte;Acqua;-;Venere;Luna;-;6;Venere
+18 novembre;322;Scorpione;Marte;Acqua;-;Venere;Luna;-;7;Venere
+19 novembre;323;Scorpione;Marte;Acqua;-;Venere;Luna;-;8;Venere
+20 novembre;324;Scorpione;Marte;Acqua;-;Venere;Luna;-;9;Venere
+21 novembre;325;Scorpione;Marte;Acqua;-;Venere;Luna;-;10;Venere
+22 novembre;326;Scorpione;Marte;Acqua;-;Venere;Luna;-;11;Venere
+23 novembre;327;Sagittario;Giove;Fuoco;-;Mercurio;-;Sole divide il potere con Saturno;1;Mercurio
+24 novembre;328;Sagittario;Giove;Fuoco;-;Mercurio;-;Sole divide il potere con Saturno;2;Mercurio
+25 novembre;329;Sagittario;Giove;Fuoco;-;Mercurio;-;Sole divide il potere con Saturno;3;Mercurio
+26 novembre;330;Sagittario;Giove;Fuoco;-;Mercurio;-;Sole divide il potere con Saturno;4;Mercurio
+27 novembre;331;Sagittario;Giove;Fuoco;-;Mercurio;-;Sole divide il potere con Saturno;5;Mercurio
+28 novembre;332;Sagittario;Giove;Fuoco;-;Mercurio;-;Sole divide il potere con Saturno;6;Mercurio
+29 novembre;333;Sagittario;Giove;Fuoco;-;Mercurio;-;Sole divide il potere con Saturno;7;Mercurio
+30 novembre;334;Sagittario;Giove;Fuoco;-;Mercurio;-;Sole divide il potere con Saturno;8;Mercurio
+01 dicembre;335;Sagittario;Giove;Fuoco;-;Mercurio;-;Sole divide il potere con Saturno;9;Mercurio
+02 dicembre;336;Sagittario;Giove;Fuoco;-;Mercurio;-;Sole divide il potere con Saturno;10;Mercurio
+03 dicembre;337;Sagittario;Giove;Fuoco;-;Mercurio;-;Sole divide il potere con Saturno;1;Luna
+04 dicembre;338;Sagittario;Giove;Fuoco;-;Mercurio;-;Sole divide il potere con Saturno;2;Luna
+05 dicembre;339;Sagittario;Giove;Fuoco;-;Mercurio;-;Sole divide il potere con Saturno;3;Luna
+06 dicembre;340;Sagittario;Giove;Fuoco;-;Mercurio;-;Sole divide il potere con Saturno;4;Luna
+07 dicembre;341;Sagittario;Giove;Fuoco;-;Mercurio;-;Sole divide il potere con Saturno;5;Luna
+08 dicembre;342;Sagittario;Giove;Fuoco;-;Mercurio;-;Sole divide il potere con Saturno;6;Luna
+09 dicembre;343;Sagittario;Giove;Fuoco;-;Mercurio;-;Sole divide il potere con Saturno;7;Luna
+10 dicembre;344;Sagittario;Giove;Fuoco;-;Mercurio;-;Sole divide il potere con Saturno;8;Luna
+11 dicembre;345;Sagittario;Giove;Fuoco;-;Mercurio;-;Sole divide il potere con Saturno;9;Luna
+12 dicembre;346;Sagittario;Giove;Fuoco;-;Mercurio;-;Sole divide il potere con Saturno;10;Luna
+13 dicembre;347;Sagittario;Giove;Fuoco;-;Mercurio;-;Sole divide il potere con Saturno;1;Saturno
+14 dicembre;348;Sagittario;Giove;Fuoco;-;Mercurio;-;Sole divide il potere con Saturno;2;Saturno
+15 dicembre;349;Sagittario;Giove;Fuoco;-;Mercurio;-;Sole divide il potere con Saturno;3;Saturno
+16 dicembre;350;Sagittario;Giove;Fuoco;-;Mercurio;-;Sole divide il potere con Saturno;4;Saturno
+17 dicembre;351;Sagittario;Giove;Fuoco;-;Mercurio;-;Sole divide il potere con Saturno;5;Saturno
+18 dicembre;352;Sagittario;Giove;Fuoco;-;Mercurio;-;Sole divide il potere con Saturno;6;Saturno
+19 dicembre;353;Sagittario;Giove;Fuoco;-;Mercurio;-;Sole divide il potere con Saturno;7;Saturno
+20 dicembre;354;Sagittario;Giove;Fuoco;-;Mercurio;-;Sole divide il potere con Saturno;8;Saturno
+21 dicembre;355;Sagittario;Giove;Fuoco;-;Mercurio;-;Sole divide il potere con Saturno;9;Saturno
+22 dicembre;356;Capricorno;Saturno;Terra;Marte;Luna;Giove;-;1;Giove
+23 dicembre;357;Capricorno;Saturno;Terra;Marte;Luna;Giove;-;2;Giove
+24 dicembre;358;Capricorno;Saturno;Terra;Marte;Luna;Giove;-;3;Giove
+25 dicembre;359;Capricorno;Saturno;Terra;Marte;Luna;Giove;-;4;Giove
+26 dicembre;360;Capricorno;Saturno;Terra;Marte;Luna;Giove;-;5;Giove
+27 dicembre;361;Capricorno;Saturno;Terra;Marte;Luna;Giove;-;6;Giove
+28 dicembre;362;Capricorno;Saturno;Terra;Marte;Luna;Giove;-;7;Giove
+29 dicembre;363;Capricorno;Saturno;Terra;Marte;Luna;Giove;-;8;Giove
+30 dicembre;364;Capricorno;Saturno;Terra;Marte;Luna;Giove;-;9;Giove
+31 dicembre;365;Capricorno;Saturno;Terra;Marte;Luna;Giove;-;10;Giove
