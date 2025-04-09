@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dignità e disabilità dei pianeti</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        .input-section {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        label {
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        button {
+            margin-left: 10px;
+            padding: 8px 16px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            border-left: 4px solid #3498db;
+            white-space: pre-line;
+        }
+        .error {
+            color: #e74c3c;
+            text-align: center;
+            font-weight: bold;
+        }
+        .loading {
+            text-align: center;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Dignità e disabilità dei pianeti</h1>
+        
+        <div class="input-section">
+            <label for="date-input">Data (gg-mm):</label>
+            <input type="text" id="date-input" placeholder="es. 24-08" pattern="[0-9]{2}-[0-9]{2}" maxlength="5">
+            <button onclick="cercaData()">Cerca</button>
+        </div>
+        
+        <div id="loading" class="loading" style="display: none;">Caricamento dati...</div>
+        <div id="error" class="error" style="display: none;"></div>
+        <div id="result" class="result" style="display: none;"></div>
+    </div>
+
+    <script>
+        let datiPianeti = [];
+
+        // Carica il file CSV quando la pagina si carica
+        window.addEventListener('DOMContentLoaded', caricaCSV);
+
+        function caricaCSV() {
+            document.getElementById('loading').style.display = 'block';
+            
+            fetch('segnidecani.csv')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Errore di rete: ${response.status}`);
+                    }
+                    return response.text();
+                })
+                .then(csvText => {
+                    Papa.parse(csvText, {
+                        header: true,
+                        delimiter: ';',
+                        complete: function(results) {
+                            datiPianeti = results.data;
+                            document.getElementById('loading').style.display = 'none';
+                            console.log('Dati caricati:', datiPianeti.length, 'righe');
+                        },
+                        error: function(error) {
+                            mostraErrore('Errore nell\'analisi del CSV: ' + error);
+                        }
+                    });
+                })
+                .catch(error => {
+                    mostraErrore('Errore nel caricamento del file: ' + error.message);
+                });
+        }
+        
+        function mostraErrore(messaggio) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('error').textContent = messaggio;
+            console.error(messaggio);
+        }
+
+        function cercaData() {
+            const dataInput = document.getElementById('date-input').value;
+            const errorDiv = document.getElementById('error');
+            const resultDiv = document.getElementById('result');
+            
+            // Nascondi eventuali messaggi precedenti
+            errorDiv.style.display = 'none';
+            resultDiv.style.display = 'none';
+            
+            // Verifica il formato dell'input
+            if (!dataInput.match(/^\d{2}-\d{2}$/)) {
+                errorDiv.style.display = 'block';
+                errorDiv.textContent = 'Formato data non valido. Usa il formato gg-mm (es. 24-08)';
+                return;
+            }
+            
+            // Estrai giorno e mese
+            const [giorno, mese] = dataInput.split('-').map(num => parseInt(num, 10));
+            
+            // Verifica validità dei numeri
+            if (giorno < 1 || giorno > 31 || mese < 1 || mese > 12) {
+                errorDiv.style.display = 'block';
+                errorDiv.textContent = 'Data non valida. Giorno deve essere 1-31 e mese 1-12.';
+                return;
+            }
+            
+            // Converti mese numerico in nome del mese in italiano
+            const nomiMesi = [
+                'gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno', 
+                'luglio', 'agosto', 'settembre', 'ottobre', 'novembre', 'dicembre'
+            ];
+            
+            // Formato giorno con zero iniziale se necessario
+            const giornoFormattato = giorno < 10 ? `0${giorno}` : `${giorno}`;
+            const dataFormattata = `${giornoFormattato} ${nomiMesi[mese - 1]}`;
+            
+            // Cerca nei dati
+            const risultato = datiPianeti.find(riga => riga.data === dataFormattata);
+            
+            if (!risultato) {
+                errorDiv.style.display = 'block';
+                errorDiv.textContent = `Nessun dato trovato per la data ${dataFormattata}`;
+                return;
+            }
+            
+            // Componi il testo del risultato
+            let testoRisultato = `Data: ${dataFormattata}\n\n`;
+            testoRisultato += `Sole in ${risultato.segno}, domicilio di ${risultato.domicilio}, ${risultato.elemento},\n`;
+            
+            // Aggiungi condizionalmente i campi non vuoti
+            if (risultato.Esaltazione && risultato.Esaltazione !== '-') {
+                testoRisultato += `${risultato.Esaltazione} esaltato, `;
+            }
+            
+            if (risultato.triste && risultato.triste !== '-') {
+                testoRisultato += `${risultato.triste} triste, `;
+            }
+            
+            if (risultato.caduta && risultato.caduta !== '-') {
+                testoRisultato += `${risultato.caduta} in caduta, `;
+            }
+            
+            if (risultato.nota && risultato.nota !== '-') {
+                testoRisultato += `${risultato.nota}, `;
+            }
+            
+            // Rimuovi l'ultima virgola e spazio se presente
+            testoRisultato = testoRisultato.replace(/, $/, '');
+            
+            testoRisultato += `\ngiorno ${risultato.gg} del Decano di ${risultato.decano}.`;
+            
+            // Mostra il risultato
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = testoRisultato;
+        }
+    </script>
+</body>
+</html>
