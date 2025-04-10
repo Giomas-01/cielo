@@ -78,36 +78,36 @@ data;giorno;segno;domicilio;elemento;Esaltazione;triste;caduta;nota;gg;decano
 18 marzo;77;Pesci;Giove;Acqua;Venere;Mercurio;Mercurio;Saturno un po? triste, appena amico di Giove;7;Marte
 19 marzo;78;Pesci;Giove;Acqua;Venere;Mercurio;Mercurio;Saturno un po? triste, appena amico di Giove;8;Marte
 20 marzo;79;Pesci;Giove;Acqua;Venere;Mercurio;Mercurio;Saturno un po? triste, appena amico di Giove;9;Marte
-21 marzo;80;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;1;Marte
-22 marzo;81;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;2;Marte
-23 marzo;82;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;3;Marte
-24 marzo;83;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;4;Marte
-25 marzo;84;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;5;Marte
-26 marzo;85;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;6;Marte
-27 marzo;86;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;7;Marte
-28 marzo;87;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;8;Marte
-29 marzo;88;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;9;Marte
-30 marzo;89;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;10;Marte
-31 marzo;90;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;1;Sole
-01 aprile;91;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;2;Sole
-02 aprile;92;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;3;Sole
-03 aprile;93;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;4;Sole
-04 aprile;94;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;5;Sole
-05 aprile;95;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;6;Sole
-06 aprile;96;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;7;Sole
-07 aprile;97;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;8;Sole
-08 aprile;98;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;9;Sole
-09 aprile;99;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;10;Sole
-10 aprile;100;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;1;Venere
-11 aprile;101;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;2;Venere
-12 aprile;102;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;3;Venere
-13 aprile;103;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;4;Venere
-14 aprile;104;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;5;Venere
-15 aprile;105;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;6;Venere
-16 aprile;106;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;7;Venere
-17 aprile;107;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;8;Venere
-18 aprile;108;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;9;Venere
-19 aprile;109;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Saturno divide potere con Marte;10;Venere
+21 marzo;80;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Sole divide potere con Marte;1;Marte
+22 marzo;81;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Sole divide potere con Marte;2;Marte
+23 marzo;82;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Sole divide potere con Marte;3;Marte
+24 marzo;83;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Sole divide potere con Marte;4;Marte
+25 marzo;84;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Sole divide potere con Marte;5;Marte
+26 marzo;85;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Sole divide potere con Marte;6;Marte
+27 marzo;86;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Sole divide potere con Marte;7;Marte
+28 marzo;87;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Sole divide potere con Marte;8;Marte
+29 marzo;88;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Sole divide potere con Marte;9;Marte
+30 marzo;89;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Sole divide potere con Marte;10;Marte
+31 marzo;90;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Sole divide potere con Marte;1;Sole
+01 aprile;91;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Sole divide potere con Marte;2;Sole
+02 aprile;92;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Sole divide potere con Marte;3;Sole
+03 aprile;93;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Sole divide potere con Marte;4;Sole
+04 aprile;94;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Sole divide potere con Marte;5;Sole
+05 aprile;95;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Sole divide potere con Marte;6;Sole
+06 aprile;96;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Sole divide potere con Marte;7;Sole
+07 aprile;97;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Sole divide potere con Marte;8;Sole
+08 aprile;98;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Sole divide potere con Marte;9;Sole
+09 aprile;99;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Sole divide potere con Marte;10;Sole
+10 aprile;100;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Sole divide potere con Marte;1;Venere
+11 aprile;101;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Sole divide potere con Marte;2;Venere
+12 aprile;102;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Sole divide potere con Marte;3;Venere
+13 aprile;103;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Sole divide potere con Marte;4;Venere
+14 aprile;104;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Sole divide potere con Marte;5;Venere
+15 aprile;105;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Sole divide potere con Marte;6;Venere
+16 aprile;106;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Sole divide potere con Marte;7;Venere
+17 aprile;107;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Sole divide potere con Marte;8;Venere
+18 aprile;108;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Sole divide potere con Marte;9;Venere
+19 aprile;109;Ariete;Marte;Fuoco;Sole;Venere;Saturno;Sole divide potere con Marte;10;Venere
 20 aprile;110;Toro;Venere;Terra;Luna;Marte;-;-;1;Mercurio
 21 aprile;111;Toro;Venere;Terra;Luna;Marte;-;-;2;Mercurio
 22 aprile;112;Toro;Venere;Terra;Luna;Marte;-;-;3;Mercurio
