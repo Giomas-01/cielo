@@ -189,10 +189,8 @@
 
         // Funzione per trovare le informazioni astrologiche in base al giorno dell'anno
         function trovaInfoAstrologiche(giornoAnno, isBisestileAnno) {
-            // Aggiusta il giorno dell'anno per anni bisestili
-            if (isBisestileAnno && giornoAnno > 59) { // 59 è il giorno dell'anno per 28 febbraio in un anno bisestile
-                giornoAnno--; // Sottrai 1 per mappare al giorno dell'anno normale
-            }
+            // Usa direttamente il giorno dell'anno senza aggiustamenti
+            // Il giorno dell'anno è già corretto per anni bisestili dalla funzione calcolaGiornoAnno
             
             for (const riga of datiAnnoNormale) {
                 if (riga.giorno === giornoAnno) {
