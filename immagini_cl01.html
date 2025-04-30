@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generatore di Figure Geometriche</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .form-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            width: 100%;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .form-group label {
+            width: 100px;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        
+        select, button {
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-top: 10px;
+            transition: background-color 0.2s;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        .canvas-container {
+            width: 100%;
+            max-width: 600px;
+            height: 600px;
+            background-color: black;
+            margin-top: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Generatore di Figure Geometriche</h1>
+        
+        <div class="form-container">
+            <div class="form-group">
+                <label for="numLines">N. linee:</label>
+                <select id="numLines">
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="symmetric">Simmetrica:</label>
+                <select id="symmetric">
+                    <option value="yes">Sì</option>
+                    <option value="no">No</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="color">Colore:</label>
+                <select id="color">
+                    <option value="white">Bianco</option>
+                    <option value="yellow">Giallo</option>
+                    <option value="red">Rosso</option>
+                    <option value="green">Verde</option>
+                    <option value="blue">Blu</option>
+                    <option value="purple">Viola</option>
+                </select>
+            </div>
+            
+            <button id="generateBtn">Genera</button>
+        </div>
+        
+        <div class="canvas-container">
+            <canvas id="canvas" width="600" height="600"></canvas>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            const generateBtn = document.getElementById('generateBtn');
+            
+            // Mappa dei colori (valori RGB più chiari per risaltare su sfondo nero)
+            const colorMap = {
+                'white': '#FFFFFF',
+                'yellow': '#FFFF00',
+                'red': '#FF5555',
+                'green': '#55FF55',
+                'blue': '#5555FF',
+                'purple': '#FF55FF'
+            };
+            
+            // Inizializza il canvas
+            function initCanvas() {
+                ctx.fillStyle = 'black';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+            
+            // Genera un numero casuale tra min e max
+            function random(min, max) {
+                return Math.floor(Math.random() * (max - min + 1)) + min;
+            }
+            
+            // Calcola la distanza tra due punti
+            function distance(point1, point2) {
+                const dx = point2.x - point1.x;
+                const dy = point2.y - point1.y;
+                return Math.sqrt(dx * dx + dy * dy);
+            }
+            
+            // Genera una figura simmetrica con esattamente numLines segmenti
+            function generateSymmetricFigure(numLines, color) {
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 3;
+                
+                const centerX = canvas.width / 2;
+                const centerY = canvas.height / 2;
+                const width = canvas.width;
+                const height = canvas.height;
+                const padding = 50;
+                
+                // Scegli simmetria orizzontale o verticale
+                const isHorizontalSymmetry = Math.random() > 0.5;
+                
+                // Array per i punti
+                let points = [];
+                
+                // Genera punti per la forma simmetrica
+                if (isHorizontalSymmetry) {
+                    // Per la simmetria orizzontale, generiamo solo (numLines/2)+1 punti nella metà sinistra
+                    // in modo che dopo la simmetria avremo esattamente numLines segmenti
+                    const halfLines = Math.ceil(numLines / 2);
+                    const leftPoints = [];
+                    
+                    // Genera punti sul lato sinistro con distribuzione casuale ma ordinata verticalmente
+                    for (let i = 0; i <= halfLines; i++) {
+                        const y = padding + i * ((height - padding * 2) / halfLines);
+                        const x = random(padding, centerX - padding);
+                        leftPoints.push({x, y});
+                    }
+                    
+                    // Aggiungi i punti sinistri all'array dei punti
+                    points = [...leftPoints];
+                    
+                    // Genera e aggiungi punti simmetrici per il lato destro (in ordine inverso)
+                    // Se numLines è dispari, non duplicare il punto centrale
+                    const startIdx = numLines % 2 === 0 ? 0 : 1;
+                    for (let i = leftPoints.length - 1 - startIdx; i >= 0; i--) {
+                        const rightPoint = {
+                            x: width - leftPoints[i].x,
+                            y: leftPoints[i].y
+                        };
+                        points.push(rightPoint);
+                    }
+                } else {
+                    // Per la simmetria verticale, generiamo solo (numLines/2)+1 punti nella metà superiore
+                    const halfLines = Math.ceil(numLines / 2);
+                    const topPoints = [];
+                    
+                    // Genera punti sulla metà superiore con distribuzione casuale ma ordinata orizzontalmente
+                    for (let i = 0; i <= halfLines; i++) {
+                        const x = padding + i * ((width - padding * 2) / halfLines);
+                        const y = random(padding, centerY - padding);
+                        topPoints.push({x, y});
+                    }
+                    
+                    // Aggiungi i punti superiori all'array dei punti
+                    points = [...topPoints];
+                    
+                    // Genera e aggiungi punti simmetrici per la metà inferiore (in ordine inverso)
+                    // Se numLines è dispari, non duplicare il punto centrale
+                    const startIdx = numLines % 2 === 0 ? 0 : 1;
+                    for (let i = topPoints.length - 1 - startIdx; i >= 0; i--) {
+                        const bottomPoint = {
+                            x: topPoints[i].x,
+                            y: height - topPoints[i].y
+                        };
+                        points.push(bottomPoint);
+                    }
+                }
+                
+                // Assicuriamoci di avere esattamente numLines+1 punti (per numLines segmenti)
+                // Questo è un controllo di sicurezza
+                while (points.length > numLines + 1) {
+                    // Rimuovi un punto in mezzo
+                    const midIndex = Math.floor(points.length / 2);
+                    points.splice(midIndex, 1);
+                }
+                
+                // Disegna la linea spezzata continua
+                ctx.beginPath();
+                ctx.moveTo(points[0].x, points[0].y);
+                
+                for (let i = 1; i < points.length; i++) {
+                    ctx.lineTo(points[i].x, points[i].y);
+                }
+                
+                ctx.stroke();
+            }
+            
+            // Genera una figura asimmetrica con esattamente numLines segmenti
+            function generateAsymmetricFigure(numLines, color) {
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 3;
+                
+                const padding = 50;
+                const width = canvas.width;
+                const height = canvas.height;
+                
+                // Generiamo numLines+1 punti per creare numLines segmenti in una linea spezzata continua
+                const points = [];
+                
+                // Decidi se la figura sarà chiusa (30% di probabilità)
+                const closeFigure = Math.random() < 0.3;
+                
+                // Per figure con pochi segmenti, usiamo approcci specifici per una migliore estetica
+                if (numLines <= 3) {
+                    const patternType = random(0, 3);
+                    
+                    switch(patternType) {
+                        case 0: // Triangolo o forma a V
+                            points.push({x: random(padding, width/3), y: random(padding, height/3)});
+                            points.push({x: random(width/3, 2*width/3), y: random(2*height/3, height-padding)});
+                            points.push({x: random(2*width/3, width-padding), y: random(padding, height/3)});
+                            if (closeFigure || numLines === 3) {
+                                points.push({...points[0]});
+                            }
+                            break;
+                            
+                        case 1: // Linea a zigzag
+                            points.push({x: random(padding, width/4), y: random(height/3, 2*height/3)});
+                            points.push({x: random(width/4, width/2), y: random(padding, height/3)});
+                            points.push({x: random(width/2, 3*width/4), y: random(2*height/3, height-padding)});
+                            points.push({x: random(3*width/4, width-padding), y: random(height/3, 2*height/3)});
+                            break;
+                            
+                        case 2: // Forma a L o a J
+                            points.push({x: random(padding, width/3), y: random(padding, height/3)});
+                            points.push({x: random(padding, width/3), y: random(2*height/3, height-padding)});
+                            points.push({x: random(2*width/3, width-padding), y: random(2*height/3, height-padding)});
+                            break;
+                            
+                        case 3: // Forma a C o a U
+                            points.push({x: random(2*width/3, width-padding), y: random(padding, height/3)});
+                            points.push({x: random(padding, width/3), y: random(padding, height/3)});
+                            points.push({x: random(padding, width/3), y: random(2*height/3, height-padding)});
+                            points.push({x: random(2*width/3, width-padding), y: random(2*height/3, height-padding)});
+                            break;
+                    }
+                } else {
+                    // Per figure con più segmenti, creiamo una distribuzione più complessa
+                    
+                    // Scegliamo un pattern di generazione
+                    const patternType = random(0, 2);
+                    
+                    switch(patternType) {
+                        case 0: // Pattern circolare/ovale
+                            for (let i = 0; i <= numLines; i++) {
+                                const angle = (i / numLines) * Math.PI * 2;
+                                
+                                // Aggiungiamo variazioni casuali al raggio e al centro per rendere la forma più interessante
+                                const radius = random(100, Math.min(width, height) / 2 - padding);
+                                const centerX = width / 2 + random(-50, 50);
+                                const centerY = height / 2 + random(-50, 50);
+                                
+                                const x = centerX + radius * Math.cos(angle);
+                                const y = centerY + radius * Math.sin(angle);
+                                
+                                points.push({x, y});
+                            }
+                            
+                            // Se è una figura chiusa, non aggiungiamo l'ultimo punto
+                            if (!closeFigure) {
+                                points.pop();
+                            }
+                            break;
+                            
+                        case 1: // Pattern a stella/fiore
+                            for (let i = 0; i <= numLines; i++) {
+                                const angle = (i / numLines) * Math.PI * 2;
+                                const innerRadius = random(50, 100);
+                                const outerRadius = random(150, Math.min(width, height) / 2 - padding);
+                                
+                                // Alterna tra raggio interno ed esterno
+                                const radius = i % 2 === 0 ? outerRadius : innerRadius;
+                                
+                                const x = width / 2 + radius * Math.cos(angle);
+                                const y = height / 2 + radius * Math.sin(angle);
+                                
+                                points.push({x, y});
+                            }
+                            
+                            // Se è una figura chiusa, non aggiungiamo l'ultimo punto
+                            if (!closeFigure) {
+                                points.pop();
+                            }
+                            break;
+                            
+                        case 2: // Pattern perimetrale (segue i bordi del canvas)
+                            const numPerimeterPoints = numLines + 1;
+                            
+                            // Generiamo i punti lungo il perimetro in senso orario
+                            for (let i = 0; i < numPerimeterPoints; i++) {
+                                let x, y;
+                                const t = i / numPerimeterPoints;
+                                
+                                if (t < 0.25) { // Lato superiore
+                                    x = padding + (t * 4) * (width - 2 * padding);
+                                    y = padding;
+                                } else if (t < 0.5) { // Lato destro
+                                    x = width - padding;
+                                    y = padding + ((t - 0.25) * 4) * (height - 2 * padding);
+                                } else if (t < 0.75) { // Lato inferiore
+                                    x = width - padding - ((t - 0.5) * 4) * (width - 2 * padding);
+                                    y = height - padding;
+                                } else { // Lato sinistro
+                                    x = padding;
+                                    y = height - padding - ((t - 0.75) * 4) * (height - 2 * padding);
+                                }
+                                
+                                // Aggiungiamo variazioni casuali per rendere la forma più interessante
+                                x += random(-20, 20);
+                                y += random(-20, 20);
+                                
+                                // Assicuriamoci che i punti siano all'interno del canvas
+                                x = Math.max(padding, Math.min(width - padding, x));
+                                y = Math.max(padding, Math.min(height - padding, y));
+                                
+                                points.push({x, y});
+                            }
+                            
+                            // Se è una figura chiusa, non aggiungiamo l'ultimo punto
+                            if (!closeFigure) {
+                                points.pop();
+                            }
+                            break;
+                    }
+                }
+                
+                // Se non abbiamo abbastanza punti per creare numLines segmenti, aggiungiamo punti aggiuntivi
+                while (points.length < numLines + 1) {
+                    const x = random(padding, width - padding);
+                    const y = random(padding, height - padding);
+                    points.push({x, y});
+                }
+                
+                // Assicuriamoci di avere esattamente numLines segmenti
+                while (points.length > numLines + 1) {
+                    // Rimuovi un punto casuale (ma non il primo o l'ultimo se la figura è chiusa)
+                    const startIdx = closeFigure ? 1 : 0;
+                    const endIdx = closeFigure ? points.length - 2 : points.length - 1;
+                    const idxToRemove = random(startIdx, endIdx);
+                    points.splice(idxToRemove, 1);
+                }
+                
+                // Disegna la linea spezzata continua
+                ctx.beginPath();
+                ctx.moveTo(points[0].x, points[0].y);
+                
+                for (let i = 1; i < points.length; i++) {
+                    ctx.lineTo(points[i].x, points[i].y);
+                }
+                
+                ctx.stroke();
+            }
+            
+            // Gestore dell'evento click per il pulsante Genera
+            generateBtn.addEventListener('click', function() {
+                const numLines = parseInt(document.getElementById('numLines').value);
+                const symmetric = document.getElementById('symmetric').value === 'yes';
+                const colorValue = document.getElementById('color').value;
+                const color = colorMap[colorValue];
+                
+                // Inizializza il canvas
+                initCanvas();
+                
+                // Genera la figura in base alle impostazioni
+                if (symmetric) {
+                    generateSymmetricFigure(numLines, color);
+                } else {
+                    generateAsymmetricFigure(numLines, color);
+                }
+            });
+            
+            // Inizializza il canvas al caricamento
+            initCanvas();
+        });
+    </script>
+</body>
+</html>
