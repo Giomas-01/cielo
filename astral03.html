@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calcolatore Date & Dignità Planetarie</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            color: #e8e8e8; min-height: 100vh; padding: 20px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 40px; }
+        .header h1 {
+            font-size: 2.5rem; color: #ffd700; margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        .header p { font-size: 1.2rem; color: #c0c0c0; font-style: italic; }
+
+        .controls {
+            background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 30px; margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.2);
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;
+        }
+        .input-group { display: flex; flex-direction: column; }
+        .input-group label {
+            font-weight: bold; margin-bottom: 8px; color: #ffd700; font-size: 1.1rem;
+        }
+        .input-group input {
+            padding: 12px 15px; border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.2); color: white; font-size: 16px;
+        }
+        .input-group input:focus {
+            outline: none; border-color: #ffd700;
+            box-shadow: 0 0 10px rgba(255,215,0,0.3);
+        }
+
+        .results { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 30px; }
+        .card { border-radius: 20px; padding: 30px; border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(10px); }
+        .card-concezione { background: linear-gradient(135deg, rgba(59,130,246,0.3), rgba(139,92,246,0.3)); }
+        .card-nascita { background: linear-gradient(135deg, rgba(249,115,22,0.3), rgba(239,68,68,0.3)); }
+        .card h2 { font-size: 1.8rem; margin-bottom: 20px; color: #ffd700; }
+
+        .info-box { background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; margin-bottom: 15px; }
+        .info-box strong { color: #ffd700; display: block; margin-bottom: 5px; }
+        .segno { font-size: 1.3rem; font-weight: bold; color: #87ceeb; }
+
+        .dignita-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .dignita-item { padding: 12px; border-radius: 8px; text-align: center; }
+        .dignita-dominio { background: rgba(34,197,94,0.3); color: #22c55e; }
+        .dignita-detrimento { background: rgba(239,68,68,0.3); color: #ef4444; }
+        .dignita-esaltazione { background: rgba(251,191,36,0.3); color: #fbbf24; }
+        .dignita-caduta { background: rgba(107,114,128,0.3); color: #6b7280; }
+        .dignita-item strong { font-size: 0.9rem; display: block; margin-bottom: 5px; }
+
+        .info-calcolo { background: rgba(255,255,255,0.1); border-radius: 20px; padding: 20px; margin-top: 30px; border: 1px solid rgba(255,255,255,0.2); }
+        .info-calcolo h3 { color: #ffd700; margin-bottom: 15px; }
+        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .info-item { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; }
+
+        @media (max-width: 768px) {
+            .controls { grid-template-columns: 1fr; }
+            .results { grid-template-columns: 1fr; }
+            .header h1 { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⭐ Calcolatore Date & Dignità Planetarie ⭐</h1>
+            <p>Astrologia Classica - Sistema Tradizionale</p>
+        </div>
+
+        <div class="controls">
+            <div class="input-group">
+                <label for="dataNascita">Data di Nascita</label>
+                <input type="date" id="dataNascita" onchange="calcolaConcezione()">
+            </div>
+            
+            <div class="input-group">
+                <label for="dataConcezione">Data di Concepimento</label>
+                <input type="date" id="dataConcezione" onchange="calcolaNascita()">
+            </div>
+            
+            <div class="input-group">
+                <label for="durata">Durata Gravidanza (giorni)</label>
+                <input type="number" id="durata" value="265" min="200" max="320" onchange="ricalcola()">
+            </div>
+        </div>
+
+        <div class="results">
+            <div class="card card-concezione">
+                <h2>Concepimento</h2>
+                
+                <div class="info-box">
+                    <strong>Data:</strong>
+                    <span id="dataConcezioneDisplay">-</span>
+                </div>
+                
+                <div class="info-box">
+                    <strong>Segno Zodiacale:</strong>
+                    <div class="segno" id="segnoConcezione">-</div>
+                </div>
+
+                <div class="info-box">
+                    <strong>Decano:</strong>
+                    <div id="decanoConcezione">-</div>
+                </div>
+
+                <div class="info-box">
+                    <strong>Decano:</strong>
+                    <div id="pianetaDecanoConcezione">-</div>
+                </div>
+
+                <div class="info-box" id="dignitaConcezione" style="display: none;">
+                    <strong>Dignità Planetarie:</strong>
+                    <div class="dignita-grid">
+                        <div class="dignita-item dignita-dominio">
+                            <strong>Dominio</strong>
+                            <span id="dominioConcezione">-</span>
+                        </div>
+                        <div class="dignita-item dignita-detrimento">
+                            <strong>Detrimento</strong>
+                            <span id="detrimentoConcezione">-</span>
+                        </div>
+                        <div class="dignita-item dignita-esaltazione">
+                            <strong>Esaltazione</strong>
+                            <span id="esaltazioneConcezione">-</span>
+                        </div>
+                        <div class="dignita-item dignita-caduta">
+                            <strong>Caduta</strong>
+                            <span id="cadutaConcezione">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card card-nascita">
+                <h2>Nascita</h2>
+                
+                <div class="info-box">
+                    <strong>Data:</strong>
+                    <span id="dataNascitaDisplay">-</span>
+                </div>
+                
+                <div class="info-box">
+                    <strong>Segno Zodiacale:</strong>
+                    <div class="segno" id="segnoNascita">-</div>
+                </div>
+
+                <div class="info-box">
+                    <strong>Decano:</strong>
+                    <div id="decanoNascita">-</div>
+                </div>
+
+                <div class="info-box">
+                    <strong>Decano:</strong>
+                    <div id="pianetaDecanoNascita">-</div>
+                </div>
+
+                <div class="info-box" id="dignitaNascita" style="display: none;">
+                    <strong>Dignità Planetarie:</strong>
+                    <div class="dignita-grid">
+                        <div class="dignita-item dignita-dominio">
+                            <strong>Dominio</strong>
+                            <span id="dominioNascita">-</span>
+                        </div>
+                        <div class="dignita-item dignita-detrimento">
+                            <strong>Detrimento</strong>
+                            <span id="detrimentoNascita">-</span>
+                        </div>
+                        <div class="dignita-item dignita-esaltazione">
+                            <strong>Esaltazione</strong>
+                            <span id="esaltazioneNascita">-</span>
+                        </div>
+                        <div class="dignita-item dignita-caduta">
+                            <strong>Caduta</strong>
+                            <span id="cadutaNascita">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dignità planetarie
+        const dignita = {
+            'Ariete': { dominio: 'Marte', detrimento: 'Venere', esaltazione: 'Sole', caduta: 'Saturno' },
+            'Toro': { dominio: 'Venere', detrimento: 'Marte', esaltazione: 'Luna', caduta: 'Nessuno' },
+            'Gemelli': { dominio: 'Mercurio', detrimento: 'Giove', esaltazione: 'Nessuno', caduta: 'Nessuno' },
+            'Cancro': { dominio: 'Luna', detrimento: 'Saturno', esaltazione: 'Giove', caduta: 'Marte' },
+            'Leone': { dominio: 'Sole', detrimento: 'Saturno', esaltazione: 'Nessuno', caduta: 'Nessuno' },
+            'Vergine': { dominio: 'Mercurio', detrimento: 'Giove', esaltazione: 'Mercurio', caduta: 'Venere' },
+            'Bilancia': { dominio: 'Venere', detrimento: 'Marte', esaltazione: 'Saturno', caduta: 'Sole' },
+            'Scorpione': { dominio: 'Marte', detrimento: 'Venere', esaltazione: 'Nessuno', caduta: 'Luna' },
+            'Sagittario': { dominio: 'Giove', detrimento: 'Mercurio', esaltazione: 'Nessuno', caduta: 'Nessuno' },
+            'Capricorno': { dominio: 'Saturno', detrimento: 'Luna', esaltazione: 'Marte', caduta: 'Giove' },
+            'Acquario': { dominio: 'Saturno', detrimento: 'Sole', esaltazione: 'Nessuno', caduta: 'Nessuno' },
+            'Pesci': { dominio: 'Giove', detrimento: 'Mercurio', esaltazione: 'Venere', caduta: 'Mercurio' }
+        };
+
+        // Pianeti governatori dei segni
+        const governatori = {
+            'Ariete': 'Marte',
+            'Toro': 'Venere', 
+            'Gemelli': 'Mercurio',
+            'Cancro': 'Luna',
+            'Leone': 'Sole',
+            'Vergine': 'Mercurio',
+            'Bilancia': 'Venere',
+            'Scorpione': 'Marte',
+            'Sagittario': 'Giove',
+            'Capricorno': 'Saturno',
+            'Acquario': 'Saturno',
+            'Pesci': 'Giove'
+        };
+
+        // Decani e loro pianeti reggenti
+        const decani = {
+            'Ariete': {
+                1: { nome: '1° Decano Ariete (21-30 Mar)', pianeta: 'Marte' },
+                2: { nome: '2° Decano Ariete (31 Mar-9 Apr)', pianeta: 'Sole' },
+                3: { nome: '3° Decano Ariete (10-19 Apr)', pianeta: 'Venere' }
+            },
+            'Toro': {
+                1: { nome: '1° Decano Toro (20-29 Apr)', pianeta: 'Mercurio' },
+                2: { nome: '2° Decano Toro (30 Apr-9 Mag)', pianeta: 'Luna' },
+                3: { nome: '3° Decano Toro (10-20 Mag)', pianeta: 'Saturno' }
+            },
+            'Gemelli': {
+                1: { nome: '1° Decano Gemelli (21-31 Mag)', pianeta: 'Giove' },
+                2: { nome: '2° Decano Gemelli (1-10 Giu)', pianeta: 'Marte' },
+                3: { nome: '3° Decano Gemelli (11-20 Giu)', pianeta: 'Sole' }
+            },
+            'Cancro': {
+                1: { nome: '1° Decano Cancro (21-30 Giu)', pianeta: 'Venere' },
+                2: { nome: '2° Decano Cancro (1-11 Lug)', pianeta: 'Mercurio' },
+                3: { nome: '3° Decano Cancro (12-22 Lug)', pianeta: 'Luna' }
+            },
+            'Leone': {
+                1: { nome: '1° Decano Leone (23 Lug-1 Ago)', pianeta: 'Saturno' },
+                2: { nome: '2° Decano Leone (2-12 Ago)', pianeta: 'Giove' },
+                3: { nome: '3° Decano Leone (13-22 Ago)', pianeta: 'Marte' }
+            },
+            'Vergine': {
+                1: { nome: '1° Decano Vergine (23 Ago-1 Set)', pianeta: 'Sole' },
+                2: { nome: '2° Decano Vergine (2-11 Set)', pianeta: 'Venere' },
+                3: { nome: '3° Decano Vergine (12-22 Set)', pianeta: 'Mercurio' }
+            },
+            'Bilancia': {
+                1: { nome: '1° Decano Bilancia (23 Set-2 Ott)', pianeta: 'Luna' },
+                2: { nome: '2° Decano Bilancia (3-13 Ott)', pianeta: 'Saturno' },
+                3: { nome: '3° Decano Bilancia (14-22 Ott)', pianeta: 'Giove' }
+            },
+            'Scorpione': {
+                1: { nome: '1° Decano Scorpione (23 Ott-1 Nov)', pianeta: 'Marte' },
+                2: { nome: '2° Decano Scorpione (2-12 Nov)', pianeta: 'Sole' },
+                3: { nome: '3° Decano Scorpione (13-21 Nov)', pianeta: 'Venere' }
+            },
+            'Sagittario': {
+                1: { nome: '1° Decano Sagittario (22 Nov-1 Dic)', pianeta: 'Mercurio' },
+                2: { nome: '2° Decano Sagittario (2-11 Dic)', pianeta: 'Luna' },
+                3: { nome: '3° Decano Sagittario (12-21 Dic)', pianeta: 'Saturno' }
+            },
+            'Capricorno': {
+                1: { nome: '1° Decano Capricorno (22-31 Dic)', pianeta: 'Giove' },
+                2: { nome: '2° Decano Capricorno (1-10 Gen)', pianeta: 'Marte' },
+                3: { nome: '3° Decano Capricorno (11-19 Gen)', pianeta: 'Sole' }
+            },
+            'Acquario': {
+                1: { nome: '1° Decano Acquario (20-29 Gen)', pianeta: 'Venere' },
+                2: { nome: '2° Decano Acquario (30 Gen-8 Feb)', pianeta: 'Mercurio' },
+                3: { nome: '3° Decano Acquario (9-18 Feb)', pianeta: 'Luna' }
+            },
+            'Pesci': {
+                1: { nome: '1° Decano Pesci (19-29 Feb)', pianeta: 'Saturno' },
+                2: { nome: '2° Decano Pesci (1-10 Mar)', pianeta: 'Giove' },
+                3: { nome: '3° Decano Pesci (11-20 Mar)', pianeta: 'Marte' }
+            }
+        };
+
+        // Calcola segno zodiacale e decano
+        function getSegnoEDecano(data) {
+            if (!data) return { segno: '', decano: null, pianetaDecano: '' };
+            const date = new Date(data);
+            const giorno = date.getDate();
+            const mese = date.getMonth() + 1;
+            let segno = '';
+            let numeroDecano = 1;
+
+            if ((mese === 3 && giorno >= 21) || (mese === 4 && giorno <= 19)) {
+                segno = 'Ariete';
+                if (mese === 3 && giorno >= 21) numeroDecano = 1;
+                else if (mese === 3 && giorno >= 31) numeroDecano = 2;
+                else if (mese === 4 && giorno >= 10) numeroDecano = 3;
+                else if (mese === 4 && giorno >= 1) numeroDecano = 2;
+                else numeroDecano = 3;
+            }
+            else if ((mese === 4 && giorno >= 20) || (mese === 5 && giorno <= 20)) {
+                segno = 'Toro';
+                if (giorno <= 29 && mese === 4) numeroDecano = 1;
+                else if ((mese === 4 && giorno >= 30) || (mese === 5 && giorno <= 9)) numeroDecano = 2;
+                else numeroDecano = 3;
+            }
+            else if ((mese === 5 && giorno >= 21) || (mese === 6 && giorno <= 20)) {
+                segno = 'Gemelli';
+                if (mese === 5) numeroDecano = 1;
+                else if (giorno <= 10) numeroDecano = 2;
+                else numeroDecano = 3;
+            }
+            else if ((mese === 6 && giorno >= 21) || (mese === 7 && giorno <= 22)) {
+                segno = 'Cancro';
+                if (mese === 6) numeroDecano = 1;
+                else if (giorno <= 11) numeroDecano = 2;
+                else numeroDecano = 3;
+            }
+            else if ((mese === 7 && giorno >= 23) || (mese === 8 && giorno <= 22)) {
+                segno = 'Leone';
+                if (mese === 7 || giorno <= 1) numeroDecano = 1;
+                else if (giorno <= 12) numeroDecano = 2;
+                else numeroDecano = 3;
+            }
+            else if ((mese === 8 && giorno >= 23) || (mese === 9 && giorno <= 22)) {
+                segno = 'Vergine';
+                if (mese === 8 || giorno <= 1) numeroDecano = 1;
+                else if (giorno <= 11) numeroDecano = 2;
+                else numeroDecano = 3;
+            }
+            else if ((mese === 9 && giorno >= 23) || (mese === 10 && giorno <= 22)) {
+                segno = 'Bilancia';
+                if (mese === 9 || giorno <= 2) numeroDecano = 1;
+                else if (giorno <= 13) numeroDecano = 2;
+                else numeroDecano = 3;
+            }
+            else if ((mese === 10 && giorno >= 23) || (mese === 11 && giorno <= 21)) {
+                segno = 'Scorpione';
+                if (mese === 10 || giorno <= 1) numeroDecano = 1;
+                else if (giorno <= 12) numeroDecano = 2;
+                else numeroDecano = 3;
+            }
+            else if ((mese === 11 && giorno >= 22) || (mese === 12 && giorno <= 21)) {
+                segno = 'Sagittario';
+                if (mese === 11 || giorno <= 1) numeroDecano = 1;
+                else if (giorno <= 11) numeroDecano = 2;
+                else numeroDecano = 3;
+            }
+            else if ((mese === 12 && giorno >= 22) || (mese === 1 && giorno <= 19)) {
+                segno = 'Capricorno';
+                if (mese === 12) numeroDecano = 1;
+                else if (giorno <= 10) numeroDecano = 2;
+                else numeroDecano = 3;
+            }
+            else if ((mese === 1 && giorno >= 20) || (mese === 2 && giorno <= 18)) {
+                segno = 'Acquario';
+                if (mese === 1) numeroDecano = 1;
+                else if (giorno <= 8) numeroDecano = 2;
+                else numeroDecano = 3;
+            }
+            else if ((mese === 2 && giorno >= 19) || (mese === 3 && giorno <= 20)) {
+                segno = 'Pesci';
+                if (mese === 2) numeroDecano = 1;
+                else if (giorno <= 10) numeroDecano = 2;
+                else numeroDecano = 3;
+            }
+            
+            const decanoInfo = decani[segno] ? decani[segno][numeroDecano] : null;
+            return { segno, decano: decanoInfo, pianetaDecano: decanoInfo ? decanoInfo.pianeta : '' };
+        }
+
+        function getSegno(data) { return getSegnoEDecano(data).segno; }
+
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('it-IT', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        }
+
+        function aggiornaDignita(segno, prefisso) {
+            const container = document.getElementById(`dignita${prefisso}`);
+            if (segno && dignita[segno]) {
+                container.style.display = 'block';
+                document.getElementById(`dominio${prefisso}`).textContent = dignita[segno].dominio;
+                document.getElementById(`detrimento${prefisso}`).textContent = dignita[segno].detrimento;
+                document.getElementById(`esaltazione${prefisso}`).textContent = dignita[segno].esaltazione;
+                document.getElementById(`caduta${prefisso}`).textContent = dignita[segno].caduta;
+            } else {
+                container.style.display = 'none';
+            }
+        }
+
+        // Calcola concezione da nascita
+        function calcolaConcezione() {
+            const dataNascita = document.getElementById('dataNascita').value;
+            const durata = parseInt(document.getElementById('durata').value) || 265;
+            if (dataNascita) {
+                const nascita = new Date(dataNascita);
+                const concezione = new Date(nascita.getTime() - (durata * 24 * 60 * 60 * 1000));
+                document.getElementById('dataConcezione').value = concezione.toISOString().split('T')[0];
+                aggiornaDisplay();
+            }
+        }
+
+        // Calcola nascita da concezione
+        function calcolaNascita() {
+            const dataConcezione = document.getElementById('dataConcezione').value;
+            const durata = parseInt(document.getElementById('durata').value) || 265;
+            if (dataConcezione) {
+                const concezione = new Date(dataConcezione);
+                const nascita = new Date(concezione.getTime() + (durata * 24 * 60 * 60 * 1000));
+                document.getElementById('dataNascita').value = nascita.toISOString().split('T')[0];
+                aggiornaDisplay();
+            }
+        }
+
+        function ricalcola() {
+            const dataNascita = document.getElementById('dataNascita').value;
+            if (dataNascita) {
+                calcolaConcezione();
+            } else {
+                const dataConcezione = document.getElementById('dataConcezione').value;
+                if (dataConcezione) calcolaNascita();
+            }
+        }
+
+        function aggiornaDisplay() {
+            const dataNascita = document.getElementById('dataNascita').value;
+            const dataConcezione = document.getElementById('dataConcezione').value;
+            document.getElementById('dataNascitaDisplay').textContent = formatDate(dataNascita);
+            document.getElementById('dataConcezioneDisplay').textContent = formatDate(dataConcezione);
+
+            const infoNascita = getSegnoEDecano(dataNascita);
+            const infoConcezione = getSegnoEDecano(dataConcezione);
+
+            // sostituito "gov." con "Dominus"
+            const segnoConPianetaNascita = infoNascita.segno ? 
+                `${infoNascita.segno} (Dominus-${governatori[infoNascita.segno]})` : '-';
+            const segnoConPianetaConcezione = infoConcezione.segno ? 
+                `${infoConcezione.segno} (Dominus-${governatori[infoConcezione.segno]})` : '-';
+
+            document.getElementById('segnoNascita').textContent = segnoConPianetaNascita;
+            document.getElementById('segnoConcezione').textContent = segnoConPianetaConcezione;
+
+            document.getElementById('decanoNascita').textContent = infoNascita.decano ? infoNascita.decano.nome : '-';
+            document.getElementById('decanoConcezione').textContent = infoConcezione.decano ? infoConcezione.decano.nome : '-';
+
+            document.getElementById('pianetaDecanoNascita').textContent = infoNascita.pianetaDecano || '-';
+            document.getElementById('pianetaDecanoConcezione').textContent = infoConcezione.pianetaDecano || '-';
+
+            aggiornaDignita(infoNascita.segno, 'Nascita');
+            aggiornaDignita(infoConcezione.segno, 'Concezione');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() { aggiornaDisplay(); });
+    </script>
+</body>
+</html>
