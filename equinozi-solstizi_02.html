@@ -1,124 +1,280 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <title>Equinozi e Solstizi</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      background-color: #f4f4f4;
-      text-align: center;
-    }
-    h1 {
-      color: #333;
-      margin: 0;
-    }
-    .subtitle {
-      font-size: 14px;
-      color: #555;
-      margin: 0 0 10px 0;
-    }
-    /* Intestazione fissa */
-    .header-fixed {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      background: #f4f4f4;
-      padding: 10px 0;
-      z-index: 1000;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    }
-    .table-container {
-      display: flex;
-      justify-content: center;
-      margin-top: 220px; /* spazio per intestazione */
-      padding: 20px;
-    }
-    table.styled-table {
-      width: 90%;
-      border-collapse: collapse;
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-      overflow: hidden;
-    }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 10px;
-      text-align: center;
-    }
-    tr:nth-child(even) {
-      background-color: #f2f2f2;
-    }
-    tr:hover {
-      background-color: #ddd;
-    }
-    /* Colori intestazioni */
-    .header-blue th {
-      background-color: #007bff;
-      color: white;
-    }
-    .header-green th {
-      background-color: #c8e6c9;
-      color: black;
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Equinozi e Solstizi</title>
+    <style>
+        /* Stili generali */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #f4f4f4;
+            text-align: center;
+            color: #333;
+        }
+        h1 {
+            color: #333;
+            margin: 0;
+            font-size: 1.6rem;
+        }
+        .subtitle {
+            font-size: 14px;
+            color: #555;
+            margin: 6px 0 0 0;
+        }
+
+        /* Header fisso contenente titolo e sottotitolo */
+        .header-fixed {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: #f4f4f4;
+            padding: 12px 10px;
+            z-index: 1200;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+            text-align: center;
+        }
+
+        /* Contenitore tabella: lasciamo overflow come prima per limitare l'altezza della tabella,
+           ma spostiamo il contenuto verso il basso con margin-top calcolato dinamicamente */
+        .table-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 220px; /* valorizzazione iniziale, verrà aggiustata in JS */
+            padding: 20px;
+            /* Manteniamo la stessa limitazione di altezza se desideri: */
+            max-height: none; /* puoi impostare 500px se preferisci scorrere solo la tabella */
+            overflow: visible;
+        }
+
+        /* Tabella */
+        table.styled-table {
+            width: 95%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px 8px;
+            text-align: center; /* centratura richiesta */
+            vertical-align: middle;
+            font-size: 14px;
+        }
+
+        /* colori originali intestazioni (la struttura del thead è lasciata uguale al tuo file originale) */
+        thead tr:first-child th {
+            background-color: #007bff;
+            color: #fff;
+        }
+        thead tr:nth-child(2) th {
+            background-color: #c8e6c9;
+            color: #000;
+        }
+
+        /* Riduciamo bordi del corpo */
+        tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tbody tr:hover {
+            background-color: #eee;
+        }
+
+        /* Assicuriamo che i th sticky siano visibili sopra le celle */
+        thead th {
+            /* position: sticky verrà applicato dinamicamente via JS con top calcolato */
+            text-align: center;
+        }
+
+        /* Footer / fonte */
+        .footer {
+            margin: 20px 0 40px 0;
+            color: #666;
+            font-size: 13px;
+        }
+
+        /* Responsive: riduci padding sui piccoli schermi */
+        @media (max-width: 600px) {
+            .header-fixed { padding: 8px 6px; }
+            .subtitle { font-size: 12px; }
+            th, td { padding: 8px 6px; font-size: 13px; }
+            .table-container { padding: 10px; margin-top: 160px; }
+        }
+    </style>
 </head>
 <body>
-  <!-- INTESTAZIONE FISSA -->
-  <div class="header-fixed">
-    <h1>Equinozi e Solstizi</h1>
-    <p class="subtitle">
-      Orari UTC - per l'Italia aggiungere +1 ora per l'ora solare e +2 ore durante l'ora legale
-    </p>
-    <!-- Cloniamo il thead -->
-    <table class="styled-table">
-      <thead>
-        <tr class="header-blue">
-          <th colspan="5">Equinozi e Solstizi</th>
-        </tr>
-        <tr class="header-green">
-          <th>Anno</th>
-          <th>Equinozio Primavera</th>
-          <th>Solstizio Estate</th>
-          <th>Equinozio Autunno</th>
-          <th>Solstizio Inverno</th>
-        </tr>
-      </thead>
-    </table>
-  </div>
 
-  <!-- TABELLA CON I DATI -->
-  <div class="table-container">
-    <table class="styled-table">
-      <thead style="display:none;"></thead> <!-- nascondiamo thead per evitare duplicazione -->
-      <tbody>
-        <tr>
-          <td>2025</td>
-          <td>20 mar 02:07</td>
-          <td>21 giu 08:42</td>
-          <td>22 set 12:20</td>
-          <td>21 dic 03:03</td>
-        </tr>
-        <tr>
-          <td>2026</td>
-          <td>20 mar 08:45</td>
-          <td>21 giu 14:25</td>
-          <td>23 set 18:05</td>
-          <td>21 dic 09:50</td>
-        </tr>
-        <tr>
-          <td>2027</td>
-          <td>20 mar 14:23</td>
-          <td>21 giu 20:11</td>
-          <td>23 set 23:44</td>
-          <td>21 dic 15:42</td>
-        </tr>
-        <!-- Aggiungi altre righe qui -->
-      </tbody>
-    </table>
-  </div>
+    <!-- Header fisso: titolo + sottotitolo (restano invariati) -->
+    <div class="header-fixed" id="page-header">
+        <h1>Equinozi e Solstizi</h1>
+        <p class="subtitle">Orari UTC - per l'Italia aggiungere +1 ora per l'ora solare e +2 ore durante l'ora legale</p>
+    </div>
+
+    <!-- Contenitore tabella: thead esattamente come nel file originale -->
+    <div class="table-container">
+        <table class="styled-table" id="data-table">
+            <thead>
+                <tr>
+                    <th>Anno</th>
+                    <th colspan="3">Equinozio di Primavera</th>
+                    <th colspan="3">Solstizio d'Estate</th>
+                    <th colspan="3">Equinozio d'Autunno</th>
+                    <th colspan="3">Solstizio d'Inverno</th>
+                    <th colspan="3">Perielio</th>
+                    <th colspan="3">Afelio</th>
+                </tr>
+                <tr>
+                    <th>Anno</th>
+                    <th>Mese</th>
+                    <th>Giorno</th>
+                    <th>Ora</th>
+                    <th>Mese</th>
+                    <th>Giorno</th>
+                    <th>Ora</th>
+                    <th>Mese</th>
+                    <th>Giorno</th>
+                    <th>Ora</th>
+                    <th>Mese</th>
+                    <th>Giorno</th>
+                    <th>Ora</th>
+                    <th>Mese</th>
+                    <th>Giorno</th>
+                    <th>Ora</th>
+                    <th>Mese</th>
+                    <th>Giorno</th>
+                    <th>Ora</th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
+                <!-- I dati saranno inseriti dinamicamente dallo script JS (carica equi-sol_02.csv) -->
+            </tbody>
+        </table>
+    </div>
+
+    <p class="footer">Fonte: <a href="https://data.giss.nasa.gov/modelE/ar5plots/srvernal.html" target="_blank" rel="noopener">NASA GISS</a></p>
+
+    <script>
+    // Funzione per caricare CSV (semicolons) e popolare tbody
+    async function loadCSVandPopulate() {
+        try {
+            const response = await fetch('equi-sol_02.csv');
+            if (!response.ok) {
+                console.warn("CSV non trovato o errore HTTP:", response.status);
+                return;
+            }
+            const text = await response.text();
+            // Split robusto sia per \r\n che \n
+            const rawRows = text.split(/\r?\n/);
+            const rows = rawRows.map(r => r.split(';').map(c => c.trim()));
+
+            const tableBody = document.getElementById('table-body');
+            tableBody.innerHTML = '';
+
+            // Scorri ogni riga: salta righe vuote e righe che sembrano header
+            const headerKeywords = ['anno','mese','giorno','ora'];
+            for (let i = 0; i < rows.length; i++) {
+                const row = rows[i];
+                // riga vuota?
+                if (!row || row.length === 0) continue;
+                if (row.every(cell => cell === '')) continue;
+                // riga header? se contiene parole come "Anno" ecc. salta
+                const isHeaderLike = row.some(cell => {
+                    if (!cell) return false;
+                    const lower = cell.toLowerCase();
+                    return headerKeywords.some(k => lower.includes(k));
+                });
+                if (isHeaderLike) continue;
+
+                // se la riga ha meno colonne rispetto alle intestazioni, riempi con celle vuote
+                // la nostra tabella visualizza 19 colonne (1 + 3*6)
+                const expectedCols = 19;
+                const cells = row.slice(0, expectedCols);
+                while (cells.length < expectedCols) cells.push('');
+
+                // Costruisci la riga HTML
+                const rowHTML = cells.map(cell => `<td>${escapeHtml(cell)}</td>`).join('');
+                const tr = document.createElement('tr');
+                tr.innerHTML = rowHTML;
+                tableBody.appendChild(tr);
+            }
+        } catch (err) {
+            console.error("Errore durante il caricamento CSV:", err);
+        }
+    }
+
+    // Piccola funzione per evitare injection (stampa testo puro dentro <td>)
+    function escapeHtml(unsafe) {
+        if (unsafe === null || unsafe === undefined) return '';
+        return String(unsafe)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    // Funzione per rendere sticky le due righe di thead correttamente sotto l'header fisso
+    function adjustStickyHeaders() {
+        const header = document.getElementById('page-header');
+        const table = document.getElementById('data-table');
+        const tableContainer = document.querySelector('.table-container');
+        if (!header || !table) return;
+
+        // Altezza dell'header fisso
+        const headerRect = header.getBoundingClientRect();
+        const headerHeight = Math.ceil(headerRect.height);
+
+        // Ottieni righe del THEAD (preserviamo la struttura esatta)
+        const thead = table.querySelector('thead');
+        const theadRows = Array.from(thead.querySelectorAll('tr'));
+
+        // Calcola altezza di ogni riga (usiamo getBoundingClientRect)
+        let totalTheadHeight = 0;
+        const rowHeights = theadRows.map(tr => {
+            const h = Math.ceil(tr.getBoundingClientRect().height) || 0;
+            totalTheadHeight += h;
+            return h;
+        });
+
+        // Applichiamo position: sticky e top calcolato per ogni TH della riga corrispondente
+        let cumulativeTop = headerHeight;
+        theadRows.forEach((tr, idx) => {
+            const ths = Array.from(tr.querySelectorAll('th'));
+            ths.forEach(th => {
+                th.style.position = 'sticky';
+                th.style.top = cumulativeTop + 'px';
+                // z-index per ordine: la prima riga superiore alla seconda
+                th.style.zIndex = 1100 - idx;
+            });
+            // somma l'altezza di questa riga
+            cumulativeTop += rowHeights[idx] || 0;
+        });
+
+        // Spazio di distanziamento tra header fisso+thead e la tabella dati:
+        // imposta margin-top del container in modo che i dati non rimangano coperti
+        const margin = headerHeight + totalTheadHeight + 12; // 12px padding aggiuntivo
+        tableContainer.style.marginTop = margin + 'px';
+    }
+
+    // On load: carica CSV e aggiusta sticky headers
+    document.addEventListener('DOMContentLoaded', () => {
+        loadCSVandPopulate().then(() => {
+            // dopo che il tbody è popolato (o anche se non lo è), aggiustiamo le posizioni
+            // timeout breve per permettere il rendering del THEAD
+            setTimeout(adjustStickyHeaders, 80);
+        });
+    });
+
+    // Ricalcola al resize della finestra
+    window.addEventListener('resize', () => {
+        // piccolo debounce
+        clearTimeout(window._rsTimer);
+        window._rsTimer = setTimeout(adjustStickyHeaders, 120);
+    });
+    </script>
 </body>
 </html>
